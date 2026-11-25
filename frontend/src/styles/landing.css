@@ -223,21 +223,6 @@
   color: #c8d1e6;
 }
 
-.tok-tag {
-  color: #9fe8bd;
-}
-.tok-attr {
-  color: #f0c05a;
-}
-.tok-str {
-  color: #ffa78c;
-}
-.tok-punc {
-  color: #929bb8;
-}
-.tok-num {
-  color: #f0c05a;
-}
 .tok-indent {
   display: inline-block;
   width: 14px;

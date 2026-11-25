@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Drill } from '../../../lib/types';
 import { matchesAnswer, shuffleWithSeed } from '../../../lib/validate';
+import { CodeTokens } from '../../ui/CodeTokens';
 import { Icon } from '../../ui/Icon';
 import { Inline } from '../Inline';
 
 interface DrillStepProps {
   drill: Drill;
+  language: string;
   solved: boolean;
   onSolved: () => void;
 }
@@ -19,7 +21,7 @@ const label: Record<Drill['kind'], string> = {
   short: 'Short answer',
 };
 
-export function DrillStep({ drill, solved, onSolved }: DrillStepProps) {
+export function DrillStep({ drill, language, solved, onSolved }: DrillStepProps) {
   const [wrong, setWrong] = useState(0);
   const [showHint, setShowHint] = useState(0);
   const hints = drill.hints ?? [];
@@ -38,11 +40,17 @@ export function DrillStep({ drill, solved, onSolved }: DrillStepProps) {
       </h2>
 
       {drill.kind === 'choice' && <ChoiceDrill drill={drill} solved={solved} onSolved={onSolved} onWrong={markWrong} />}
-      {drill.kind === 'fill' && <FillDrill drill={drill} solved={solved} onSolved={onSolved} onWrong={markWrong} />}
-      {drill.kind === 'order' && <OrderDrill drill={drill} solved={solved} onSolved={onSolved} onWrong={markWrong} />}
-      {drill.kind === 'find' && <FindDrill drill={drill} solved={solved} onSolved={onSolved} onWrong={markWrong} />}
+      {drill.kind === 'fill' && (
+        <FillDrill drill={drill} language={language} solved={solved} onSolved={onSolved} onWrong={markWrong} />
+      )}
+      {drill.kind === 'order' && (
+        <OrderDrill drill={drill} language={language} solved={solved} onSolved={onSolved} onWrong={markWrong} />
+      )}
+      {drill.kind === 'find' && (
+        <FindDrill drill={drill} language={language} solved={solved} onSolved={onSolved} onWrong={markWrong} />
+      )}
       {(drill.kind === 'predict' || drill.kind === 'short') && (
-        <TextDrill drill={drill} solved={solved} onSolved={onSolved} onWrong={markWrong} />
+        <TextDrill drill={drill} language={language} solved={solved} onSolved={onSolved} onWrong={markWrong} />
       )}
 
       {wrong > 0 && !solved && showHint < hints.length && (
@@ -126,11 +134,13 @@ function ChoiceDrill({
 
 function FillDrill({
   drill,
+  language,
   solved,
   onSolved,
   onWrong,
 }: {
   drill: Extract<Drill, { kind: 'fill' }>;
+  language: string;
   solved: boolean;
   onSolved: () => void;
   onWrong: () => void;
@@ -158,7 +168,12 @@ function FillDrill({
         <code>
           {segments.map((segment, index) => {
             const match = segment.match(/^\{\{(\d+)\}\}$/);
-            if (!match) return <span key={index}>{segment}</span>;
+            if (!match)
+              return (
+                <span key={index}>
+                  <CodeTokens code={segment} language={language} />
+                </span>
+              );
             const blank = Number(match[1]);
             const state = checked ? (checked[blank] ? 'is-ok' : 'is-bad') : '';
             return (
@@ -202,11 +217,13 @@ function FillDrill({
 
 function OrderDrill({
   drill,
+  language,
   solved,
   onSolved,
   onWrong,
 }: {
   drill: Extract<Drill, { kind: 'order' }>;
+  language: string;
   solved: boolean;
   onSolved: () => void;
   onWrong: () => void;
@@ -242,7 +259,9 @@ function OrderDrill({
             className={`drill-order-row${checked ? (entry.index === position ? ' is-ok' : ' is-bad') : ''}`}
           >
             <span className="drill-order-num mono">{position + 1}</span>
-            <code>{entry.line}</code>
+            <code>
+              <CodeTokens code={entry.line} language={language} />
+            </code>
             <span className="drill-order-moves">
               <button type="button" onClick={() => move(position, -1)} aria-label="Move line up" disabled={solved || position === 0}>
                 <Icon name="arrowUp" size={12} />
@@ -278,11 +297,13 @@ function OrderDrill({
 
 function FindDrill({
   drill,
+  language,
   solved,
   onSolved,
   onWrong,
 }: {
   drill: Extract<Drill, { kind: 'find' }>;
+  language: string;
   solved: boolean;
   onSolved: () => void;
   onWrong: () => void;
@@ -316,7 +337,9 @@ function FindDrill({
                 }}
               >
                 <span className="drill-order-num mono">{index + 1}</span>
-                <code>{line}</code>
+                <code>
+                  <CodeTokens code={line} language={language} />
+                </code>
               </button>
             </li>
           );
@@ -347,11 +370,13 @@ function FindDrill({
 
 function TextDrill({
   drill,
+  language,
   solved,
   onSolved,
   onWrong,
 }: {
   drill: Extract<Drill, { kind: 'predict' | 'short' }>;
+  language: string;
   solved: boolean;
   onSolved: () => void;
   onWrong: () => void;
@@ -379,7 +404,9 @@ function TextDrill({
             <span>snippet</span>
           </div>
           <pre>
-            <code>{drill.code}</code>
+            <code>
+              <CodeTokens code={drill.code} language={language} />
+            </code>
           </pre>
         </figure>
       )}

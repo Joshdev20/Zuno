@@ -339,6 +339,36 @@ samp {
   }
 }
 
+/* Code tokens — shared by lesson figures, drills and marketing mocks. */
+.tok-tag {
+  color: #8b7bff;
+}
+.tok-attr {
+  color: #5fd4c4;
+}
+.tok-str {
+  color: #e6bd80;
+}
+.tok-num {
+  color: #eb9dc4;
+}
+.tok-key {
+  color: #b092ff;
+}
+.tok-fn {
+  color: #7fb8ff;
+}
+.tok-com {
+  color: #7c88ab;
+  font-style: italic;
+}
+.tok-op {
+  color: #b9c1d9;
+}
+.tok-punc {
+  color: #8a94b2;
+}
+
 /* iOS zooms the viewport when a control smaller than 16px takes focus. */
 @media (max-width: 820px) {
   input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']),

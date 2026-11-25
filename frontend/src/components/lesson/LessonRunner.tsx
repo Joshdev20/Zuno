@@ -210,6 +210,7 @@ function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
         {step.kind === 'drill' && (
           <DrillStep
             drill={step.drill}
+            language={lesson.exercise.kind}
             solved={Boolean(drillSolved[step.index])}
             onSolved={() => setDrillSolved((current) => ({ ...current, [step.index]: true }))}
           />

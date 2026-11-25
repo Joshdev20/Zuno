@@ -15,7 +15,8 @@ const editorTheme = EditorView.theme(
     '&': {
       backgroundColor: 'transparent',
       color: '#dfe4f2',
-      fontSize: '13px',
+      fontSize: '14px',
+      fontWeight: '500',
       height: '100%',
     },
     '.cm-scroller': {
@@ -45,19 +46,19 @@ const editorTheme = EditorView.theme(
 );
 
 const highlight = HighlightStyle.define([
-  { tag: [tags.comment, tags.lineComment, tags.blockComment], color: '#5d688c', fontStyle: 'italic' },
-  { tag: [tags.tagName, tags.typeName, tags.className, tags.namespace], color: '#9d8cff' },
-  { tag: tags.angleBracket, color: '#6b7694' },
-  { tag: [tags.attributeName, tags.propertyName], color: '#6fd3c7' },
-  { tag: [tags.string, tags.special(tags.string), tags.attributeValue, tags.regexp], color: '#e8c07a' },
-  { tag: [tags.number, tags.integer, tags.float, tags.bool, tags.null, tags.atom], color: '#f0a3c8' },
+  { tag: [tags.comment, tags.lineComment, tags.blockComment], color: '#8b96b8', fontStyle: 'italic' },
+  { tag: [tags.tagName, tags.typeName, tags.className, tags.namespace], color: '#8b7bff' },
+  { tag: tags.angleBracket, color: '#7b86a6' },
+  { tag: [tags.attributeName, tags.propertyName], color: '#5fd4c4' },
+  { tag: [tags.string, tags.special(tags.string), tags.attributeValue, tags.regexp], color: '#e6bd80' },
+  { tag: [tags.number, tags.integer, tags.float, tags.bool, tags.null, tags.atom], color: '#eb9dc4' },
   {
     tag: [tags.keyword, tags.controlKeyword, tags.moduleKeyword, tags.operatorKeyword, tags.definitionKeyword],
-    color: '#a78bff',
+    color: '#b092ff',
   },
-  { tag: [tags.function(tags.variableName), tags.function(tags.propertyName)], color: '#8fc7ff' },
+  { tag: [tags.function(tags.variableName), tags.function(tags.propertyName)], color: '#7fb8ff' },
   { tag: [tags.definition(tags.variableName), tags.variableName], color: '#dfe4f2' },
-  { tag: [tags.operator, tags.punctuation], color: '#8a94b2' },
+  { tag: [tags.operator, tags.punctuation], color: '#94a0c0' },
   { tag: [tags.brace, tags.squareBracket, tags.paren], color: '#7d88a8' },
   { tag: [tags.meta, tags.documentMeta], color: '#7d88a8' },
   { tag: [tags.heading, tags.strong], color: '#eef1fb', fontWeight: '600' },
@@ -103,6 +104,7 @@ export function CodeEditor({
         closeBrackets: true,
         highlightSelectionMatches: false,
         searchKeymap: true,
+        syntaxHighlighting: false,
       }}
     />
   );

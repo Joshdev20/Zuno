@@ -426,7 +426,8 @@
   background: var(--code);
   color: var(--code-ink);
   font-family: var(--mono);
-  font-size: 0.86rem;
+  font-size: 0.875rem;
+  font-weight: 500;
   line-height: 2;
   overflow-x: auto;
   white-space: pre-wrap;
@@ -500,7 +501,7 @@
 }
 
 .drill-order-row code,
-.drill-find-row code { flex: 1; white-space: pre-wrap; word-break: break-word; }
+.drill-find-row code { flex: 1; white-space: pre-wrap; word-break: break-word; font-weight: 500; }
 
 .drill-order-moves { display: flex; flex-direction: column; gap: 2px; }
 
