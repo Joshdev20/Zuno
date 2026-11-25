@@ -51,6 +51,11 @@ select {
   color: inherit;
 }
 
+a,
+button {
+  touch-action: manipulation;
+}
+
 button {
   cursor: pointer;
   border: none;
@@ -82,7 +87,7 @@ samp {
 
 ::selection {
   background: var(--pine);
-  color: #f8f5ec;
+  color: #f2f5ff;
 }
 
 :focus-visible {
@@ -99,12 +104,12 @@ samp {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d3ccba;
+  background: #2c3757;
   border: 3px solid var(--paper);
   border-radius: 99px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #bcb4a0;
+  background: #3a476b;
 }
 
 .container {
@@ -179,8 +184,8 @@ samp {
 
 .btn--primary {
   background: var(--pine);
-  color: #f8f5ec;
-  box-shadow: 0 1px 2px rgba(20, 21, 15, 0.16);
+  color: #f2f5ff;
+  box-shadow: 0 1px 2px rgba(2, 4, 12, 0.5);
 }
 
 .btn--primary:hover {
@@ -204,7 +209,7 @@ samp {
 }
 
 .btn--quiet:hover {
-  background: rgba(20, 21, 15, 0.05);
+  background: rgba(2, 4, 12, 0.5);
 }
 
 .btn--dark {
@@ -213,7 +218,7 @@ samp {
 }
 
 .btn--dark:hover {
-  background: #000;
+  background: #ffffff;
 }
 
 .btn--lg {
@@ -254,21 +259,21 @@ samp {
 }
 
 .chip--pine {
-  border-color: #cddfd2;
+  border-color: rgba(123, 92, 255, 0.3);
   background: var(--pine-soft);
   color: var(--pine);
 }
 
 .chip--clay {
-  border-color: #ebd0c2;
+  border-color: rgba(255, 111, 125, 0.3);
   background: var(--clay-soft);
   color: var(--clay);
 }
 
 .chip--brass {
-  border-color: #e6d8bb;
+  border-color: rgba(240, 192, 90, 0.3);
   background: var(--brass-soft);
-  color: #8a6a2e;
+  color: #d8a844;
 }
 
 .chip--plain {
@@ -331,5 +336,15 @@ samp {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+}
+
+/* iOS zooms the viewport when a control smaller than 16px takes focus. */
+@media (max-width: 820px) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']),
+  textarea,
+  select,
+  .cm-editor.cm-editor {
+    font-size: 16px;
   }
 }

@@ -175,7 +175,7 @@ export function Dashboard() {
           <section className="side-card">
             <div className="side-card-head">
               <h3>Tracks</h3>
-              <span className="mono muted">3</span>
+              <span className="mono muted">{stats.length}</span>
             </div>
             <ul className="track-rows">
               {stats.map(({ track, done: trackDone, total, ratio }) => (
@@ -192,7 +192,7 @@ export function Dashboard() {
                       <ProgressBar
                         value={ratio}
                         height={3}
-                        tone={track.id === 'css' ? 'clay' : track.id === 'js' ? 'brass' : 'pine'}
+                        tone={track.id === 'css' ? 'clay' : track.id === 'js' ? 'brass' : track.id === 'python' ? 'slate' : 'pine'}
                       />
                     </span>
                     <Icon name="arrowRight" size={14} />

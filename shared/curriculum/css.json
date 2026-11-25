@@ -47,6 +47,54 @@
           "body": "The inspector in your browser's dev tools shows which declaration won and which were struck through. That panel is the fastest way to learn the cascade."
         }
       ],
+      "drills": [
+        {
+          "kind": "choice",
+          "prompt": "Which selector wins when three rules target the same element?",
+          "options": [
+            "`p { color: red }`",
+            "`.intro { color: blue }`",
+            "`#hero { color: green }`",
+            "All tie"
+          ],
+          "answer": 2,
+          "explain": "Specificity ranks id beats class beats element: 1-0-0 against 0-1-0 against 0-0-1. The id rule wins even when written first.",
+          "hints": [
+            "Count ids, classes, elements.",
+            "The id column is the strongest."
+          ]
+        },
+        {
+          "kind": "fill",
+          "prompt": "Target every element with the class `card`.",
+          "code": "{{0}} {\n  padding: 24px;\n}",
+          "blanks": [
+            [
+              ".card"
+            ]
+          ],
+          "explain": "A leading dot targets a class. Without the dot you are targeting an element named `card`, which does not exist.",
+          "hints": [
+            "Classes start with a punctuation mark.",
+            "It is not a hash."
+          ]
+        },
+        {
+          "kind": "find",
+          "prompt": "Which rule will not apply?",
+          "lines": [
+            "p { color: #333; }",
+            ".intro { color: #111; }",
+            "#hero { color: b; }"
+          ],
+          "bad": 2,
+          "explain": "`b` is not a colour value. The declaration is dropped and the element falls back to an inherited colour.",
+          "hints": [
+            "Colours are hex or named.",
+            "One value is a single letter."
+          ]
+        }
+      ],
       "exercise": {
         "kind": "css",
         "brief": "Give `.card` a warm surface (`#fffdf8`), a 12px radius, 24px of inner space and a hairline border (`1px solid #e3e0d6`). Then colour `.title` with `#14150f`.",
@@ -164,6 +212,50 @@
           "body": "When a layout overflows, check the box model before blaming flexbox. Nine times out of ten, a width plus padding is the culprit."
         }
       ],
+      "drills": [
+        {
+          "kind": "short",
+          "prompt": "Which property adds space inside an element, between content and border?",
+          "answers": [
+            "padding"
+          ],
+          "explain": "`padding` is inside the border; `margin` is outside it. That distinction is what makes box maths predictable.",
+          "hints": [
+            "Margin is outside.",
+            "Seven letters."
+          ]
+        },
+        {
+          "kind": "choice",
+          "prompt": "With `box-sizing: border-box`, what does `width: 200px` include?",
+          "options": [
+            "Only the content",
+            "Content and padding",
+            "Content, padding and border",
+            "Everything including margin"
+          ],
+          "answer": 2,
+          "explain": "`border-box` folds padding and border into the declared width, so 200px is the size you actually see. Margin stays outside.",
+          "hints": [
+            "Margin is never inside the box.",
+            "The border is inside the declared width."
+          ]
+        },
+        {
+          "kind": "predict",
+          "prompt": "A box is 100px wide with 10px padding and `box-sizing: content-box`. How wide is it on screen?",
+          "code": ".box {\n  width: 100px;\n  padding: 10px;\n  box-sizing: content-box;\n}",
+          "answers": [
+            "120px",
+            "120"
+          ],
+          "explain": "With `content-box` the padding is added on top: 100 + 10 + 10 = 120px. That is exactly the surprise `border-box` removes.",
+          "hints": [
+            "Padding applies on both sides.",
+            "Add, do not subtract."
+          ]
+        }
+      ],
       "exercise": {
         "kind": "css",
         "brief": "Give `.box` a fixed 320px width, 24px padding, a `2px solid #1e4b3a` border and `box-sizing: border-box`. The rendered box should stay exactly 320px wide.",
@@ -277,6 +369,41 @@
         {
           "type": "text",
           "body": "Space is part of typography. Give a heading more room above than below, and it will group with the text it introduces."
+        }
+      ],
+      "drills": [
+        {
+          "kind": "fill",
+          "prompt": "Set body text to a comfortable line height.",
+          "code": "body {\n  font-size: 1rem;\n  line-height: {{0}};\n}",
+          "blanks": [
+            [
+              "1.6",
+              "1.5",
+              "1.7"
+            ]
+          ],
+          "explain": "A unitless line-height multiplies the font size, so it scales with every element. 1.5 to 1.7 is the readable range for body copy.",
+          "hints": [
+            "Unitless scales.",
+            "Somewhere between 1.5 and 1.7."
+          ]
+        },
+        {
+          "kind": "choice",
+          "prompt": "Why prefer `rem` over `px` for type sizes?",
+          "options": [
+            "It renders faster",
+            "It respects the user's root font-size setting",
+            "It is shorter to type",
+            "It works in more browsers"
+          ],
+          "answer": 1,
+          "explain": "`rem` is relative to the root font size, so a user who raised their default gets larger text everywhere. `px` ignores that preference.",
+          "hints": [
+            "Think about accessibility settings.",
+            "The r in rem means root."
+          ]
         }
       ],
       "exercise": {
@@ -394,6 +521,57 @@
         {
           "type": "text",
           "body": "Centering one thing? `display: grid; place-items: center` is even shorter than flexbox. For a row of controls, flexbox is still the clearest choice."
+        }
+      ],
+      "drills": [
+        {
+          "kind": "choice",
+          "prompt": "Which property aligns items along the main axis of a flex container?",
+          "options": [
+            "`align-items`",
+            "`justify-content`",
+            "`place-content`",
+            "`gap`"
+          ],
+          "answer": 1,
+          "explain": "`justify-content` works on the main axis; `align-items` works on the cross axis. In a row, main is horizontal.",
+          "hints": [
+            "Main axis, not cross axis.",
+            "It is the one with 'content'."
+          ]
+        },
+        {
+          "kind": "order",
+          "prompt": "Order a toolbar that pushes its last button to the right.",
+          "lines": [
+            ".toolbar {",
+            "  display: flex;",
+            "  align-items: center;",
+            "  gap: 12px;",
+            "}",
+            ".toolbar .spacer {",
+            "  margin-left: auto;",
+            "}"
+          ],
+          "explain": "`margin-left: auto` on a flex child eats the free space on that side, which pushes everything after it to the far end.",
+          "hints": [
+            "The container comes first.",
+            "Auto margins absorb free space."
+          ]
+        },
+        {
+          "kind": "short",
+          "prompt": "Which property sets spacing between flex items without margins?",
+          "answers": [
+            "gap",
+            "gap:",
+            "row-gap"
+          ],
+          "explain": "`gap` is applied by the container and never adds space on the outer edges, which is why it replaced margin hacks.",
+          "hints": [
+            "Three letters.",
+            "It replaced a long-standing hack."
+          ]
         }
       ],
       "exercise": {
@@ -514,6 +692,43 @@
           "body": "Test at 320px wide with the browser's device toolbar. If the page scrolls sideways, something has a fixed width wider than the viewport — often an image or a `min-width`."
         }
       ],
+      "drills": [
+        {
+          "kind": "fill",
+          "prompt": "Make three equal columns that collapse to one on narrow screens.",
+          "code": ".grid {\n  display: grid;\n  grid-template-columns: repeat({{0}}, minmax(0, 1fr));\n  gap: 24px;\n}\n\n@media (max-width: 700px) {\n  .grid { grid-template-columns: {{1}}; }\n}",
+          "blanks": [
+            [
+              "3",
+              "3,"
+            ],
+            [
+              "1fr"
+            ]
+          ],
+          "explain": "`repeat(3, minmax(0, 1fr))` gives three equal tracks that can shrink below their content. On small screens one track stacks them.",
+          "hints": [
+            "How many columns?",
+            "One column is 1fr."
+          ]
+        },
+        {
+          "kind": "choice",
+          "prompt": "What does `1fr` mean in a grid template?",
+          "options": [
+            "One fixed fraction of 100px",
+            "One share of the leftover space",
+            "One row",
+            "One flexible pixel"
+          ],
+          "answer": 1,
+          "explain": "`fr` is a fraction of the free space after fixed tracks and gaps are taken out. Two `1fr` tracks are equal whatever the viewport.",
+          "hints": [
+            "It is a share, not a size.",
+            "Free space gets divided."
+          ]
+        }
+      ],
       "exercise": {
         "kind": "css",
         "brief": "Make `.grid` a responsive grid: three equal columns at desktop width, 16px gaps, using `repeat(auto-fit, minmax(240px, 1fr))`. Add a `@media (max-width: 640px)` block that sets the grid to a single column.",
@@ -624,6 +839,39 @@
         {
           "type": "text",
           "body": "This is also how you support dark mode without duplicating every rule. Set `data-theme` on `<html>`, let the tokens do the work, and the whole interface follows."
+        }
+      ],
+      "drills": [
+        {
+          "kind": "fill",
+          "prompt": "Read a custom property with a fallback.",
+          "code": ":root {\n  --brand: #1c5c46;\n}\n\n.button {\n  background: var({{0}}, #234);\n}",
+          "blanks": [
+            [
+              "--brand"
+            ]
+          ],
+          "explain": "The name includes the two dashes. The second argument to `var()` is the fallback used when the property is undefined.",
+          "hints": [
+            "Custom property names start with two dashes.",
+            "It matches the name in `:root`."
+          ]
+        },
+        {
+          "kind": "choice",
+          "prompt": "Where must a custom property be declared so it can be overridden per section?",
+          "options": [
+            "Only in `:root`",
+            "On any selector — the cascade decides the winner",
+            "In a media query only",
+            "In JavaScript only"
+          ],
+          "answer": 1,
+          "explain": "Custom properties are inherited, so declaring them on a section overrides the `:root` value for everything inside it. That is the whole point of theming.",
+          "hints": [
+            "They cascade like any other property.",
+            "`:root` is just the most common place."
+          ]
         }
       ],
       "exercise": {
@@ -737,6 +985,38 @@
         {
           "type": "text",
           "body": "Focus states deserve the same care as hover. Use `:focus-visible` so keyboard users see the ring, and never remove an outline without replacing it."
+        }
+      ],
+      "drills": [
+        {
+          "kind": "choice",
+          "prompt": "Which query should wrap a large entrance animation?",
+          "options": [
+            "`@media (max-width: 700px)`",
+            "`@media (prefers-reduced-motion: reduce)`",
+            "`@supports (animation: fade)`",
+            "`@media (prefers-color-scheme: dark)`"
+          ],
+          "answer": 1,
+          "explain": "`prefers-reduced-motion` is the user telling you motion makes them ill. Respect it by replacing movement with an instant change.",
+          "hints": [
+            "Some users get motion sickness.",
+            "It is a preference, not a screen size."
+          ]
+        },
+        {
+          "kind": "short",
+          "prompt": "Which property should you animate instead of `width` to stay on the compositor?",
+          "answers": [
+            "transform",
+            "opacity",
+            "scale"
+          ],
+          "explain": "`transform` and `opacity` are cheap: the compositor handles them without recalculating layout. Animating `width` forces layout every frame.",
+          "hints": [
+            "It moves or scales the box.",
+            "It does not change layout."
+          ]
         }
       ],
       "exercise": {

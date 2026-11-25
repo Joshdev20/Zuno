@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getTrack, levelLabel, tracks } from '../lib/curriculum';
-import { useProgress } from '../lib/progress';
+import { isLessonUnlocked, useProgress } from '../lib/progress';
 import { Icon } from '../components/ui/Icon';
 import { ProgressBar, Ring } from '../components/ui/Meters';
 import { NotFound } from './NotFound';
@@ -78,6 +78,25 @@ export function TrackPage() {
                 const index = track.lessons.findIndex((entry) => entry.id === lesson.id);
                 const complete = Boolean(state.completed[lesson.id]);
                 const isNext = nextLesson?.id === lesson.id;
+                const locked = !complete && !isLessonUnlocked(state, track, lesson);
+                if (locked) {
+                  return (
+                    <li key={lesson.id}>
+                      <div className="lesson-row is-locked">
+                        <span className="lesson-status">
+                          <Icon name="lock" size={13} />
+                        </span>
+                        <span className="lesson-row-main">
+                          <span className="lesson-row-title">{lesson.title}</span>
+                          <span className="lesson-row-summary">Finish the previous lesson to unlock.</span>
+                        </span>
+                        <span className="lesson-row-meta mono">
+                          {lesson.minutes} min · {lesson.xp} XP
+                        </span>
+                      </div>
+                    </li>
+                  );
+                }
                 return (
                   <li key={lesson.id}>
                     <Link
@@ -124,7 +143,7 @@ export function TrackPage() {
                 <ProgressBar
                   value={entryDone / entry.lessons.length}
                   height={3}
-                  tone={entry.id === 'css' ? 'clay' : entry.id === 'js' ? 'brass' : 'pine'}
+                  tone={entry.id === 'css' ? 'clay' : entry.id === 'js' ? 'brass' : entry.id === 'python' ? 'slate' : 'pine'}
                 />
                 <Icon name="arrowRight" size={15} />
               </Link>

@@ -11,3 +11,4 @@ venv/
 .vercel
 .DS_Store
 *.log
+frontend/public/pyodide/

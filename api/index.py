@@ -20,7 +20,7 @@ from pydantic import BaseModel, Field
 
 ROOT = Path(__file__).resolve().parent.parent
 CURRICULUM_DIR = ROOT / "shared" / "curriculum"
-TRACK_IDS = ("html", "css", "js")
+TRACK_IDS = ("html", "css", "js", "python")
 
 app = FastAPI(title="Zuno API", version="0.1.0", docs_url="/api/docs", openapi_url="/api/openapi.json")
 

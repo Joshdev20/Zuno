@@ -51,6 +51,66 @@
           "body": "One rule matters more than the rest: elements **nest** or sit side by side, they never overlap. If you open a tag inside a paragraph, close it before you close the paragraph."
         }
       ],
+      "drills": [
+        {
+          "kind": "choice",
+          "prompt": "Which element declares the language of the whole document?",
+          "options": [
+            "`<html lang=\"en\">`",
+            "`<meta charset=\"utf-8\">`",
+            "`<head>`",
+            "`<body>`"
+          ],
+          "answer": 0,
+          "explain": "The `lang` attribute on `<html>` tells screen readers and search engines which language the page is written in. The charset meta describes encoding, not language.",
+          "hints": [
+            "Language is not an encoding.",
+            "The attribute lives on the outermost element."
+          ]
+        },
+        {
+          "kind": "order",
+          "prompt": "Put the skeleton of a page in the order the browser reads it.",
+          "lines": [
+            "<!doctype html>",
+            "<html lang=\"en\">",
+            "<head>",
+            "<meta charset=\"utf-8\">",
+            "<title>Zuno</title>",
+            "</head>",
+            "<body>",
+            "<p>Hello</p>",
+            "</body>",
+            "</html>"
+          ],
+          "explain": "Doctype first, then the root element, then head and body in that order. The doctype is what puts the browser in standards mode.",
+          "hints": [
+            "The doctype is not inside `<html>`.",
+            "The head closes before the body opens."
+          ]
+        },
+        {
+          "kind": "find",
+          "prompt": "One line stops this page from being valid. Which one?",
+          "lines": [
+            "<!doctype html>",
+            "<html lang=\"en\">",
+            "<head>",
+            "  <title>Field notes",
+            "</head>",
+            "<body>",
+            "  <h1>Field notes</h1>",
+            "</body>",
+            "</html>"
+          ],
+          "bad": 3,
+          "explain": "`<title>` is never self-closing. Without `</title>` everything after it is parsed as title text.",
+          "hints": [
+            "Look for an element that opens and never closes.",
+            "It sits in the head."
+          ]
+        }
+      ],
       "exercise": {
         "kind": "html",
         "brief": "Turn the empty document into a field journal entry. Add an `<h1>` reading “Field notes from the coast”, a `<p>` with at least one sentence, and keep the title as “Zuno Journal”.",
@@ -155,6 +215,56 @@
         {
           "type": "text",
           "body": "Write the content first, then check: could someone navigate this page using only its headings? If the answer is no, the structure is wrong, not the styling."
+        }
+      ],
+      "drills": [
+        {
+          "kind": "fill",
+          "prompt": "Mark the opening and closing tag of a level-two heading.",
+          "code": "<{{0}}>Why headings matter</{{1}}>",
+          "blanks": [
+            [
+              "h2"
+            ],
+            [
+              "h2"
+            ]
+          ],
+          "explain": "Heading elements are numbered `h1` to `h6`. An `h1` names the page; `h2` starts a section inside it.",
+          "hints": [
+            "Level two.",
+            "The closing tag matches the opening one exactly."
+          ]
+        },
+        {
+          "kind": "choice",
+          "prompt": "Which element should wrap a list where order matters?",
+          "options": [
+            "`<ul>`",
+            "`<ol>`",
+            "`<dl>`",
+            "`<menu>`"
+          ],
+          "answer": 1,
+          "explain": "`<ol>` is an ordered list: the browser numbers the items for you. Use `<ul>` when the sequence carries no meaning.",
+          "hints": [
+            "'Ordered' is in the name.",
+            "Unordered lists use bullets."
+          ]
+        },
+        {
+          "kind": "short",
+          "prompt": "Which element gives a paragraph of text?",
+          "answers": [
+            "p",
+            "<p>",
+            "<p></p>"
+          ],
+          "explain": "`<p>` is the paragraph element. Browsers add spacing around it by default, which is why it reads as a block of prose.",
+          "hints": [
+            "It is one letter.",
+            "It is the shortest block element you know."
+          ]
         }
       ],
       "exercise": {
@@ -263,6 +373,50 @@
           "body": "Paths are relative to the document that contains them. `coast.jpg` looks next to the current file, `/coast.jpg` starts from the site root, `../coast.jpg` climbs one folder."
         }
       ],
+      "drills": [
+        {
+          "kind": "fill",
+          "prompt": "Give the image a text alternative.",
+          "code": "<img src=\"cat.jpg\" {{0}}=\"A grey cat asleep on a keyboard\">",
+          "blanks": [
+            [
+              "alt"
+            ]
+          ],
+          "explain": "`alt` is what a screen reader announces and what shows if the image fails. Decorative images take `alt=\"\"`.",
+          "hints": [
+            "Three letters.",
+            "It stands for alternative text."
+          ]
+        },
+        {
+          "kind": "find",
+          "prompt": "Which line links to a page that will not load?",
+          "lines": [
+            "<a href=\"/learn\">Learn</a>",
+            "<a hraf=\"/playground\">Playground</a>",
+            "<a href=\"https://zuno.dev\">Docs</a>"
+          ],
+          "bad": 1,
+          "explain": "`hraf` is a typo. The attribute is `href`, so the browser treats the second link as having no destination.",
+          "hints": [
+            "Read the attribute names character by character.",
+            "One is misspelled."
+          ]
+        },
+        {
+          "kind": "short",
+          "prompt": "Which attribute holds a link's destination?",
+          "answers": [
+            "href"
+          ],
+          "explain": "`href` is the hypertext reference: the URL the link points at. `src` is for embedded resources like images and scripts.",
+          "hints": [
+            "Four letters.",
+            "It starts with h."
+          ]
+        }
+      ],
       "exercise": {
         "kind": "html",
         "brief": "Add a `<nav>` with two links: one internal pointing to `#lessons`, one external pointing to `https://developer.mozilla.org`. Then add an `<img>` with a real `src` and descriptive `alt` text.",
@@ -368,6 +522,55 @@
         {
           "type": "text",
           "body": "Rule of thumb: if you are about to write `<div class=\"header\">`, check whether `<header>` does the job. The class name is a strong hint that you already knew the meaning."
+        }
+      ],
+      "drills": [
+        {
+          "kind": "choice",
+          "prompt": "Which element wraps the main navigation of a site?",
+          "options": [
+            "`<nav>`",
+            "`<menu>`",
+            "`<section>`",
+            "`<aside>`"
+          ],
+          "answer": 0,
+          "explain": "`<nav>` marks a block of navigation links. Screen readers can jump straight to it, and so can crawlers.",
+          "hints": [
+            "It is short for navigation.",
+            "`<menu>` is for command lists, not site links."
+          ]
+        },
+        {
+          "kind": "order",
+          "prompt": "Order the landmarks of a typical page.",
+          "lines": [
+            "<header>",
+            "  <nav>…</nav>",
+            "</header>",
+            "<main>",
+            "  <article>…</article>",
+            "</main>",
+            "<footer>…</footer>"
+          ],
+          "explain": "Header, main, footer is the reading order. Landmarks describe regions, never appearance.",
+          "hints": [
+            "Navigation sits inside the header.",
+            "Content lives in `<main>`."
+          ]
+        },
+        {
+          "kind": "short",
+          "prompt": "Which element holds the unique content of the page, used once per document?",
+          "answers": [
+            "main",
+            "<main>"
+          ],
+          "explain": "`<main>` is the single region holding the page's primary content. It also gives assistive tech a skip-to-content target.",
+          "hints": [
+            "Four letters.",
+            "There is exactly one."
+          ]
         }
       ],
       "exercise": {
@@ -482,6 +685,42 @@
           "body": "Group related fields with `<fieldset>` and `<legend>` — especially radio buttons, where the legend answers “what am I choosing between?”."
         }
       ],
+      "drills": [
+        {
+          "kind": "fill",
+          "prompt": "Ask the browser for an email field and a required name field.",
+          "code": "<label for=\"email\">Email</label>\n<input id=\"email\" {{0}}=\"email\" {{1}}>\n<input id=\"name\" type=\"text\" required>",
+          "blanks": [
+            [
+              "type"
+            ],
+            [
+              "required"
+            ]
+          ],
+          "explain": "`type=\"email\"` gives you keyboard and validation for free. `required` blocks submission while the field is empty, without any JavaScript.",
+          "hints": [
+            "The first one names the kind of control.",
+            "The second is a boolean attribute."
+          ]
+        },
+        {
+          "kind": "choice",
+          "prompt": "Why does `<label for=\"email\">` matter?",
+          "options": [
+            "It styles the input",
+            "It ties the label to the control so clicking it focuses the field",
+            "It validates the input",
+            "It makes the field required"
+          ],
+          "answer": 1,
+          "explain": "`for` matches the input's `id`, so the two are announced together and clicking the label focuses the field.",
+          "hints": [
+            "Think about what a screen reader says.",
+            "It is about association, not looks."
+          ]
+        }
+      ],
       "exercise": {
         "kind": "html",
         "brief": "Build a sign-up `<form>` with: a labeled email input (`type=\"email\"`, `required`), a labeled password input (`type=\"password\"`, `minlength=\"8\"`), and a submit button. Every input needs an `id`, a `name` and a `<label for>`.",
@@ -588,6 +827,40 @@
           "body": "If a table needs horizontal scrolling on small screens, wrap it in a container with `overflow-x: auto` rather than shrinking the text."
         }
       ],
+      "drills": [
+        {
+          "kind": "order",
+          "prompt": "Build the smallest valid table.",
+          "lines": [
+            "<table>",
+            "  <thead>",
+            "    <tr><th scope=\"col\">Name</th></tr>",
+            "  </thead>",
+            "  <tbody>",
+            "    <tr><td>Ada</td></tr>",
+            "  </tbody>",
+            "</table>"
+          ],
+          "explain": "Head, body, rows, cells. `scope=\"col\"` tells assistive tech that the header describes the column below it.",
+          "hints": [
+            "Headers come before data.",
+            "Rows live inside a section."
+          ]
+        },
+        {
+          "kind": "short",
+          "prompt": "Which element marks a header cell in a table?",
+          "answers": [
+            "th",
+            "<th>"
+          ],
+          "explain": "`<th>` is a header cell; `<td>` is a data cell. Headers are read out before each cell value.",
+          "hints": [
+            "Two letters.",
+            "`td` is the other one."
+          ]
+        }
+      ],
       "exercise": {
         "kind": "html",
         "brief": "Build a pricing table with a `<caption>`, a `<thead>` containing two `<th scope=\"col\">` headers (Plan, Price), and a `<tbody>` with three rows of data.",
@@ -692,6 +965,42 @@
         {
           "type": "text",
           "body": "Prefer the native element every time. `<details>` beats a hand-rolled accordion, `<dialog>` beats a modal div, `<button>` beats a clickable div. Less code, more behaviour."
+        }
+      ],
+      "drills": [
+        {
+          "kind": "choice",
+          "prompt": "A decorative background image should have which alt text?",
+          "options": [
+            "`alt=\"background\"`",
+            "`alt=\"\"`",
+            "No alt attribute at all",
+            "`alt=\"image\"`"
+          ],
+          "answer": 1,
+          "explain": "An empty `alt` marks the image as decorative, so screen readers skip it. Leaving the attribute out makes some readers announce the file name instead.",
+          "hints": [
+            "Decorative means it adds no information.",
+            "Empty is different from missing."
+          ]
+        },
+        {
+          "kind": "fill",
+          "prompt": "Load a video with controls and captions.",
+          "code": "<video {{0}} muted playsinline>\n  <source src=\"intro.mp4\" type=\"video/mp4\">\n  <{{1}} src=\"intro.vtt\" kind=\"captions\" srclang=\"en\">\n</video>",
+          "blanks": [
+            [
+              "controls"
+            ],
+            [
+              "track"
+            ]
+          ],
+          "explain": "`controls` gives the play button back to the user. `<track kind=\"captions\">` supplies the caption file.",
+          "hints": [
+            "The user needs a play button.",
+            "Captions are a track."
+          ]
         }
       ],
       "exercise": {

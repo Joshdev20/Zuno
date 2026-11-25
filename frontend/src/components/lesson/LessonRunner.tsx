@@ -2,11 +2,13 @@ import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react
 import { Link, useParams } from 'react-router-dom';
 import { getLesson, getTrack, lessonTrack, levelLabel, neighbours } from '../../lib/curriculum';
 import { useProgress } from '../../lib/progress';
-import type { Lesson, QuizQuestion, Section, Track } from '../../lib/types';
+import type { Drill, Lesson, QuizQuestion, Section, Track } from '../../lib/types';
 import { Icon } from '../ui/Icon';
 import { LessonSections } from './LessonSections';
 import { Inline } from './Inline';
 import { NotFound } from '../../pages/NotFound';
+import { isLessonUnlocked } from '../../lib/progress';
+import { DrillStep } from './drills/DrillStep';
 
 const Workspace = lazy(() =>
   import('./Workspace').then((module) => ({ default: module.Workspace })),
@@ -15,6 +17,7 @@ const Workspace = lazy(() =>
 type Step =
   | { kind: 'intro' }
   | { kind: 'section'; sections: Section[] }
+  | { kind: 'drill'; drill: Drill; index: number }
   | { kind: 'practice' }
   | { kind: 'quiz'; question: QuizQuestion; index: number }
   | { kind: 'done' };
@@ -32,13 +35,20 @@ function groupSections(sections: Section[]): Section[][] {
 }
 
 function buildSteps(lesson: Lesson): Step[] {
-  return [
-    { kind: 'intro' },
-    ...groupSections(lesson.sections).map((sections) => ({ kind: 'section', sections }) as Step),
-    { kind: 'practice' },
-    ...lesson.quiz.map((question, index) => ({ kind: 'quiz', question, index }) as Step),
-    { kind: 'done' },
-  ];
+  const groups = groupSections(lesson.sections);
+  const drills = lesson.drills ?? [];
+  const steps: Step[] = [{ kind: 'intro' }];
+  groups.forEach((sections, groupIndex) => {
+    steps.push({ kind: 'section', sections });
+    drills.forEach((drill, drillIndex) => {
+      const target = drill.after ?? groups.length - 1;
+      if (target === groupIndex) steps.push({ kind: 'drill', drill, index: drillIndex });
+    });
+  });
+  steps.push({ kind: 'practice' });
+  lesson.quiz.forEach((question, index) => steps.push({ kind: 'quiz', question, index }));
+  steps.push({ kind: 'done' });
+  return steps;
 }
 
 export function LessonRunner() {
@@ -53,6 +63,7 @@ export function LessonRunner() {
 
 function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
   const { state, completeLesson, completeQuiz, setResume } = useProgress();
+  const unlocked = isLessonUnlocked(state, track, lesson);
   const steps = useMemo(() => buildSteps(lesson), [lesson]);
   const stored = state.resume[lesson.id] ?? 0;
   const [index, setIndex] = useState(() => Math.min(Math.max(stored, 0), steps.length - 1));
@@ -60,6 +71,7 @@ function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
   const [choice, setChoice] = useState<number | null>(null);
   const [quizSolved, setQuizSolved] = useState<Record<number, boolean>>({});
   const [attempts, setAttempts] = useState<Record<number, number>>({});
+  const [drillSolved, setDrillSolved] = useState<Record<number, boolean>>({});
   const [banked, setBanked] = useState(Boolean(state.completed[lesson.id]));
 
   const step = steps[index];
@@ -81,7 +93,13 @@ function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
   const solved = useCallback(() => setExerciseSolved(true), []);
 
   const canContinue =
-    step.kind === 'practice' ? exerciseSolved : step.kind === 'quiz' ? Boolean(quizSolved[step.index]) : true;
+    step.kind === 'practice'
+      ? exerciseSolved
+      : step.kind === 'quiz'
+        ? Boolean(quizSolved[step.index])
+        : step.kind === 'drill'
+          ? Boolean(drillSolved[step.index])
+          : true;
 
   const advance = () => {
     if (step.kind === 'quiz') setChoice(null);
@@ -102,6 +120,8 @@ function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
   });
 
   const progress = ((index + 1) / steps.length) * 100;
+
+  if (!unlocked && !state.completed[lesson.id]) return <LockedNotice lesson={lesson} track={track} />;
 
   return (
     <div className="runner">
@@ -187,6 +207,14 @@ function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
           </div>
         )}
 
+        {step.kind === 'drill' && (
+          <DrillStep
+            drill={step.drill}
+            solved={Boolean(drillSolved[step.index])}
+            onSolved={() => setDrillSolved((current) => ({ ...current, [step.index]: true }))}
+          />
+        )}
+
         {step.kind === 'quiz' && (
           <QuizStep
             question={step.question}
@@ -252,6 +280,7 @@ function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
           <span className="runner-foot-note mono">
             {step.kind === 'practice' && !exerciseSolved && 'Run the checks to unlock Continue'}
             {step.kind === 'quiz' && !quizSolved[step.index] && 'Pick the answer you think is right'}
+            {step.kind === 'drill' && !drillSolved[step.index] && 'Answer to unlock Continue'}
             {(step.kind === 'intro' || step.kind === 'section') && `Step ${index + 1} of ${steps.length}`}
           </span>
           <button type="button" className="btn btn--primary runner-continue" onClick={advance} disabled={!canContinue}>
@@ -328,6 +357,36 @@ function QuizStep({
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+function LockedNotice({ lesson, track }: { lesson: Lesson; track: Track }) {
+  const index = track.lessons.findIndex((entry) => entry.id === lesson.id);
+  const previous = track.lessons[index - 1];
+  return (
+    <div className="runner-locked fade-in">
+      <div className="runner-locked-card">
+        <span className="runner-locked-icon">
+          <Icon name="lock" size={18} />
+        </span>
+        <h1 className="runner-h1">This lesson is locked</h1>
+        <p className="runner-lede">
+          {track.name} runs in order. Finish {previous ? `“${previous.title}”` : 'the previous lesson'} and this one
+          opens straight after it.
+        </p>
+        <div className="runner-locked-actions">
+          {previous && (
+            <Link to={`/learn/${track.id}/${previous.id}`} className="btn btn--primary">
+              Go to {previous.title}
+              <Icon name="arrowRight" size={15} />
+            </Link>
+          )}
+          <Link to={`/learn/${track.id}`} className="btn btn--ghost">
+            Back to {track.name}
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

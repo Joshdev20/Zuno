@@ -9,7 +9,7 @@ const faqs = [
   },
   {
     q: 'Is the curriculum really free?',
-    a: 'Yes. All 21 lessons, the playground and the checks are free with no account. Pro exists for people who want saved projects, challenge sets and feedback.',
+    a: 'Yes. All lessons, the playground and the checks are free with no account. Pro exists for people who want saved projects, challenge sets and feedback.',
   },
   {
     q: 'How long does it take?',

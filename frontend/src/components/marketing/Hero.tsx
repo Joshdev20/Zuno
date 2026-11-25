@@ -141,7 +141,7 @@ export function Hero() {
     <section className="hero">
       <div className="container hero-grid">
         <div className="hero-copy">
-          <p className="eyebrow">Interactive curriculum · HTML · CSS · JavaScript</p>
+          <p className="eyebrow">Interactive curriculum · HTML · CSS · JavaScript · Python</p>
           <h1 className="hero-title">
             Learn the web
             <br />
@@ -179,6 +179,7 @@ export function Hero() {
           <span>Flexbox</span>
           <span>Grid</span>
           <span>Async</span>
+          <span>Python</span>
           <span>Accessibility</span>
         </div>
       </div>

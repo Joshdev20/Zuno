@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { buildDocument, mergeResults } from '../../lib/runner';
+import { explainPythonError, runPython, type PythonRun } from '../../lib/python';
 import { useSandbox } from '../../lib/useSandbox';
 import { fileForKind } from '../../lib/curriculum';
 import type { CheckResult, Lesson } from '../../lib/types';
@@ -42,6 +43,7 @@ export function Workspace({
   const [code, setCode] = useState(() => readDraft(draftKey, lesson.exercise.starter));
   const [tab, setTab] = useState<Tab>(lesson.exercise.kind === 'js' ? 'console' : 'preview');
   const [results, setResults] = useState<CheckResult[] | null>(null);
+  const [pyRun, setPyRun] = useState<PythonRun | null>(null);
   const [checking, setChecking] = useState(false);
   const { srcDoc, result, timedOut, run } = useSandbox();
   const pending = useRef(false);
@@ -49,6 +51,7 @@ export function Workspace({
   const autoTimer = useRef<number | null>(null);
   codeRef.current = code;
 
+  const isPython = lesson.exercise.kind === 'python';
   const checks = lesson.exercise.checks;
   const total = checks.length;
   const passed = results ? results.filter((entry) => entry.ok).length : 0;
@@ -68,8 +71,9 @@ export function Workspace({
   useEffect(() => {
     setCode(readDraft(`zuno.draft.${lesson.id}`, lesson.exercise.starter));
     setResults(null);
+    setPyRun(null);
     setChecking(false);
-    setTab(lesson.exercise.kind === 'js' ? 'console' : 'preview');
+    setTab(lesson.exercise.kind === 'html' || lesson.exercise.kind === 'css' ? 'preview' : 'console');
   }, [lesson.id, lesson.exercise.starter, lesson.exercise.kind]);
 
   useEffect(() => {
@@ -84,12 +88,13 @@ export function Workspace({
   }, [code, draftKey]);
 
   useEffect(() => {
+    if (isPython) return;
     if (autoTimer.current) window.clearTimeout(autoTimer.current);
     autoTimer.current = window.setTimeout(() => run(build), 650);
     return () => {
       if (autoTimer.current) window.clearTimeout(autoTimer.current);
     };
-  }, [code, run, build]);
+  }, [code, run, build, isPython]);
 
   useEffect(() => {
     if (!result || !pending.current) return;
@@ -119,10 +124,20 @@ export function Workspace({
 
   const handleCheck = useCallback(() => {
     if (autoTimer.current) window.clearTimeout(autoTimer.current);
+    if (isPython) {
+      setChecking(true);
+      void runPython(codeRef.current, checks).then((out) => {
+        setPyRun(out);
+        setResults(out.results.length > 0 ? out.results : null);
+        setChecking(false);
+        setTab('checks');
+      });
+      return;
+    }
     pending.current = true;
     setChecking(true);
     run(build);
-  }, [build, run]);
+  }, [build, run, isPython, checks]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -146,9 +161,13 @@ export function Workspace({
   };
 
   const tabs: Tab[] =
-    lesson.exercise.kind === 'js' && !lesson.exercise.markup
-      ? ['console', 'checks']
-      : ['preview', 'console', 'checks'];
+    lesson.exercise.kind === 'html' || (lesson.exercise.kind === 'css' && lesson.exercise.markup)
+      ? ['preview', 'console', 'checks']
+      : ['console', 'checks'];
+
+  const logs = isPython ? pyRun?.logs ?? [] : result?.logs ?? [];
+  const error = isPython ? pyRun?.error ?? null : result?.error ?? null;
+  const fix = error ? explainPythonError(error) : null;
 
   return (
     <div className="workspace">
@@ -166,7 +185,7 @@ export function Workspace({
             Solution
           </button>
           <button type="button" className="ws-check" onClick={handleCheck} disabled={checking}>
-            {checking ? 'Checking…' : 'Check'}
+            {checking ? (isPython ? 'Running…' : 'Checking…') : isPython ? 'Run' : 'Check'}
             <kbd>⌘↵</kbd>
           </button>
         </div>
@@ -208,16 +227,19 @@ export function Workspace({
 
           {tab === 'console' && (
             <div className="ws-console mono">
-              {result?.error && <p className="console-error">{result.error}</p>}
+              {error && <p className="console-error">{error}</p>}
+              {fix && <p className="console-fix">{fix}</p>}
               {timedOut && <p className="console-error">Execution timed out after 5 seconds.</p>}
-              {!result?.error && !timedOut && (result?.logs.length ?? 0) === 0 && (
+              {!error && !timedOut && logs.length === 0 && (
                 <p className="console-empty">
-                  {lesson.exercise.kind === 'js'
-                    ? 'Console output appears here. Try console.log() in your code.'
-                    : 'Your console output will appear here.'}
+                  {isPython
+                    ? 'Run the code to see print() output here.'
+                    : lesson.exercise.kind === 'js'
+                      ? 'Console output appears here. Try console.log() in your code.'
+                      : 'Your console output will appear here.'}
                 </p>
               )}
-              {result?.logs.map((line, index) => (
+              {logs.map((line, index) => (
                 <p key={index} className="console-line">
                   <span className="console-caret">›</span>
                   {line}

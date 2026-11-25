@@ -6,6 +6,7 @@ const highlights: Record<string, string[]> = {
   html: ['Semantic documents', 'Forms with real labels', 'Accessible media'],
   css: ['The box model', 'Flexbox and grid', 'Theming with tokens'],
   js: ['Values and logic', 'DOM events', 'Async and classes'],
+  python: ['Printing and variables', 'Loops over data', 'Functions that return'],
 };
 
 export function TracksSection() {
@@ -15,11 +16,12 @@ export function TracksSection() {
         <div className="section-head">
           <div>
             <p className="eyebrow">The curriculum</p>
-            <h2 className="section-title">Three tracks. One habit.</h2>
+            <h2 className="section-title">Four tracks. One habit.</h2>
           </div>
           <p className="section-note">
             Each track runs from first principles to the details that separate a page that works from a page that feels
-            considered. Lessons unlock in order, but nothing is locked behind a paywall.
+            considered. HTML, CSS and JavaScript run in a live preview; Python runs in a real interpreter loaded in
+            your browser. Lessons unlock in order, and nothing is locked behind a paywall.
           </p>
         </div>
 

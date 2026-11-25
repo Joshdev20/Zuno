@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 import { Icon } from '../ui/Icon';
 
 const freeFeatures = [
-  'All 21 interactive lessons',
+  'All interactive lessons',
   'Live editor and preview',
   'Instant checks on every exercise',
   'Playground with three panes',
-  'XP, levels and 12 badges',
+  'XP, levels and 13 badges',
 ];
 
 const proFeatures = [

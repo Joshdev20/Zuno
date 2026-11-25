@@ -1,9 +1,10 @@
 import htmlTrack from '@shared/curriculum/html.json';
 import cssTrack from '@shared/curriculum/css.json';
 import jsTrack from '@shared/curriculum/js.json';
+import pythonTrack from '@shared/curriculum/python.json';
 import type { Lesson, Track } from './types';
 
-export const tracks = [htmlTrack, cssTrack, jsTrack] as unknown as Track[];
+export const tracks = [htmlTrack, cssTrack, jsTrack, pythonTrack] as unknown as Track[];
 
 export const trackById = new Map<string, Track>(tracks.map((t) => [t.id, t]));
 
@@ -46,4 +47,5 @@ export const fileForKind: Record<string, string> = {
   html: 'index.html',
   css: 'styles.css',
   js: 'script.js',
+  python: 'main.py',
 };

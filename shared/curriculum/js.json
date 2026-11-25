@@ -46,6 +46,69 @@
           "body": "The primitive types are `string`, `number`, `boolean`, `undefined`, `null`, `symbol` and `bigint`. Everything else — arrays, functions, dates — is an object. `typeof` tells you which one you have."
         }
       ],
+      "drills": [
+        {
+          "kind": "choice",
+          "prompt": "Which keyword creates a binding that cannot be reassigned?",
+          "options": [
+            "`let`",
+            "`const`",
+            "`var`",
+            "`def`"
+          ],
+          "answer": 1,
+          "explain": "`const` locks the binding, not the value: a const object can still be mutated, but the name cannot point at something else.",
+          "hints": [
+            "Constant is in the name.",
+            "`let` is the flexible one."
+          ]
+        },
+        {
+          "kind": "fill",
+          "prompt": "Declare the age, then read it back.",
+          "code": "{{0}} age = 23;\nconsole.log({{1}});",
+          "blanks": [
+            [
+              "let",
+              "const",
+              "var"
+            ],
+            [
+              "age"
+            ]
+          ],
+          "explain": "Any of `let`, `const` or `var` creates the binding. `let` is the modern default when the value changes later.",
+          "hints": [
+            "The first blank is a declaration keyword.",
+            "The second refers to the name you just declared."
+          ]
+        },
+        {
+          "kind": "predict",
+          "prompt": "What does the console show?",
+          "code": "let score = 100;\nscore = score + 25;\nconsole.log(score);",
+          "answers": [
+            "125"
+          ],
+          "explain": "The second line reads the current value (100), adds 25 and stores it back. The console prints the new value, 125.",
+          "hints": [
+            "Read the second line right to left.",
+            "Nothing is printed as a string here."
+          ]
+        },
+        {
+          "kind": "short",
+          "prompt": "Which declaration keyword should you use when the value never changes?",
+          "answers": [
+            "const"
+          ],
+          "explain": "`const` documents intent: if the name must not point somewhere else, the language enforces it.",
+          "hints": [
+            "Five letters.",
+            "Constant."
+          ]
+        }
+      ],
       "exercise": {
         "kind": "js",
         "brief": "Write a function `describe(name, age)` that returns a sentence in the form `Ada is 36 years old.` Use a template literal.",
@@ -146,6 +209,72 @@
         {
           "type": "text",
           "body": "Once the branches cover every case, the last `return` acts as the default. That is why the example has no final `else`."
+        }
+      ],
+      "drills": [
+        {
+          "kind": "choice",
+          "prompt": "What does `===` compare?",
+          "options": [
+            "Value only",
+            "Value and type",
+            "Object identity only",
+            "Nothing; it is assignment"
+          ],
+          "answer": 1,
+          "explain": "Strict equality checks type first, then value. `'5' === 5` is false, which is why it is the default.",
+          "hints": [
+            "Type matters.",
+            "Loose equality is the one that coerces."
+          ]
+        },
+        {
+          "kind": "fill",
+          "prompt": "Return early when the score is not passing.",
+          "code": "function check(score) {\n  if (score {{0}} 50) {\n    {{1}} 'fail';\n  }\n  return 'pass';\n}",
+          "blanks": [
+            [
+              "<",
+              "<="
+            ],
+            [
+              "return"
+            ]
+          ],
+          "explain": "The guard clause exits early so the happy path stays at the bottom, un-nested.",
+          "hints": [
+            "Compare against the pass mark.",
+            "Send the value back."
+          ]
+        },
+        {
+          "kind": "predict",
+          "prompt": "What is logged?",
+          "code": "const age = 17;\nconsole.log(age >= 18 ? 'adult' : 'minor');",
+          "answers": [
+            "minor"
+          ],
+          "explain": "The condition is false, so the ternary evaluates its second branch. Ternaries suit two outcomes, not five.",
+          "hints": [
+            "17 is not 18 or more.",
+            "Pick the branch after the colon."
+          ]
+        },
+        {
+          "kind": "find",
+          "prompt": "One line mixes up assignment and comparison. Which one?",
+          "lines": [
+            "const role = 'admin';",
+            "if (role = 'admin') {",
+            "  console.log('welcome');",
+            "}"
+          ],
+          "bad": 1,
+          "explain": "A single `=` assigns. That line overwrites `role` and then evaluates the string, which is truthy, so the branch always runs.",
+          "hints": [
+            "Count the equals signs.",
+            "One line changes a value it should only read."
+          ]
         }
       ],
       "exercise": {
@@ -254,6 +383,53 @@
           "body": "Prefer `for...of` when you need to break early or perform side effects. Prefer `map`/`filter` when you are building a new value from an old one."
         }
       ],
+      "drills": [
+        {
+          "kind": "predict",
+          "prompt": "What does the console show?",
+          "code": "const nums = [1, 2, 3];\nlet total = 0;\nfor (const n of nums) {\n  total += n;\n}\nconsole.log(total);",
+          "answers": [
+            "6"
+          ],
+          "explain": "`for...of` walks the values in order: 1, then 3, then 6. `+=` keeps the running total.",
+          "hints": [
+            "Add them up.",
+            "Start from zero."
+          ]
+        },
+        {
+          "kind": "fill",
+          "prompt": "Walk every item and log it.",
+          "code": "const items = ['pen', 'pad'];\n{{0}} (const item {{1}} items) {\n  console.log(item);\n}",
+          "blanks": [
+            [
+              "for"
+            ],
+            [
+              "of"
+            ]
+          ],
+          "explain": "`for...of` iterates values, `for...in` iterates keys. For an array you almost always want `of`.",
+          "hints": [
+            "Three letters to start the loop.",
+            "Arrays give values, not keys."
+          ]
+        },
+        {
+          "kind": "short",
+          "prompt": "Which array method adds an item to the end?",
+          "answers": [
+            "push",
+            "push()",
+            ".push()"
+          ],
+          "explain": "`push` mutates the array and returns the new length. `concat` would return a new array instead.",
+          "hints": [
+            "Four letters.",
+            "It is not `pop`."
+          ]
+        }
+      ],
       "exercise": {
         "kind": "js",
         "brief": "Write `doubleAll(numbers)` that returns a new array with every number doubled. It must not mutate the input array.",
@@ -353,6 +529,55 @@
         {
           "type": "text",
           "body": "When a function needs three or more positional arguments, take an object instead. Call sites become self-documenting: `createLesson({ track, title, xp })`."
+        }
+      ],
+      "drills": [
+        {
+          "kind": "choice",
+          "prompt": "What does a function return when it has no `return` statement?",
+          "options": [
+            "`null`",
+            "`undefined`",
+            "`0`",
+            "Its last expression"
+          ],
+          "answer": 1,
+          "explain": "JavaScript returns `undefined` implicitly. Arrow functions with a bare expression body are the exception: they return the expression.",
+          "hints": [
+            "It is the value of an unassigned variable.",
+            "Not null."
+          ]
+        },
+        {
+          "kind": "order",
+          "prompt": "Order the arrow function that doubles a number.",
+          "lines": [
+            "const double = (n) => {",
+            "  return n * 2;",
+            "};",
+            "console.log(double(21));"
+          ],
+          "explain": "Declaration first, then body, then the call. The shorter `const double = (n) => n * 2;` returns the expression with no braces.",
+          "hints": [
+            "Declare before calling.",
+            "The closing brace comes before the log."
+          ]
+        },
+        {
+          "kind": "find",
+          "prompt": "This function never returns a value. Find the line to fix.",
+          "lines": [
+            "function double(n) {",
+            "  n * 2;",
+            "}",
+            "console.log(double(4));"
+          ],
+          "bad": 1,
+          "explain": "Computing a value does nothing unless it is returned. `console.log(double(4))` prints `undefined` because line 2 discards the result.",
+          "hints": [
+            "Look for a missing keyword.",
+            "The value is calculated but lost."
+          ]
         }
       ],
       "exercise": {
@@ -461,6 +686,53 @@
           "body": "If your UI ever shows a value that disagrees with your variable, you have two sources of truth. Pick one — the variable — and always render from it."
         }
       ],
+      "drills": [
+        {
+          "kind": "predict",
+          "prompt": "What is logged?",
+          "code": "const user = { name: 'Ada', role: 'engineer' };\nconsole.log(user['name']);",
+          "answers": [
+            "Ada"
+          ],
+          "explain": "Bracket notation works like dot notation here: `user['name']` and `user.name` read the same property.",
+          "hints": [
+            "Read the key, not the whole object.",
+            "No quotes in the output."
+          ]
+        },
+        {
+          "kind": "fill",
+          "prompt": "Select the heading and change its text.",
+          "code": "const title = document.{{0}}('h1');\ntitle.{{1}} = 'Field notes';",
+          "blanks": [
+            [
+              "querySelector"
+            ],
+            [
+              "textContent"
+            ]
+          ],
+          "explain": "`querySelector` takes a CSS selector and returns the first match. `textContent` sets plain text without parsing HTML.",
+          "hints": [
+            "It speaks CSS selectors.",
+            "Setting text, not markup."
+          ]
+        },
+        {
+          "kind": "short",
+          "prompt": "Which method returns the first element matching a CSS selector?",
+          "answers": [
+            "querySelector",
+            "querySelector()",
+            "document.querySelector()"
+          ],
+          "explain": "`querySelector` returns the first match or `null`. `querySelectorAll` returns every match as a static node list.",
+          "hints": [
+            "It starts with query.",
+            "There is a singular and a plural version."
+          ]
+        }
+      ],
       "exercise": {
         "kind": "js",
         "brief": "Make the button work: each click increments a counter and writes the new value into `#count` as text.",
@@ -561,6 +833,51 @@
         {
           "type": "text",
           "body": "Forgetting `await` is the most common async bug: you get a promise where you expected a value, and it prints as `[object Promise]`. If a value looks like that, you missed an await."
+        }
+      ],
+      "drills": [
+        {
+          "kind": "choice",
+          "prompt": "What does an `async` function always return?",
+          "options": [
+            "The returned value",
+            "A promise",
+            "A callback",
+            "undefined"
+          ],
+          "answer": 1,
+          "explain": "Marking a function async wraps its return value in a promise. That is why callers can `await` it even when the body is synchronous.",
+          "hints": [
+            "It is awaitable even when the body is not async.",
+            "It is the thing `await` works on."
+          ]
+        },
+        {
+          "kind": "predict",
+          "prompt": "In what order do these log?",
+          "code": "console.log('a');\nsetTimeout(() => console.log('b'), 0);\nconsole.log('c');",
+          "answers": [
+            "a c b",
+            "a,c,b",
+            "acb"
+          ],
+          "explain": "`setTimeout` always defers to the task queue, even with 0ms. The synchronous logs finish first, then queued work runs.",
+          "hints": [
+            "Timers wait for the current stack.",
+            "Everything after the timer is still synchronous."
+          ]
+        },
+        {
+          "kind": "short",
+          "prompt": "Which keyword pauses inside an async function until a promise settles?",
+          "answers": [
+            "await"
+          ],
+          "explain": "`await` suspends the function without blocking the page, and resumes it with the resolved value or throws the rejection.",
+          "hints": [
+            "Five letters.",
+            "It only works inside async."
+          ]
         }
       ],
       "exercise": {
@@ -668,6 +985,52 @@
         {
           "type": "text",
           "body": "Reach for a class when you have several related operations. For a single transformation, a plain function is simpler and just as testable."
+        }
+      ],
+      "drills": [
+        {
+          "kind": "choice",
+          "prompt": "What does `new Character('Ada')` do first?",
+          "options": [
+            "Calls `Character.render()`",
+            "Creates a blank object, then runs the constructor with `this` bound to it",
+            "Returns the class itself",
+            "Copies a prototype"
+          ],
+          "answer": 1,
+          "explain": "`new` allocates the object, links its prototype, and runs the constructor. The constructor's job is to fill the blank object.",
+          "hints": [
+            "One object is created before any code runs.",
+            "`this` is that object."
+          ]
+        },
+        {
+          "kind": "fill",
+          "prompt": "Give the class its initialiser.",
+          "code": "class Dog {\n  {{0}}(name) {\n    this.name = name;\n  }\n\n  speak() {\n    return `${this.name} barks`;\n  }\n}",
+          "blanks": [
+            [
+              "constructor"
+            ]
+          ],
+          "explain": "`constructor` runs on every `new`. A plain method with another name is never called by construction.",
+          "hints": [
+            "It is the method that runs on `new`.",
+            "Eleven letters."
+          ]
+        },
+        {
+          "kind": "short",
+          "prompt": "Which class method can be overridden to control how instances print inside template literals?",
+          "answers": [
+            "toString",
+            "toString()"
+          ],
+          "explain": "`toString` is what template literals call implicitly. Override it and `${instance}` prints something meaningful instead of `[object Object]`.",
+          "hints": [
+            "It returns a string.",
+            "It starts with a lowercase t."
+          ]
         }
       ],
       "exercise": {
