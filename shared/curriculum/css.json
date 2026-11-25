@@ -1,0 +1,808 @@
+{
+  "id": "css",
+  "name": "CSS",
+  "tagline": "Style",
+  "description": "The cascade, the box model, layout systems and the details that feel designed.",
+  "lessons": [
+    {
+      "id": "css-01",
+      "level": "beginner",
+      "title": "Selectors and the cascade",
+      "summary": "How a browser decides which rule wins, and why yours sometimes loses.",
+      "minutes": 8,
+      "xp": 45,
+      "objectives": [
+        "Read a CSS rule: selector, property, value",
+        "Target elements by class",
+        "Predict which declaration wins when two rules collide"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "CSS is a list of claims about elements. Each claim has a **selector** that picks elements and a block of **declarations** that describe how they should look."
+        },
+        {
+          "type": "code",
+          "language": "css",
+          "code": ".card {\n  background: #fffdf8;\n  border-radius: 12px;\n}\n\nh2 {\n  color: #1e4b3a;\n}",
+          "caption": "Two rules: one class selector, one element selector"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`.card` selects every element with `class=\"card\"`. The dot is part of the selector, not the class name.",
+            "`h2` selects every `<h2>` on the page. Broad selectors are easy, but they leak.",
+            "The cascade resolves conflicts by specificity, then by source order. `.card` (0,1,0) beats `h2` (0,0,1).",
+            "`!important` is not a fix. It is a debt with 30% interest."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "tip",
+          "title": "Prefer classes",
+          "body": "Element selectors are fine for base typography, but anything you will style deliberately should have a class. It keeps specificity flat and predictable."
+        },
+        {
+          "type": "text",
+          "body": "The inspector in your browser's dev tools shows which declaration won and which were struck through. That panel is the fastest way to learn the cascade."
+        }
+      ],
+      "exercise": {
+        "kind": "css",
+        "brief": "Give `.card` a warm surface (`#fffdf8`), a 12px radius, 24px of inner space and a hairline border (`1px solid #e3e0d6`). Then colour `.title` with `#14150f`.",
+        "markup": "<div class=\"page\">\n  <header class=\"masthead\">\n    <p class=\"kicker\">A journal from the coast</p>\n    <h1 class=\"title\">Field notes</h1>\n  </header>\n  <article class=\"card\">\n    <h2>Wind</h2>\n    <p>Twenty knots before breakfast, and rising.</p>\n  </article>\n</div>",
+        "starter": "/* Style the card and the title */\n.card {\n  /* your declarations */\n}",
+        "solution": ".card {\n  background: #fffdf8;\n  border-radius: 12px;\n  padding: 24px;\n  border: 1px solid #e3e0d6;\n}\n\n.title {\n  color: #14150f;\n}",
+        "checks": [
+          {
+            "kind": "style",
+            "label": "The card has a warm surface colour",
+            "selector": ".card",
+            "property": "backgroundColor",
+            "expected": "#fffdf8"
+          },
+          {
+            "kind": "style",
+            "label": "The card corners are rounded 12px",
+            "selector": ".card",
+            "property": "borderRadius",
+            "expected": "12px"
+          },
+          {
+            "kind": "style",
+            "label": "The card has 24px of inner space",
+            "selector": ".card",
+            "property": "paddingTop",
+            "expected": "24px"
+          },
+          {
+            "kind": "style",
+            "label": "The card has a 1px hairline border",
+            "selector": ".card",
+            "property": "borderTopWidth",
+            "expected": "1px"
+          },
+          {
+            "kind": "style",
+            "label": "The title is ink black",
+            "selector": ".title",
+            "property": "color",
+            "expected": "#14150f"
+          }
+        ],
+        "hints": [
+          "Colours can be hex, rgb() or a name. The check compares the final computed colour.",
+          "`border: 1px solid #e3e0d6` sets width, style and colour in one declaration."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "css-01-q1",
+          "prompt": "Which selector is most specific?",
+          "options": [
+            ".card",
+            "#hero",
+            "article p",
+            "h2"
+          ],
+          "answer": 1,
+          "explain": "IDs win over classes, and classes win over element selectors."
+        },
+        {
+          "id": "css-01-q2",
+          "prompt": "Two rules set `color` on the same element with equal specificity. Which applies?",
+          "options": [
+            "The one defined first",
+            "The one defined last",
+            "The one with more declarations",
+            "The browser picks randomly"
+          ],
+          "answer": 1,
+          "explain": "With equal specificity, later source order wins — which is why import order matters."
+        }
+      ]
+    },
+    {
+      "id": "css-02",
+      "level": "beginner",
+      "title": "The box model",
+      "summary": "Every element is a box. Learn what is inside it and what pushes it around.",
+      "minutes": 9,
+      "xp": 50,
+      "objectives": [
+        "Distinguish content, padding, border and margin",
+        "Use box-sizing: border-box everywhere",
+        "Set width without surprising overflow"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "Every element renders as a rectangle with four layers: the **content**, the **padding** around it, the **border**, and the **margin** that pushes neighbours away."
+        },
+        {
+          "type": "code",
+          "language": "css",
+          "code": "*, *::before, *::after {\n  box-sizing: border-box;\n}\n\n.note {\n  width: 320px;\n  padding: 24px;\n  border: 2px solid #dcd7c9;\n}"
+        },
+        {
+          "type": "list",
+          "items": [
+            "By default `width` measures the content only. Add padding and a border and the box grows past 320px.",
+            "`box-sizing: border-box` makes `width` include padding and border. This is what you almost always want.",
+            "Padding is inside the border and takes the element's background colour. Margin is outside and always transparent.",
+            "Vertical margins between siblings collapse into the larger one. Padding never collapses."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "note",
+          "title": "Why the universal reset",
+          "body": "`box-sizing: border-box` on `*, *::before, *::after` is the one reset worth memorising. It makes every width mean the same thing everywhere."
+        },
+        {
+          "type": "text",
+          "body": "When a layout overflows, check the box model before blaming flexbox. Nine times out of ten, a width plus padding is the culprit."
+        }
+      ],
+      "exercise": {
+        "kind": "css",
+        "brief": "Give `.box` a fixed 320px width, 24px padding, a `2px solid #1e4b3a` border and `box-sizing: border-box`. The rendered box should stay exactly 320px wide.",
+        "markup": "<div class=\"box\">\n  <h2>Packing list</h2>\n  <p>Notebook, thermos, and a jacket that can take rain.</p>\n</div>",
+        "starter": ".box {\n  /* width, padding, border, box-sizing */\n}",
+        "solution": ".box {\n  width: 320px;\n  padding: 24px;\n  border: 2px solid #1e4b3a;\n  box-sizing: border-box;\n}",
+        "checks": [
+          {
+            "kind": "style",
+            "label": "The box measures 320px wide",
+            "selector": ".box",
+            "property": "width",
+            "expected": "320px"
+          },
+          {
+            "kind": "style",
+            "label": "Padding is 24px on every side",
+            "selector": ".box",
+            "property": "paddingLeft",
+            "expected": "24px"
+          },
+          {
+            "kind": "style",
+            "label": "The border is 2px of pine green",
+            "selector": ".box",
+            "property": "borderTopWidth",
+            "expected": "2px"
+          },
+          {
+            "kind": "style",
+            "label": "box-sizing includes padding and border",
+            "selector": ".box",
+            "property": "boxSizing",
+            "expected": "border-box"
+          },
+          {
+            "kind": "js",
+            "label": "The rendered box is exactly 320px",
+            "expression": "Math.round(document.querySelector('.box').getBoundingClientRect().width) === 320"
+          }
+        ],
+        "hints": [
+          "Set `box-sizing: border-box` on `.box` if you are not using a reset.",
+          "`border: 2px solid #1e4b3a` sets width, style and colour together."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "css-02-q1",
+          "prompt": "An element is 200px wide with 20px padding and a 1px border, default box-sizing. How wide does it render?",
+          "options": [
+            "200px",
+            "220px",
+            "241px",
+            "242px"
+          ],
+          "answer": 3,
+          "explain": "200 + 20 + 20 padding + 1 + 1 border = 242px. That is the surprise border-box removes."
+        },
+        {
+          "id": "css-02-q2",
+          "prompt": "Which layer shows the element's background colour?",
+          "options": [
+            "Margin",
+            "Border",
+            "Padding",
+            "None of them"
+          ],
+          "answer": 2,
+          "explain": "Backgrounds paint under the content and the padding, but not the margin."
+        }
+      ]
+    },
+    {
+      "id": "css-03",
+      "level": "beginner",
+      "title": "Colour, type and rhythm",
+      "summary": "The handful of properties that decide whether text feels designed.",
+      "minutes": 10,
+      "xp": 50,
+      "objectives": [
+        "Set a readable measure for body text",
+        "Build hierarchy with size, weight and colour",
+        "Use letter-spacing and case for small labels"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "Most interfaces are text. Four decisions do most of the work: the typeface, the size scale, the line-height, and how wide a line of text is allowed to run."
+        },
+        {
+          "type": "code",
+          "language": "css",
+          "code": "body {\n  font-family: Inter, system-ui, sans-serif;\n  font-size: 16px;\n  line-height: 1.6;\n  color: #14150f;\n}\n\n.lead {\n  font-size: 18px;\n  color: #4a4a44;\n  max-width: 62ch;\n}\n\n.eyebrow {\n  font-size: 12px;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n  color: #7c7a71;\n}"
+        },
+        {
+          "type": "list",
+          "items": [
+            "A line of body text reads best between 45 and 75 characters. `max-width: 62ch` enforces it without media queries.",
+            "Line-height between 1.4 and 1.7 for paragraphs. Headings can be tighter: 1.1 to 1.2.",
+            "Use weight and colour for secondary hierarchy. Two typefaces is plenty; one is often better.",
+            "`ch` is the width of a zero. It scales with the font size, unlike `px`."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "tip",
+          "title": "Contrast is not optional",
+          "body": "Body text should hit at least 4.5:1 against its background. Muted grey on cream is a classic failure: `#7c7a71` on `#f5f2ea` is about 4.6:1, which passes — barely."
+        },
+        {
+          "type": "text",
+          "body": "Space is part of typography. Give a heading more room above than below, and it will group with the text it introduces."
+        }
+      ],
+      "exercise": {
+        "kind": "css",
+        "brief": "Style the article: `.lead` at 18px in `#4a4a44` with `max-width: 62ch`, `.eyebrow` uppercase with `letter-spacing: 0.08em`, and give `.title` a `font-weight` of 600.",
+        "markup": "<article class=\"post\">\n  <p class=\"eyebrow\">Field notes</p>\n  <h1 class=\"title\">A week of weather</h1>\n  <p class=\"lead\">The coast does not care about your plans. It cares about pressure systems, and this week they were busy.</p>\n</article>",
+        "starter": "/* Type the article */\n.lead {\n  /* size, colour, measure */\n}\n\n.eyebrow {\n  /* case and tracking */\n}\n\n.title {\n  /* weight */\n}",
+        "solution": ".lead {\n  font-size: 18px;\n  color: #4a4a44;\n  max-width: 62ch;\n}\n\n.eyebrow {\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n}\n\n.title {\n  font-weight: 600;\n}",
+        "checks": [
+          {
+            "kind": "style",
+            "label": "The lead paragraph is 18px",
+            "selector": ".lead",
+            "property": "fontSize",
+            "expected": "18px"
+          },
+          {
+            "kind": "style",
+            "label": "The lead paragraph is muted grey",
+            "selector": ".lead",
+            "property": "color",
+            "expected": "#4a4a44"
+          },
+          {
+            "kind": "style",
+            "label": "The lead is capped at 62ch",
+            "selector": ".lead",
+            "property": "maxWidth",
+            "expected": "62ch"
+          },
+          {
+            "kind": "style",
+            "label": "The eyebrow is uppercase",
+            "selector": ".eyebrow",
+            "property": "textTransform",
+            "expected": "uppercase"
+          },
+          {
+            "kind": "style",
+            "label": "The title is semibold",
+            "selector": ".title",
+            "property": "fontWeight",
+            "expected": "600"
+          }
+        ],
+        "hints": [
+          "`letter-spacing: 0.08em` is relative to the font size, so it scales.",
+          "`text-transform` changes the rendered case, not the HTML."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "css-03-q1",
+          "prompt": "Why is `max-width: 62ch` better than `max-width: 700px` for body copy?",
+          "options": [
+            "It is shorter",
+            "It scales with the font size and caps characters per line",
+            "Pixels are deprecated",
+            "It works in more browsers"
+          ],
+          "answer": 1,
+          "explain": "`ch` is tied to the font, so the measure stays readable when the user increases text size."
+        },
+        {
+          "id": "css-03-q2",
+          "prompt": "Which line-height suits a paragraph of body text?",
+          "options": [
+            "0.9",
+            "1.0",
+            "1.6",
+            "3.0"
+          ],
+          "answer": 2,
+          "explain": "Around 1.5–1.7 gives comfortable line spacing for prose. Tight values are for headings."
+        }
+      ]
+    },
+    {
+      "id": "css-04",
+      "level": "intermediate",
+      "title": "Flexbox, properly",
+      "summary": "One axis, total control. The layout tool you will reach for every day.",
+      "minutes": 11,
+      "xp": 65,
+      "objectives": [
+        "Understand main axis vs cross axis",
+        "Space items with gap instead of margins",
+        "Center anything in two lines"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "Flexbox lays out children along **one axis**. Set `display: flex` on the parent and the children become items that you can distribute, align and reorder."
+        },
+        {
+          "type": "code",
+          "language": "css",
+          "code": ".bar {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 24px;\n}"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`justify-content` distributes along the main axis: `flex-start`, `center`, `space-between`, `space-around`.",
+            "`align-items` positions on the cross axis: `stretch` by default, `center` for vertical centering.",
+            "`gap` is the modern spacing tool. It only applies between items and never adds outer margin.",
+            "`flex: 1` lets an item grow to fill leftover space. `flex: 0 0 auto` keeps its natural size."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "note",
+          "title": "flex-wrap is a different layout",
+          "body": "Once items wrap, `justify-content` distributes each line and `align-content` distributes the lines. If you find yourself fighting it, grid is probably the better tool."
+        },
+        {
+          "type": "text",
+          "body": "Centering one thing? `display: grid; place-items: center` is even shorter than flexbox. For a row of controls, flexbox is still the clearest choice."
+        }
+      ],
+      "exercise": {
+        "kind": "css",
+        "brief": "Turn `.bar` into a flex row with 24px gaps, vertically centered items, and the links pushed to the right edge with `justify-content: space-between`.",
+        "markup": "<header class=\"bar\">\n  <a class=\"brand\" href=\"/\">Zuno</a>\n  <nav class=\"links\">\n    <a href=\"/learn\">Learn</a>\n    <a href=\"/playground\">Playground</a>\n    <a href=\"/pricing\">Pricing</a>\n  </nav>\n</header>",
+        "starter": ".bar {\n  /* display, gap, alignment */\n}\n\n.links {\n  display: flex;\n  gap: 16px;\n}",
+        "solution": ".bar {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 24px;\n}\n\n.links {\n  display: flex;\n  gap: 16px;\n}",
+        "checks": [
+          {
+            "kind": "style",
+            "label": "The bar is a flex container",
+            "selector": ".bar",
+            "property": "display",
+            "expected": "flex"
+          },
+          {
+            "kind": "style",
+            "label": "Items are vertically centered",
+            "selector": ".bar",
+            "property": "alignItems",
+            "expected": "center"
+          },
+          {
+            "kind": "style",
+            "label": "The brand and links sit at opposite ends",
+            "selector": ".bar",
+            "property": "justifyContent",
+            "expected": "space-between"
+          },
+          {
+            "kind": "style",
+            "label": "There is a 24px gap between the two groups",
+            "selector": ".bar",
+            "property": "gap",
+            "expected": "24px"
+          },
+          {
+            "kind": "style",
+            "label": "The link list is also a flex row",
+            "selector": ".links",
+            "property": "display",
+            "expected": "flex"
+          }
+        ],
+        "hints": [
+          "`align-items: center` centers on the cross axis, which is vertical in a row.",
+          "`space-between` pushes the first item to the start and the last to the end."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "css-04-q1",
+          "prompt": "In `flex-direction: row`, which property aligns items vertically?",
+          "options": [
+            "justify-content",
+            "align-items",
+            "align-content",
+            "place-self"
+          ],
+          "answer": 1,
+          "explain": "The main axis is horizontal, so vertical alignment is the cross axis: align-items."
+        },
+        {
+          "id": "css-04-q2",
+          "prompt": "Why prefer `gap` over margins between flex items?",
+          "options": [
+            "It is faster",
+            "It only adds space between items, never at the ends",
+            "Margins do not work in flexbox",
+            "It supports animation"
+          ],
+          "answer": 1,
+          "explain": "gap spaces the gaps, not the outer edges — no :last-child hacks required."
+        }
+      ]
+    },
+    {
+      "id": "css-05",
+      "level": "intermediate",
+      "title": "Grid and responsive design",
+      "summary": "Two-dimensional layout, then make it survive a 320px screen.",
+      "minutes": 13,
+      "xp": 70,
+      "objectives": [
+        "Create a responsive card grid with auto-fit",
+        "Understand minmax and fr units",
+        "Write a mobile-first media query"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "Grid works in two dimensions at once. The most useful pattern in day-to-day work is a card grid that reflows by itself, with no media queries at all."
+        },
+        {
+          "type": "code",
+          "language": "css",
+          "code": ".grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));\n  gap: 16px;\n}",
+          "caption": "A grid that decides its own column count"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`repeat(auto-fit, …)` creates as many columns as fit and collapses empty ones. `auto-fill` keeps the empty ones.",
+            "`minmax(240px, 1fr)` means “never narrower than 240px, share the rest equally”.",
+            "`1fr` is a share of the free space, not a fixed size.",
+            "Media queries are for structural changes. If a grid can reflow by itself, let it."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "tip",
+          "title": "Mobile first",
+          "body": "Write the small-screen layout as the base, then add complexity with `@media (min-width: 720px)`. It produces less override code than the reverse."
+        },
+        {
+          "type": "text",
+          "body": "Test at 320px wide with the browser's device toolbar. If the page scrolls sideways, something has a fixed width wider than the viewport — often an image or a `min-width`."
+        }
+      ],
+      "exercise": {
+        "kind": "css",
+        "brief": "Make `.grid` a responsive grid: three equal columns at desktop width, 16px gaps, using `repeat(auto-fit, minmax(240px, 1fr))`. Add a `@media (max-width: 640px)` block that sets the grid to a single column.",
+        "markup": "<section class=\"grid\">\n  <article class=\"tile\"><h2>HTML</h2><p>Structure and semantics.</p></article>\n  <article class=\"tile\"><h2>CSS</h2><p>Layout and typography.</p></article>\n  <article class=\"tile\"><h2>JavaScript</h2><p>Behaviour and state.</p></article>\n</section>",
+        "starter": ".grid {\n  /* display, columns, gap */\n}\n\n/* add a media query below */",
+        "solution": ".grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));\n  gap: 16px;\n}\n\n@media (max-width: 640px) {\n  .grid {\n    grid-template-columns: 1fr;\n  }\n}",
+        "checks": [
+          {
+            "kind": "style",
+            "label": "The container is a grid",
+            "selector": ".grid",
+            "property": "display",
+            "expected": "grid"
+          },
+          {
+            "kind": "style",
+            "label": "Gaps are 16px",
+            "selector": ".grid",
+            "property": "gap",
+            "expected": "16px"
+          },
+          {
+            "kind": "js",
+            "label": "Three columns are laid out at this width",
+            "expression": "getComputedStyle(document.querySelector('.grid')).gridTemplateColumns.split(' ').length === 3"
+          },
+          {
+            "kind": "source",
+            "label": "Columns use auto-fit with minmax",
+            "includes": "auto-fit"
+          },
+          {
+            "kind": "source",
+            "label": "A media query handles small screens",
+            "includes": "@media"
+          }
+        ],
+        "hints": [
+          "`repeat(auto-fit, minmax(240px, 1fr))` is one declaration — no media query needed for the reflow.",
+          "The media query is a separate block, not nested inside `.grid`."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "css-05-q1",
+          "prompt": "What does `1fr` mean in a grid track?",
+          "options": [
+            "Exactly 1 pixel",
+            "One fraction of the available free space",
+            "One fixed row",
+            "The first column only"
+          ],
+          "answer": 1,
+          "explain": "fr distributes the leftover space after fixed sizes and gaps are accounted for."
+        },
+        {
+          "id": "css-05-q2",
+          "prompt": "`auto-fit` vs `auto-fill`: which collapses empty tracks?",
+          "options": [
+            "auto-fill",
+            "auto-fit",
+            "Both",
+            "Neither"
+          ],
+          "answer": 1,
+          "explain": "auto-fit collapses empty tracks so the remaining items stretch; auto-fill keeps them reserved."
+        }
+      ]
+    },
+    {
+      "id": "css-06",
+      "level": "advanced",
+      "title": "Custom properties and theming",
+      "summary": "Design tokens, one override, and a theme switch with no JavaScript.",
+      "minutes": 12,
+      "xp": 75,
+      "objectives": [
+        "Declare tokens on :root",
+        "Override tokens per theme scope",
+        "Understand inheritance of custom properties"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "Custom properties are variables that live in the cascade. They inherit like any other property, which means a theme is just a different set of values on an ancestor."
+        },
+        {
+          "type": "code",
+          "language": "css",
+          "code": ":root {\n  --surface: #ffffff;\n  --ink: #14150f;\n}\n\n[data-theme=\"dark\"] {\n  --surface: #16181c;\n  --ink: #f2efe6;\n}\n\n.panel {\n  background: var(--surface);\n  color: var(--ink);\n}",
+          "caption": "One component, two themes, zero duplicated rules"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Tokens belong on `:root` so every element can read them.",
+            "A `[data-theme=\"dark\"]` scope overrides only the values. `.panel` never changes.",
+            "Custom properties inherit, so a theme can be applied to a section, not just the page.",
+            "Provide a fallback: `var(--surface, #ffffff)` keeps the component usable if a token is missing."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "note",
+          "title": "Name by role, not by value",
+          "body": "`--surface` and `--ink` survive a redesign. `--grey-100` does not: the day you make the theme warm, the name lies."
+        },
+        {
+          "type": "text",
+          "body": "This is also how you support dark mode without duplicating every rule. Set `data-theme` on `<html>`, let the tokens do the work, and the whole interface follows."
+        }
+      ],
+      "exercise": {
+        "kind": "css",
+        "brief": "Declare `--surface` and `--ink` on `:root` (light values `#ffffff` / `#14150f`), override them under `[data-theme=\"dark\"]` (`#16181c` / `#f2efe6`), and make `.panel` use `var(--surface)` and `var(--ink)` with 24px padding.",
+        "markup": "<div data-theme=\"light\">\n  <section class=\"panel\"><h2>Light</h2><p>Paper and ink.</p></section>\n</div>\n<div data-theme=\"dark\">\n  <section class=\"panel\"><h2>Dark</h2><p>Ink and paper, reversed.</p></section>\n</div>",
+        "starter": ":root {\n  /* light tokens */\n}\n\n[data-theme=\"dark\"] {\n  /* dark overrides */\n}\n\n.panel {\n  /* use the tokens */\n}",
+        "solution": ":root {\n  --surface: #ffffff;\n  --ink: #14150f;\n}\n\n[data-theme=\"dark\"] {\n  --surface: #16181c;\n  --ink: #f2efe6;\n}\n\n.panel {\n  background: var(--surface);\n  color: var(--ink);\n  padding: 24px;\n}",
+        "checks": [
+          {
+            "kind": "source",
+            "label": "Tokens are declared on :root",
+            "includes": ":root"
+          },
+          {
+            "kind": "source",
+            "label": "The panel reads tokens with var()",
+            "includes": "var(--"
+          },
+          {
+            "kind": "style",
+            "label": "The light panel is white",
+            "selector": "[data-theme=\"light\"] .panel",
+            "property": "backgroundColor",
+            "expected": "#ffffff"
+          },
+          {
+            "kind": "style",
+            "label": "The dark panel is near-black",
+            "selector": "[data-theme=\"dark\"] .panel",
+            "property": "backgroundColor",
+            "expected": "#16181c"
+          },
+          {
+            "kind": "style",
+            "label": "Dark theme text is warm off-white",
+            "selector": "[data-theme=\"dark\"] .panel",
+            "property": "color",
+            "expected": "#f2efe6"
+          }
+        ],
+        "hints": [
+          "The `[data-theme=\"dark\"]` block only overrides values — do not repeat `.panel` inside it.",
+          "`var(--surface)` is the syntax; the fallback form is `var(--surface, #fff)`."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "css-06-q1",
+          "prompt": "Why does a theme override work without touching component rules?",
+          "options": [
+            "Because var() is evaluated at runtime by JavaScript",
+            "Because custom properties inherit and are resolved on each element",
+            "Because [data-theme] has higher specificity",
+            "Because CSS recompiles the stylesheet"
+          ],
+          "answer": 1,
+          "explain": "Inheritance carries the value down; `var(--surface)` resolves against the nearest ancestor's value."
+        },
+        {
+          "id": "css-06-q2",
+          "prompt": "Which token name survives a rebrand best?",
+          "options": [
+            "--grey-100",
+            "--surface-raised",
+            "--light-bg-2",
+            "--color-fffdf8"
+          ],
+          "answer": 1,
+          "explain": "Names that describe the role keep meaning when the palette changes."
+        }
+      ]
+    },
+    {
+      "id": "css-07",
+      "level": "advanced",
+      "title": "Motion and polish",
+      "summary": "Transitions that feel physical, and the accessibility guard everyone forgets.",
+      "minutes": 11,
+      "xp": 75,
+      "objectives": [
+        "Animate only transform and opacity for performance",
+        "Choose sensible durations and easing",
+        "Respect prefers-reduced-motion"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "Motion is feedback. A hover lift tells you the card is interactive; a 900ms fade tells you the designer had time on their hands. Keep it short and make it physical."
+        },
+        {
+          "type": "code",
+          "language": "css",
+          "code": ".card {\n  transition: transform 180ms ease, box-shadow 180ms ease;\n}\n\n.card:hover {\n  transform: translateY(-2px);\n  box-shadow: 0 8px 24px rgb(20 21 15 / 0.08);\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .card {\n    transition: none;\n  }\n}"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Animate `transform` and `opacity`. Animating `width`, `top` or `margin` forces layout on every frame.",
+            "150–250ms for hover and press feedback. 300ms+ only for entering a new screen.",
+            "`ease` or a gentle `cubic-bezier` feels natural. Linear feels mechanical.",
+            "Always wrap non-essential motion in `@media (prefers-reduced-motion: reduce)`."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "warn",
+          "title": "Reduced motion is a health setting",
+          "body": "For some people, large movement triggers nausea or migraines. Honour the setting: keep the state change, drop the travel."
+        },
+        {
+          "type": "text",
+          "body": "Focus states deserve the same care as hover. Use `:focus-visible` so keyboard users see the ring, and never remove an outline without replacing it."
+        }
+      ],
+      "exercise": {
+        "kind": "css",
+        "brief": "Give `.card` a 180ms transition on `transform` and `box-shadow`, a `:hover` state that lifts it with `translateY(-2px)`, a `@keyframes pulse` animation applied to `.dot`, and a `prefers-reduced-motion` block that disables the transition.",
+        "markup": "<article class=\"card\">\n  <span class=\"dot\"></span>\n  <h2>Live now</h2>\n  <p>Two hundred people are learning.</p>\n</article>",
+        "starter": ".card {\n  /* transition */\n}\n\n.card:hover {\n  /* lift */\n}\n\n.dot {\n  /* animation */\n}\n\n/* reduced motion */",
+        "solution": ".card {\n  transition: transform 180ms ease, box-shadow 180ms ease;\n}\n\n.card:hover {\n  transform: translateY(-2px);\n  box-shadow: 0 8px 24px rgb(20 21 15 / 0.08);\n}\n\n.dot {\n  animation: pulse 2s ease-in-out infinite;\n}\n\n@keyframes pulse {\n  0%, 100% { opacity: 1; }\n  50% { opacity: 0.4; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .card {\n    transition: none;\n  }\n}",
+        "checks": [
+          {
+            "kind": "js",
+            "label": "The card has a non-zero transition duration",
+            "expression": "getComputedStyle(document.querySelector('.card')).transitionDuration !== '0s'"
+          },
+          {
+            "kind": "js",
+            "label": "Transform is part of the transition",
+            "expression": "getComputedStyle(document.querySelector('.card')).transitionProperty.includes('transform')"
+          },
+          {
+            "kind": "js",
+            "label": "The dot runs a keyframe animation",
+            "expression": "getComputedStyle(document.querySelector('.dot')).animationName !== 'none'"
+          },
+          {
+            "kind": "source",
+            "label": "Keyframes are defined",
+            "includes": "@keyframes"
+          },
+          {
+            "kind": "source",
+            "label": "Reduced motion is respected",
+            "includes": "prefers-reduced-motion"
+          }
+        ],
+        "hints": [
+          "`transition: transform 180ms ease, box-shadow 180ms ease` covers both properties.",
+          "The media query goes at the top level, after the other rules."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "css-07-q1",
+          "prompt": "Which pair of properties is cheapest to animate?",
+          "options": [
+            "width and height",
+            "top and left",
+            "transform and opacity",
+            "margin and padding"
+          ],
+          "answer": 2,
+          "explain": "Transform and opacity can be handled by the compositor without recalculating layout."
+        },
+        {
+          "id": "css-07-q2",
+          "prompt": "What should happen under prefers-reduced-motion?",
+          "options": [
+            "Remove all interactivity",
+            "Keep the state change, remove the movement",
+            "Slow the animation down",
+            "Nothing, it is optional"
+          ],
+          "answer": 1,
+          "explain": "Feedback still matters. Replace travel with a colour or opacity change."
+        }
+      ]
+    }
+  ]
+}

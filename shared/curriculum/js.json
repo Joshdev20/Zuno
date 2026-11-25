@@ -1,0 +1,738 @@
+{
+  "id": "js",
+  "name": "JavaScript",
+  "tagline": "Behaviour",
+  "description": "Values, logic, the DOM and async code — the language that makes pages do things.",
+  "lessons": [
+    {
+      "id": "js-01",
+      "level": "beginner",
+      "title": "Values and variables",
+      "summary": "const, let, types and the template literal you will use every day.",
+      "minutes": 8,
+      "xp": 45,
+      "objectives": [
+        "Choose between const and let",
+        "Name the primitive types",
+        "Build strings with template literals"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "A variable is a name for a value. JavaScript gives you three ways to create one, and you should use two of them."
+        },
+        {
+          "type": "code",
+          "language": "js",
+          "code": "const name = 'Ada';\nlet streak = 3;\nstreak = streak + 1;\n\nconst message = `${name} has a ${streak} day streak.`;"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`const` means the binding never changes. The value it points to can still be mutated if it is an object.",
+            "`let` is for values that get reassigned: counters, accumulators, state.",
+            "`var` is function-scoped and hoisted in a way that surprises people. Do not use it in new code.",
+            "Template literals use backticks and `${}` and produce strings without concatenation."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "tip",
+          "title": "Start with const",
+          "body": "Write `const` first. When the editor complains that you reassign, change it to `let`. That habit prevents a whole category of accidental mutation bugs."
+        },
+        {
+          "type": "text",
+          "body": "The primitive types are `string`, `number`, `boolean`, `undefined`, `null`, `symbol` and `bigint`. Everything else — arrays, functions, dates — is an object. `typeof` tells you which one you have."
+        }
+      ],
+      "exercise": {
+        "kind": "js",
+        "brief": "Write a function `describe(name, age)` that returns a sentence in the form `Ada is 36 years old.` Use a template literal.",
+        "starter": "function describe(name, age) {\n  // return the sentence\n}",
+        "solution": "function describe(name, age) {\n  return `${name} is ${age} years old.`;\n}",
+        "checks": [
+          {
+            "kind": "js",
+            "label": "describe is a function",
+            "expression": "typeof describe === 'function'"
+          },
+          {
+            "kind": "js",
+            "label": "It returns the expected sentence",
+            "expression": "describe('Ada', 36) === 'Ada is 36 years old.'"
+          },
+          {
+            "kind": "js",
+            "label": "It works for any name and age",
+            "expression": "describe('Grace', 85) === 'Grace is 85 years old.'"
+          },
+          {
+            "kind": "source",
+            "label": "The sentence uses a template literal",
+            "includes": "`"
+          }
+        ],
+        "hints": [
+          "Template literals use backticks, not quotes: `` `${name} is ${age} years old.` ``",
+          "Do not forget the full stop at the end — the check compares the whole string."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "js-01-q1",
+          "prompt": "Which declaration can be reassigned?",
+          "options": [
+            "const",
+            "let",
+            "Both",
+            "Neither"
+          ],
+          "answer": 1,
+          "explain": "const forbids reassignment of the binding. let allows it."
+        },
+        {
+          "id": "js-01-q2",
+          "prompt": "What does `typeof []` return?",
+          "options": [
+            "'array'",
+            "'object'",
+            "'list'",
+            "'undefined'"
+          ],
+          "answer": 1,
+          "explain": "Arrays are objects. Use Array.isArray() to test for an array."
+        }
+      ]
+    },
+    {
+      "id": "js-02",
+      "level": "beginner",
+      "title": "Logic and conditionals",
+      "summary": "Comparisons, if/else and the ternary you should not overuse.",
+      "minutes": 8,
+      "xp": 45,
+      "objectives": [
+        "Use strict equality",
+        "Chain conditions with && and ||",
+        "Return early instead of nesting"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "Programs decide things. In JavaScript the decisions are `if`, `else if`, `else`, and the ternary expression for short choices."
+        },
+        {
+          "type": "code",
+          "language": "js",
+          "code": "function grade(score) {\n  if (score >= 90) return 'A';\n  if (score >= 80) return 'B';\n  if (score >= 70) return 'C';\n  return 'F';\n}",
+          "caption": "Early returns flatten the logic"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`===` compares value and type. `==` converts first, which is how `'' == 0` becomes true.",
+            "`&&` and `||` return a value, not just a boolean. `user && user.name` short-circuits.",
+            "`??` falls back only for `null` and `undefined`, unlike `||` which also catches `0` and `''`.",
+            "Return early. A function with four levels of nesting is four functions waiting to happen."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "note",
+          "title": "Falsy values",
+          "body": "`false`, `0`, `-0`, `0n`, `''`, `null`, `undefined` and `NaN` are falsy. Everything else — including `[]` and `{}` — is truthy."
+        },
+        {
+          "type": "text",
+          "body": "Once the branches cover every case, the last `return` acts as the default. That is why the example has no final `else`."
+        }
+      ],
+      "exercise": {
+        "kind": "js",
+        "brief": "Write `grade(score)` returning `'A'` for 90+, `'B'` for 80+, `'C'` for 70+, and `'F'` below 70.",
+        "starter": "function grade(score) {\n  // return a letter\n}",
+        "solution": "function grade(score) {\n  if (score >= 90) return 'A';\n  if (score >= 80) return 'B';\n  if (score >= 70) return 'C';\n  return 'F';\n}",
+        "checks": [
+          {
+            "kind": "js",
+            "label": "90 is an A",
+            "expression": "grade(90) === 'A'"
+          },
+          {
+            "kind": "js",
+            "label": "85 is a B",
+            "expression": "grade(85) === 'B'"
+          },
+          {
+            "kind": "js",
+            "label": "70 is a C",
+            "expression": "grade(70) === 'C'"
+          },
+          {
+            "kind": "js",
+            "label": "69 is an F",
+            "expression": "grade(69) === 'F'"
+          },
+          {
+            "kind": "js",
+            "label": "0 is an F",
+            "expression": "grade(0) === 'F'"
+          }
+        ],
+        "hints": [
+          "Order matters: check the highest threshold first.",
+          "Each `if` returns immediately, so no `else` is needed."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "js-02-q1",
+          "prompt": "What does `0 || 'fallback'` evaluate to?",
+          "options": [
+            "0",
+            "'fallback'",
+            "false",
+            "undefined"
+          ],
+          "answer": 1,
+          "explain": "0 is falsy, so || returns the right-hand operand. `0 ?? 'fallback'` would return 0."
+        },
+        {
+          "id": "js-02-q2",
+          "prompt": "Which comparison avoids type coercion?",
+          "options": [
+            "==",
+            "===",
+            "=",
+            "!=="
+          ],
+          "answer": 1,
+          "explain": "=== compares without converting. (!== is also strict, but the question asks for a comparison of equality.)"
+        }
+      ]
+    },
+    {
+      "id": "js-03",
+      "level": "beginner",
+      "title": "Loops and arrays",
+      "summary": "Iterate, accumulate and transform without mutating what you were given.",
+      "minutes": 10,
+      "xp": 50,
+      "objectives": [
+        "Loop with for and for...of",
+        "Read and write array items by index",
+        "Build a new array instead of mutating the input"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "An array is an ordered list. A loop is how you visit every item. Together they are the backbone of most code you will write."
+        },
+        {
+          "type": "code",
+          "language": "js",
+          "code": "const scores = [72, 88, 95];\n\nfor (const score of scores) {\n  console.log(score);\n}\n\nconst doubled = scores.map((score) => score * 2);"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`for...of` gives you values. `for...in` gives you keys as strings — avoid it for arrays.",
+            "`array.length` is one more than the last index. Indexes start at 0.",
+            "`map`, `filter` and `reduce` return new arrays or values; `push` and `splice` mutate in place.",
+            "`push` adds to the end, `pop` removes from the end, `includes` tests membership."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "tip",
+          "title": "Copy before you mutate",
+          "body": "`const copy = [...items]` gives you a shallow copy. Mutating an argument that the caller still holds is one of the most common sources of “why did that change?” bugs."
+        },
+        {
+          "type": "text",
+          "body": "Prefer `for...of` when you need to break early or perform side effects. Prefer `map`/`filter` when you are building a new value from an old one."
+        }
+      ],
+      "exercise": {
+        "kind": "js",
+        "brief": "Write `doubleAll(numbers)` that returns a new array with every number doubled. It must not mutate the input array.",
+        "starter": "function doubleAll(numbers) {\n  // return a new array\n}",
+        "solution": "function doubleAll(numbers) {\n  const result = [];\n  for (const number of numbers) {\n    result.push(number * 2);\n  }\n  return result;\n}",
+        "checks": [
+          {
+            "kind": "js",
+            "label": "Doubles each value",
+            "expression": "JSON.stringify(doubleAll([1, 2, 3])) === '[2,4,6]'"
+          },
+          {
+            "kind": "js",
+            "label": "Handles an empty array",
+            "expression": "JSON.stringify(doubleAll([])) === '[]'"
+          },
+          {
+            "kind": "js",
+            "label": "Handles negative numbers",
+            "expression": "JSON.stringify(doubleAll([-2, 0])) === '[-4,0]'"
+          },
+          {
+            "kind": "js",
+            "label": "Does not mutate the input",
+            "expression": "(() => { const input = [1, 2]; doubleAll(input); return JSON.stringify(input) === '[1,2]'; })()"
+          }
+        ],
+        "hints": [
+          "Create a new array, push into it, return it.",
+          "`numbers.map(n => n * 2)` also passes every check and is shorter."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "js-03-q1",
+          "prompt": "Which method mutates the original array?",
+          "options": [
+            "map",
+            "filter",
+            "push",
+            "slice"
+          ],
+          "answer": 2,
+          "explain": "push adds to the existing array. map, filter and slice all return new arrays."
+        },
+        {
+          "id": "js-03-q2",
+          "prompt": "What is the last index of an array with 4 items?",
+          "options": [
+            "4",
+            "3",
+            "5",
+            "0"
+          ],
+          "answer": 1,
+          "explain": "Indexes start at 0, so the last index is length - 1 = 3."
+        }
+      ]
+    },
+    {
+      "id": "js-04",
+      "level": "intermediate",
+      "title": "Functions that compose",
+      "summary": "Parameters, returns, arrows and the two array methods you will live in.",
+      "minutes": 12,
+      "xp": 65,
+      "objectives": [
+        "Design functions around return values",
+        "Use default and rest parameters",
+        "Chain filter and map to transform data"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "A good function takes data, returns data, and does not reach outside itself. That shape is what makes code testable and composable."
+        },
+        {
+          "type": "code",
+          "language": "js",
+          "code": "const activeNames = (users) =>\n  users.filter((user) => user.active).map((user) => user.name);\n\nconst total = (...numbers) =>\n  numbers.reduce((sum, n) => sum + n, 0);\n\nfunction greet(name, greeting = 'Hello') {\n  return `${greeting}, ${name}`;\n}"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Arrow functions inherit `this` from the surrounding scope. Use them for callbacks, not for methods.",
+            "Default parameters keep call sites short: `greet('Ada')` works.",
+            "`...rest` collects arguments into an array, which pairs well with `reduce`.",
+            "Chain `filter` then `map` to go from a list of objects to a list of values."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "warn",
+          "title": "Brace your arrows",
+          "body": "An arrow with braces needs an explicit `return`. Forgetting it returns `undefined` and the bug is invisible until the value is used."
+        },
+        {
+          "type": "text",
+          "body": "When a function needs three or more positional arguments, take an object instead. Call sites become self-documenting: `createLesson({ track, title, xp })`."
+        }
+      ],
+      "exercise": {
+        "kind": "js",
+        "brief": "Write `activeNames(users)`: return an array of names for users where `active` is true, in their original order. Use `filter` and `map`.",
+        "starter": "const users = [\n  { name: 'Ada', active: true },\n  { name: 'Grace', active: false },\n  { name: 'Alan', active: true },\n];\n\nfunction activeNames(users) {\n  // filter, then map\n}",
+        "solution": "const users = [\n  { name: 'Ada', active: true },\n  { name: 'Grace', active: false },\n  { name: 'Alan', active: true },\n];\n\nfunction activeNames(users) {\n  return users.filter((user) => user.active).map((user) => user.name);\n}",
+        "checks": [
+          {
+            "kind": "js",
+            "label": "Returns the active names in order",
+            "expression": "JSON.stringify(activeNames(users)) === '[\"Ada\",\"Alan\"]'"
+          },
+          {
+            "kind": "js",
+            "label": "Works with a different list",
+            "expression": "JSON.stringify(activeNames([{ name: 'Lin', active: false }, { name: 'Mo', active: true }])) === '[\"Mo\"]'"
+          },
+          {
+            "kind": "js",
+            "label": "Handles an empty list",
+            "expression": "activeNames([]).length === 0"
+          },
+          {
+            "kind": "source",
+            "label": "Uses filter",
+            "includes": ".filter("
+          },
+          {
+            "kind": "source",
+            "label": "Uses map",
+            "includes": ".map("
+          }
+        ],
+        "hints": [
+          "`users.filter(u => u.active)` keeps the active users; `.map(u => u.name)` turns them into names.",
+          "Return the whole chain — do not assign it to a variable unless you need to."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "js-04-q1",
+          "prompt": "What does `filter` return?",
+          "options": [
+            "A boolean",
+            "A new array with the items that passed",
+            "The first matching item",
+            "The original array, mutated"
+          ],
+          "answer": 1,
+          "explain": "filter always returns a new array, even when nothing matches."
+        },
+        {
+          "id": "js-04-q2",
+          "prompt": "Which arrow function correctly returns an object?",
+          "options": [
+            "() => { name: 'Ada' }",
+            "() => ({ name: 'Ada' })",
+            "() => { return name: 'Ada' }",
+            "() => [name: 'Ada']"
+          ],
+          "answer": 1,
+          "explain": "Braces start a block. Wrap the object in parentheses to return it directly."
+        }
+      ]
+    },
+    {
+      "id": "js-05",
+      "level": "intermediate",
+      "title": "Objects and the DOM",
+      "summary": "Select elements, change them, and respond to a click.",
+      "minutes": 13,
+      "xp": 70,
+      "objectives": [
+        "Select elements with querySelector",
+        "Update text with textContent",
+        "Attach an event listener without inline handlers"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "The DOM is a live tree of objects that mirrors your HTML. JavaScript can read it, change it, and listen to it."
+        },
+        {
+          "type": "code",
+          "language": "js",
+          "code": "const button = document.querySelector('#counter');\nconst output = document.querySelector('#count');\n\nlet count = 0;\n\nbutton.addEventListener('click', () => {\n  count += 1;\n  output.textContent = String(count);\n});"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`querySelector` returns the first match; `querySelectorAll` returns a NodeList you can spread into an array.",
+            "`textContent` sets text safely. `innerHTML` parses markup, which is how injection bugs get in.",
+            "`addEventListener('click', fn)` keeps behaviour out of the HTML. Inline `onclick` cannot be tested or reused.",
+            "State lives in a variable; the DOM is a projection of that state. Update the variable first, then render."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "note",
+          "title": "The event object",
+          "body": "Every listener receives an event: `event.target` is what was clicked, `event.preventDefault()` stops the default action, `event.key` tells you which key was pressed."
+        },
+        {
+          "type": "text",
+          "body": "If your UI ever shows a value that disagrees with your variable, you have two sources of truth. Pick one — the variable — and always render from it."
+        }
+      ],
+      "exercise": {
+        "kind": "js",
+        "brief": "Make the button work: each click increments a counter and writes the new value into `#count` as text.",
+        "markup": "<div class=\"counter\">\n  <button id=\"counter\" type=\"button\">Add one</button>\n  <p>Total: <span id=\"count\">0</span></p>\n</div>",
+        "starter": "const button = document.querySelector('#counter');\nconst output = document.querySelector('#count');\n\n// add a click listener that updates the count",
+        "solution": "const button = document.querySelector('#counter');\nconst output = document.querySelector('#count');\n\nlet count = 0;\n\nbutton.addEventListener('click', () => {\n  count += 1;\n  output.textContent = String(count);\n});",
+        "checks": [
+          {
+            "kind": "js",
+            "label": "One click shows 1",
+            "expression": "(() => { const b = document.querySelector('#counter'); b.click(); return document.querySelector('#count').textContent.trim() === '1'; })()"
+          },
+          {
+            "kind": "js",
+            "label": "Three clicks show 3",
+            "expression": "(() => { const b = document.querySelector('#counter'); b.click(); b.click(); return document.querySelector('#count').textContent.trim() === '3'; })()"
+          },
+          {
+            "kind": "source",
+            "label": "Uses addEventListener",
+            "includes": "addEventListener"
+          },
+          {
+            "kind": "source",
+            "label": "Updates with textContent",
+            "includes": "textContent"
+          }
+        ],
+        "hints": [
+          "Keep a `count` variable outside the listener so it persists between clicks.",
+          "`output.textContent = count` works — the browser converts the number to a string."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "js-05-q1",
+          "prompt": "Why is textContent safer than innerHTML?",
+          "options": [
+            "It is faster on large pages",
+            "It treats input as text instead of parsing it as markup",
+            "It supports more characters",
+            "It automatically escapes attributes only"
+          ],
+          "answer": 1,
+          "explain": "innerHTML parses whatever string you give it, including <script> or event attributes."
+        },
+        {
+          "id": "js-05-q2",
+          "prompt": "Where should application state live?",
+          "options": [
+            "In the DOM only",
+            "In a variable, with the DOM rendered from it",
+            "In CSS custom properties",
+            "In the URL only"
+          ],
+          "answer": 1,
+          "explain": "One source of truth in JS, then render. Reading state back out of the DOM causes drift."
+        }
+      ]
+    },
+    {
+      "id": "js-06",
+      "level": "advanced",
+      "title": "Async, promises and errors",
+      "summary": "Fetch data, await it, and handle the case where it fails.",
+      "minutes": 14,
+      "xp": 85,
+      "objectives": [
+        "Use async/await instead of promise chains",
+        "Catch failures with try/catch",
+        "Load independent requests in parallel"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "Network work takes time. JavaScript does not wait: it returns a **promise** and continues. `async`/`await` lets you write that as if it were sequential."
+        },
+        {
+          "type": "code",
+          "language": "js",
+          "code": "async function loadUser(id) {\n  const response = await fetch(`/api/users/${id}`);\n  if (!response.ok) throw new Error('User not found');\n  const user = await response.json();\n  return user.name;\n}"
+        },
+        {
+          "type": "list",
+          "items": [
+            "An `async` function always returns a promise. `await` unwraps another promise inside it.",
+            "`try/catch` handles rejections and thrown errors in the same block.",
+            "`Promise.all([a, b])` runs requests in parallel; awaiting them one by one is slower for no reason.",
+            "A rejected promise that nobody catches becomes an unhandled rejection. Handle it or let it propagate deliberately."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "warn",
+          "title": "Check response.ok",
+          "body": "fetch does not reject on a 404 or 500. It resolves with `ok: false`. Without the check, your error handling never runs."
+        },
+        {
+          "type": "text",
+          "body": "Forgetting `await` is the most common async bug: you get a promise where you expected a value, and it prints as `[object Promise]`. If a value looks like that, you missed an await."
+        }
+      ],
+      "exercise": {
+        "kind": "js",
+        "brief": "Using the provided `fakeFetch`, write `async function loadUser(id)` that fetches `/users/${id}`, throws if `response.ok` is false, and returns the user's `name`.",
+        "prelude": "// Provided: a tiny stand-in for fetch that resolves after 30ms.\nfunction fakeFetch(url) {\n  return new Promise((resolve, reject) => {\n    setTimeout(() => {\n      const id = Number(url.split('/').pop());\n      if (id === 1) {\n        resolve({ ok: true, json: async () => ({ id: 1, name: 'Ada Lovelace' }) });\n      } else if (id === 2) {\n        resolve({ ok: true, json: async () => ({ id: 2, name: 'Grace Hopper' }) });\n      } else {\n        reject(new Error('User not found'));\n      }\n    }, 30);\n  });\n}",
+        "starter": "async function loadUser(id) {\n  // fetch, check, parse, return the name\n}",
+        "solution": "async function loadUser(id) {\n  const response = await fakeFetch(`/users/${id}`);\n  if (!response.ok) throw new Error('User not found');\n  const user = await response.json();\n  return user.name;\n}",
+        "checks": [
+          {
+            "kind": "js",
+            "label": "Resolves the name for user 1",
+            "expression": "(await loadUser(1)) === 'Ada Lovelace'"
+          },
+          {
+            "kind": "js",
+            "label": "Resolves the name for user 2",
+            "expression": "(await loadUser(2)) === 'Grace Hopper'"
+          },
+          {
+            "kind": "js",
+            "label": "Rejects for an unknown user",
+            "expression": "await loadUser(99).then(() => false).catch(() => true)"
+          },
+          {
+            "kind": "source",
+            "label": "Uses await",
+            "includes": "await"
+          },
+          {
+            "kind": "source",
+            "label": "Checks response.ok",
+            "includes": ".ok"
+          }
+        ],
+        "hints": [
+          "`const response = await fakeFetch(...)` gives you the response object.",
+          "Throw an error when `!response.ok`; the rejection is what the third check looks for."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "js-06-q1",
+          "prompt": "What does an async function return?",
+          "options": [
+            "The value directly",
+            "A promise",
+            "undefined",
+            "A callback"
+          ],
+          "answer": 1,
+          "explain": "async always wraps the return value in a promise, even if you return a plain number."
+        },
+        {
+          "id": "js-06-q2",
+          "prompt": "fetch('/missing') returns a 404. What happens?",
+          "options": [
+            "The promise rejects with a network error",
+            "The promise resolves with ok: false",
+            "It throws synchronously",
+            "It retries automatically"
+          ],
+          "answer": 1,
+          "explain": "HTTP errors are still responses. Only network failures reject the promise."
+        }
+      ]
+    },
+    {
+      "id": "js-07",
+      "level": "advanced",
+      "title": "Classes and clean state",
+      "summary": "Encapsulate behaviour, expose getters, and keep totals honest.",
+      "minutes": 14,
+      "xp": 90,
+      "objectives": [
+        "Write a class with a constructor and methods",
+        "Use getters for derived values",
+        "Keep internal arrays private to the class"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "A class is a template for objects that share behaviour. Use one when data and the operations on it belong together — a cart, a timer, a game board."
+        },
+        {
+          "type": "code",
+          "language": "js",
+          "code": "class Cart {\n  #items = [];\n\n  add(name, price) {\n    this.#items.push({ name, price });\n  }\n\n  remove(name) {\n    this.#items = this.#items.filter((item) => item.name !== name);\n  }\n\n  get total() {\n    return this.#items.reduce((sum, item) => sum + item.price, 0);\n  }\n\n  get count() {\n    return this.#items.length;\n  }\n}"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`#items` is a private field: outside code cannot read or replace it, so the invariant stays intact.",
+            "A `get` accessor is read like a property: `cart.total`, not `cart.total()`.",
+            "Derive totals in a getter instead of storing a `total` field you must keep in sync.",
+            "Methods that change state should be the only way to change it. That is the whole point of the class."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "tip",
+          "title": "Derive, do not duplicate",
+          "body": "Every stored duplicate is a chance for two values to disagree. Compute the total from the items each time you need it; the cost is trivial and the bug class disappears."
+        },
+        {
+          "type": "text",
+          "body": "Reach for a class when you have several related operations. For a single transformation, a plain function is simpler and just as testable."
+        }
+      ],
+      "exercise": {
+        "kind": "js",
+        "brief": "Build a `Cart` class: `add(name, price)` appends an item, `remove(name)` deletes it, `get total()` sums prices, and `get count()` returns the number of items.",
+        "starter": "class Cart {\n  constructor() {\n    // your storage\n  }\n\n  add(name, price) {\n    // ...\n  }\n\n  remove(name) {\n    // ...\n  }\n}",
+        "solution": "class Cart {\n  #items = [];\n\n  add(name, price) {\n    this.#items.push({ name, price });\n  }\n\n  remove(name) {\n    this.#items = this.#items.filter((item) => item.name !== name);\n  }\n\n  get total() {\n    return this.#items.reduce((sum, item) => sum + item.price, 0);\n  }\n\n  get count() {\n    return this.#items.length;\n  }\n}",
+        "checks": [
+          {
+            "kind": "js",
+            "label": "An empty cart totals zero",
+            "expression": "new Cart().total === 0"
+          },
+          {
+            "kind": "js",
+            "label": "Adding items sums their prices",
+            "expression": "(() => { const c = new Cart(); c.add('Mug', 12); c.add('Beans', 8); return c.total === 20; })()"
+          },
+          {
+            "kind": "js",
+            "label": "Count tracks the number of items",
+            "expression": "(() => { const c = new Cart(); c.add('Mug', 12); c.add('Beans', 8); return c.count === 2; })()"
+          },
+          {
+            "kind": "js",
+            "label": "Removing an item updates the total",
+            "expression": "(() => { const c = new Cart(); c.add('Mug', 12); c.add('Beans', 8); c.remove('Mug'); return c.total === 8 && c.count === 1; })()"
+          },
+          {
+            "kind": "js",
+            "label": "The total is a getter, not a method",
+            "expression": "typeof Object.getOwnPropertyDescriptor(Cart.prototype, 'total').get === 'function'"
+          }
+        ],
+        "hints": [
+          "Store items in an array on the instance: `this.items = []` or a private `#items`.",
+          "`remove` can rebuild the array with `filter`, which is easier to reason about than `splice`."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "js-07-q1",
+          "prompt": "Why compute `total` in a getter instead of storing it?",
+          "options": [
+            "Getters are faster",
+            "A derived value cannot fall out of sync with its source",
+            "Stored fields are private",
+            "Getters can be serialised to JSON"
+          ],
+          "answer": 1,
+          "explain": "One source of truth: items. The total is always consistent because it is computed from them."
+        },
+        {
+          "id": "js-07-q2",
+          "prompt": "What does the `#` prefix on a class field mean?",
+          "options": [
+            "It is a comment",
+            "It is a private field, inaccessible outside the class",
+            "It is a static field",
+            "It is a getter"
+          ],
+          "answer": 1,
+          "explain": "Private fields are enforced by the language, not by convention like the underscore prefix."
+        }
+      ]
+    }
+  ]
+}

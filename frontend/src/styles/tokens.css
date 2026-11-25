@@ -1,0 +1,58 @@
+:root {
+  color-scheme: light;
+
+  --paper: #f5f2ea;
+  --paper-2: #efeade;
+  --surface: #fffdf8;
+  --surface-2: #faf7f0;
+
+  --ink: #14150f;
+  --ink-2: #3f4139;
+  --muted: #6f7167;
+  --faint: #9a9b91;
+
+  --line: #ded8c9;
+  --line-soft: #e9e4d7;
+  --line-strong: #c9c2b0;
+
+  --pine: #1e4b3a;
+  --pine-dark: #16382b;
+  --pine-soft: #e4ede6;
+  --pine-tint: #f0f5f1;
+
+  --clay: #b4552f;
+  --clay-soft: #f7e8dd;
+
+  --brass: #a8813f;
+  --brass-soft: #f4ecdb;
+
+  --ok: #2f6b4f;
+  --ok-soft: #e5f0e8;
+  --bad: #a8442f;
+  --bad-soft: #f8e7e2;
+
+  --code: #14161a;
+  --code-2: #1a1d22;
+  --code-line: #2a2e34;
+  --code-ink: #e7e3d8;
+  --code-muted: #7c847e;
+
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+
+  --shadow-xs: 0 1px 2px rgba(20, 21, 15, 0.04);
+  --shadow-sm: 0 2px 6px rgba(20, 21, 15, 0.05), 0 1px 2px rgba(20, 21, 15, 0.04);
+  --shadow-md: 0 18px 40px -28px rgba(20, 21, 15, 0.45);
+  --shadow-lg: 0 32px 70px -40px rgba(20, 21, 15, 0.55);
+
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --container: 1180px;
+  --sidebar: 264px;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}

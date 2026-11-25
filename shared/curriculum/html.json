@@ -1,0 +1,762 @@
+{
+  "id": "html",
+  "name": "HTML",
+  "tagline": "Structure",
+  "description": "Documents, landmarks, forms and the semantics that hold a page together.",
+  "lessons": [
+    {
+      "id": "html-01",
+      "level": "beginner",
+      "title": "The shape of a page",
+      "summary": "Every website is one document with a head and a body. Build your first one.",
+      "minutes": 7,
+      "xp": 40,
+      "objectives": [
+        "Write a valid HTML document from scratch",
+        "Explain what the head and body are for",
+        "Nest elements correctly"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "Every page you have ever visited is a text file that a browser reads top to bottom. HTML gives that text structure: this is a heading, this is a paragraph, this is a link. You are not styling anything yet. You are describing what things **are**."
+        },
+        {
+          "type": "text",
+          "body": "A complete document has four parts that never change:"
+        },
+        {
+          "type": "code",
+          "language": "html",
+          "code": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <title>Zuno Journal</title>\n  </head>\n  <body>\n    <h1>Field notes from the coast</h1>\n    <p>Three days of wind, salt and very average coffee.</p>\n  </body>\n</html>",
+          "caption": "The smallest page worth writing"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`<!DOCTYPE html>` tells the browser to use modern standards mode. Leave it out and you get 1999 behaviour.",
+            "`<head>` holds information **about** the page: the title, character set, descriptions, styles.",
+            "`<body>` holds everything a visitor can actually see.",
+            "`lang=\"en\"` on `<html>` tells screen readers which language to pronounce."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "tip",
+          "title": "Indentation is for humans",
+          "body": "The browser does not care about whitespace between tags, but the next person reading your file does. Two spaces per level, one element per line, and your future self will thank you."
+        },
+        {
+          "type": "text",
+          "body": "One rule matters more than the rest: elements **nest** or sit side by side, they never overlap. If you open a tag inside a paragraph, close it before you close the paragraph."
+        }
+      ],
+      "exercise": {
+        "kind": "html",
+        "brief": "Turn the empty document into a field journal entry. Add an `<h1>` reading “Field notes from the coast”, a `<p>` with at least one sentence, and keep the title as “Zuno Journal”.",
+        "starter": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <title>Zuno Journal</title>\n  </head>\n  <body>\n    <!-- Your page goes here -->\n  </body>\n</html>",
+        "solution": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <title>Zuno Journal</title>\n  </head>\n  <body>\n    <h1>Field notes from the coast</h1>\n    <p>Three days of wind, salt and very average coffee.</p>\n  </body>\n</html>",
+        "checks": [
+          {
+            "kind": "js",
+            "label": "Document starts with <!DOCTYPE html>",
+            "expression": "!!document.doctype && document.doctype.name.toLowerCase() === 'html'"
+          },
+          {
+            "kind": "js",
+            "label": "The tab title reads “Zuno Journal”",
+            "expression": "document.title.trim().toLowerCase() === 'zuno journal'"
+          },
+          {
+            "kind": "js",
+            "label": "An <h1> says “Field notes from the coast”",
+            "expression": "/field notes from the coast/i.test(document.querySelector('h1')?.textContent || '')"
+          },
+          {
+            "kind": "js",
+            "label": "At least one <p> follows the heading",
+            "expression": "document.querySelectorAll('p').length >= 1"
+          },
+          {
+            "kind": "js",
+            "label": "The page language is declared",
+            "expression": "document.documentElement.getAttribute('lang') !== null"
+          }
+        ],
+        "hints": [
+          "The `<h1>` and `<p>` belong inside `<body>`.",
+          "Text goes between the opening and closing tag: `<h1>Your text</h1>`."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "html-01-q1",
+          "prompt": "Where does the page title belong?",
+          "options": [
+            "Inside <body>, above the heading",
+            "Inside <head>, in a <title> element",
+            "Inside <html>, next to the doctype",
+            "In a <meta name=\"title\"> tag"
+          ],
+          "answer": 1,
+          "explain": "The title lives in <head>. It shows in the browser tab and in search results, never in the page body."
+        },
+        {
+          "id": "html-01-q2",
+          "prompt": "Which statement about nesting is true?",
+          "options": [
+            "Elements can overlap as long as they are closed eventually",
+            "Elements must be fully nested or be siblings",
+            "Only block elements need closing tags",
+            "The browser fixes any nesting you write"
+          ],
+          "answer": 1,
+          "explain": "Elements are either fully inside another element or siblings next to it. Overlapping tags produce unpredictable trees."
+        }
+      ]
+    },
+    {
+      "id": "html-02",
+      "level": "beginner",
+      "title": "Text that reads well",
+      "summary": "Headings, paragraphs, lists and emphasis — the typography of HTML.",
+      "minutes": 8,
+      "xp": 45,
+      "objectives": [
+        "Use a heading hierarchy instead of bold text",
+        "Mark up lists with ul and ol",
+        "Choose strong and em for meaning, not decoration"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "Sighted users skim. Screen reader users jump between headings. Both behaviours depend on you choosing the right element rather than making text *look* big."
+        },
+        {
+          "type": "code",
+          "language": "html",
+          "code": "<h1>Brew guide</h1>\n<h2>Water</h2>\n<p>Start with soft water. Hard water mutes the acidity.</p>\n<h2>Ratio</h2>\n<p>Use <strong>60 grams per litre</strong>. Adjust after tasting.</p>\n<ul>\n  <li>Weigh the beans</li>\n  <li>Rinse the filter</li>\n  <li>Pour slowly</li>\n</ul>"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`<h1>` once per page. `<h2>` for sections, `<h3>` for subsections. Never skip a level for looks.",
+            "`<p>` is for prose. If you need a line break inside a paragraph, `<br>` exists, but a new paragraph is usually correct.",
+            "`<ul>` is unordered (order does not matter), `<ol>` is ordered (steps, rankings).",
+            "`<strong>` marks importance, `<em>` marks emphasis. A screen reader can change its voice for both."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "warn",
+          "title": "Do not use headings to style text",
+          "body": "If a line should look bold but is not a section title, use `<strong>`. If it should look big, that is CSS. Heading levels describe document structure, and assistive tech relies on them."
+        },
+        {
+          "type": "text",
+          "body": "Write the content first, then check: could someone navigate this page using only its headings? If the answer is no, the structure is wrong, not the styling."
+        }
+      ],
+      "exercise": {
+        "kind": "html",
+        "brief": "Build a short article inside `<body>`: an `<h2>` reading “Field notes”, two paragraphs, a `<strong>` inside one of them, and a `<ul>` with at least three `<li>` items.",
+        "starter": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <title>Zuno Journal</title>\n  </head>\n  <body>\n    <!-- Write the article here -->\n  </body>\n</html>",
+        "solution": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <title>Zuno Journal</title>\n  </head>\n  <body>\n    <h2>Field notes</h2>\n    <p>The wind arrived before the tide and stayed all morning.</p>\n    <p><strong>Bring a second jacket.</strong> The coast is colder than the forecast admits.</p>\n    <ul>\n      <li>Notebook</li>\n      <li>Thermos</li>\n      <li>Waterproof bag</li>\n    </ul>\n  </body>\n</html>",
+        "checks": [
+          {
+            "kind": "dom",
+            "label": "An <h2> heading exists",
+            "selector": "h2"
+          },
+          {
+            "kind": "js",
+            "label": "The heading reads “Field notes”",
+            "expression": "/field notes/i.test(document.querySelector('h2')?.textContent || '')"
+          },
+          {
+            "kind": "js",
+            "label": "There are at least two paragraphs",
+            "expression": "document.querySelectorAll('p').length >= 2"
+          },
+          {
+            "kind": "dom",
+            "label": "One paragraph uses <strong> for emphasis",
+            "selector": "p strong"
+          },
+          {
+            "kind": "js",
+            "label": "The list has at least three items",
+            "expression": "document.querySelectorAll('ul > li').length >= 3"
+          }
+        ],
+        "hints": [
+          "Each list item is its own `<li>` inside a single `<ul>`.",
+          "`<strong>` goes *inside* the paragraph, around the words you want to stress."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "html-02-q1",
+          "prompt": "You need a step-by-step recipe. Which list is correct?",
+          "options": [
+            "<ul>",
+            "<ol>",
+            "<dl>",
+            "<menu>"
+          ],
+          "answer": 1,
+          "explain": "<ol> is the ordered list. Order matters for steps, and screen readers announce the item numbers."
+        },
+        {
+          "id": "html-02-q2",
+          "prompt": "Why is <strong> better than <b>?",
+          "options": [
+            "It is shorter to type",
+            "<b> is deprecated and renders as normal text",
+            "<strong> carries meaning that assistive technology can announce",
+            "It is the only tag that accepts a class"
+          ],
+          "answer": 2,
+          "explain": "<strong> means “important”; <b> only means “bold”. Same pixels, different semantics."
+        }
+      ]
+    },
+    {
+      "id": "html-03",
+      "level": "beginner",
+      "title": "Links and images",
+      "summary": "The two elements that turn a document into the web.",
+      "minutes": 8,
+      "xp": 45,
+      "objectives": [
+        "Write relative and absolute links",
+        "Explain what the alt attribute is for",
+        "Group navigation links in a nav element"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "A page with no links is a dead end. `<a>` and `<img>` are the two elements that make a document part of the web, and both have one attribute you must never skip."
+        },
+        {
+          "type": "code",
+          "language": "html",
+          "code": "<nav>\n  <a href=\"/learn\">Lessons</a>\n  <a href=\"https://developer.mozilla.org\" target=\"_blank\" rel=\"noreferrer\">MDN</a>\n</nav>\n<img src=\"coast.jpg\" alt=\"Fog rolling over a grey beach at dawn\" />"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`href` accepts a full URL, a path like `/learn`, a fragment like `#pricing`, or `mailto:you@site.com`.",
+            "Link text should make sense out of context. “Read the CSS guide” beats “click here”.",
+            "`alt` describes the image for people who cannot see it. Empty `alt=\"\"` is correct for purely decorative images.",
+            "`target=\"_blank\"` opens a new tab. Add `rel=\"noreferrer\"` so the new page cannot access your tab."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "tip",
+          "title": "Alt text is a caption, not a filename",
+          "body": "Write what the image shows and why it matters here: “Fog rolling over a grey beach at dawn”, not “coast.jpg” and not “image”."
+        },
+        {
+          "type": "text",
+          "body": "Paths are relative to the document that contains them. `coast.jpg` looks next to the current file, `/coast.jpg` starts from the site root, `../coast.jpg` climbs one folder."
+        }
+      ],
+      "exercise": {
+        "kind": "html",
+        "brief": "Add a `<nav>` with two links: one internal pointing to `#lessons`, one external pointing to `https://developer.mozilla.org`. Then add an `<img>` with a real `src` and descriptive `alt` text.",
+        "starter": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <title>Zuno Journal</title>\n  </head>\n  <body>\n    <h1>Field notes</h1>\n    <!-- Add navigation and an image -->\n  </body>\n</html>",
+        "solution": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <title>Zuno Journal</title>\n  </head>\n  <body>\n    <h1>Field notes</h1>\n    <nav>\n      <a href=\"#lessons\">Lessons</a>\n      <a href=\"https://developer.mozilla.org\" target=\"_blank\" rel=\"noreferrer\">MDN</a>\n    </nav>\n    <img src=\"https://picsum.photos/seed/coast/640/360\" alt=\"Fog rolling over a grey beach at dawn\" />\n  </body>\n</html>",
+        "checks": [
+          {
+            "kind": "dom",
+            "label": "A <nav> wraps the links",
+            "selector": "nav"
+          },
+          {
+            "kind": "js",
+            "label": "There are two links inside the nav",
+            "expression": "document.querySelectorAll('nav a').length >= 2"
+          },
+          {
+            "kind": "js",
+            "label": "One link points to an external site",
+            "expression": "[...document.querySelectorAll('a')].some(a => a.getAttribute('href')?.startsWith('https://'))"
+          },
+          {
+            "kind": "js",
+            "label": "One link points to the #lessons section",
+            "expression": "[...document.querySelectorAll('a')].some(a => a.getAttribute('href') === '#lessons')"
+          },
+          {
+            "kind": "js",
+            "label": "The image has descriptive alt text",
+            "expression": "(document.querySelector('img')?.getAttribute('alt') || '').trim().length > 8"
+          }
+        ],
+        "hints": [
+          "`href=\"#lessons\"` links to an element with `id=\"lessons\"` on the same page.",
+          "Alt text should describe the picture in a sentence fragment: no “image of”."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "html-03-q1",
+          "prompt": "Which href is relative to the site root?",
+          "options": [
+            "lessons/css.html",
+            "/learn/css",
+            "../learn",
+            "https://zuno.dev/learn"
+          ],
+          "answer": 1,
+          "explain": "A leading slash always resolves from the domain root, no matter which page you are on."
+        },
+        {
+          "id": "html-03-q2",
+          "prompt": "When is alt=\"\" the right choice?",
+          "options": [
+            "Never, every image needs a description",
+            "When the image is decorative and adds no information",
+            "When the image is a photo",
+            "When the filename already describes it"
+          ],
+          "answer": 1,
+          "explain": "An empty alt tells assistive tech to skip the image entirely, which is correct for decoration."
+        }
+      ]
+    },
+    {
+      "id": "html-04",
+      "level": "intermediate",
+      "title": "Semantic structure",
+      "summary": "Landmarks that make a page navigable for humans, screen readers and search engines.",
+      "minutes": 10,
+      "xp": 60,
+      "objectives": [
+        "Replace generic divs with landmark elements",
+        "Understand header, main, section, article, footer",
+        "Keep exactly one main per page"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "A page built from `<div>`s works until someone tries to navigate it. Screen readers offer a list of landmarks; search engines use the same structure to understand which part is the actual content."
+        },
+        {
+          "type": "code",
+          "language": "html",
+          "code": "<header>\n  <a href=\"/\">Zuno</a>\n  <nav aria-label=\"Primary\">\n    <a href=\"/learn\">Learn</a>\n  </nav>\n</header>\n<main>\n  <h1>Field notes</h1>\n  <article>\n    <h2>Tide tables</h2>\n    <p>The tide turned an hour early.</p>\n  </article>\n</main>\n<footer>\n  <p>&copy; 2026 Zuno</p>\n</footer>"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`<header>` and `<footer>` can appear on the page or inside an article. They describe their nearest section.",
+            "`<main>` holds the content unique to this page. Exactly one per document.",
+            "`<article>` is a self-contained unit: a post, a card, a comment. It should make sense on its own.",
+            "`<section>` groups related content and usually starts with a heading.",
+            "`<nav>` is for major link groups. Not every group of links needs one."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "note",
+          "title": "Landmarks replace ARIA",
+          "body": "A `<nav>` already exposes `role=\"navigation\"`. Writing both is noise. Native elements first, ARIA only when nothing native fits."
+        },
+        {
+          "type": "text",
+          "body": "Rule of thumb: if you are about to write `<div class=\"header\">`, check whether `<header>` does the job. The class name is a strong hint that you already knew the meaning."
+        }
+      ],
+      "exercise": {
+        "kind": "html",
+        "brief": "Restructure the page into landmarks: a `<header>` containing a `<nav>`, a `<main>` with an `<h1>` and two `<article>` elements, each with its own `<h2>`, and a `<footer>`.",
+        "starter": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <title>Zuno Journal</title>\n  </head>\n  <body>\n    <div class=\"top\">\n      <a href=\"/\">Zuno</a>\n      <div class=\"links\"><a href=\"/learn\">Learn</a></div>\n    </div>\n    <div class=\"content\">\n      <h1>Field notes</h1>\n      <div class=\"post\"><h2>Tide tables</h2><p>The tide turned early.</p></div>\n      <div class=\"post\"><h2>Wind</h2><p>It never dropped below twenty knots.</p></div>\n    </div>\n    <div class=\"bottom\"><p>&copy; 2026 Zuno</p></div>\n  </body>\n</html>",
+        "solution": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <title>Zuno Journal</title>\n  </head>\n  <body>\n    <header>\n      <a href=\"/\">Zuno</a>\n      <nav aria-label=\"Primary\">\n        <a href=\"/learn\">Learn</a>\n      </nav>\n    </header>\n    <main>\n      <h1>Field notes</h1>\n      <article>\n        <h2>Tide tables</h2>\n        <p>The tide turned early.</p>\n      </article>\n      <article>\n        <h2>Wind</h2>\n        <p>It never dropped below twenty knots.</p>\n      </article>\n    </main>\n    <footer>\n      <p>&copy; 2026 Zuno</p>\n    </footer>\n  </body>\n</html>",
+        "checks": [
+          {
+            "kind": "dom",
+            "label": "A <header> opens the page",
+            "selector": "body > header"
+          },
+          {
+            "kind": "js",
+            "label": "The header contains a <nav> with a link",
+            "expression": "!!document.querySelector('header nav a')"
+          },
+          {
+            "kind": "js",
+            "label": "Exactly one <main> exists",
+            "expression": "document.querySelectorAll('main').length === 1"
+          },
+          {
+            "kind": "js",
+            "label": "Two <article> elements live inside main",
+            "expression": "document.querySelectorAll('main > article').length === 2"
+          },
+          {
+            "kind": "js",
+            "label": "The <h1> sits inside main",
+            "expression": "document.querySelector('main > h1') !== null"
+          },
+          {
+            "kind": "dom",
+            "label": "A <footer> closes the page",
+            "selector": "body > footer"
+          }
+        ],
+        "hints": [
+          "Rename the wrappers: `div.top` becomes `<header>`, `div.content` becomes `<main>`.",
+          "Each `div.post` is self-contained, so `<article>` is the honest element."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "html-04-q1",
+          "prompt": "How many <main> elements should a page have?",
+          "options": [
+            "One per section",
+            "Exactly one",
+            "As many as you need",
+            "None, it is optional"
+          ],
+          "answer": 1,
+          "explain": "<main> marks the unique content of the document. More than one breaks the landmark map."
+        },
+        {
+          "id": "html-04-q2",
+          "prompt": "A blog card that could be syndicated on its own should be a…",
+          "options": [
+            "<section>",
+            "<article>",
+            "<aside>",
+            "<div>"
+          ],
+          "answer": 1,
+          "explain": "<article> means self-contained and independently distributable — exactly what a syndicated card is."
+        }
+      ]
+    },
+    {
+      "id": "html-05",
+      "level": "intermediate",
+      "title": "Forms people can finish",
+      "summary": "Labels, input types and validation that work before JavaScript exists.",
+      "minutes": 12,
+      "xp": 65,
+      "objectives": [
+        "Connect every input to a label",
+        "Pick input types that unlock the right keyboard",
+        "Use native validation before writing any JavaScript"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "Forms are where a website asks for something. Most form pain is self-inflicted: missing labels, `type=\"text\"` for an email, a submit handler that fights the browser."
+        },
+        {
+          "type": "code",
+          "language": "html",
+          "code": "<form action=\"/subscribe\" method=\"post\">\n  <label for=\"email\">Email address</label>\n  <input id=\"email\" name=\"email\" type=\"email\" required autocomplete=\"email\" />\n  <p class=\"hint\" id=\"email-hint\">We send one short lesson each weekday.</p>\n  <button type=\"submit\">Start learning</button>\n</form>"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`label for=\"email\"` must match the input's `id`. Clicking the label then focuses the field.",
+            "`type=\"email\"` gives you a validation rule and the @ keyboard on phones, for free.",
+            "`required`, `minlength`, `pattern` and `min` are enforced by the browser before submission.",
+            "`autocomplete` lets password managers and browsers fill the field correctly.",
+            "Every input needs a `name` or it will never reach the server."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "warn",
+          "title": "Placeholder is not a label",
+          "body": "Placeholders vanish the moment someone types, have poor contrast, and are skipped by some screen readers. Use a real `<label>`; the placeholder is a hint at most."
+        },
+        {
+          "type": "text",
+          "body": "Group related fields with `<fieldset>` and `<legend>` — especially radio buttons, where the legend answers “what am I choosing between?”."
+        }
+      ],
+      "exercise": {
+        "kind": "html",
+        "brief": "Build a sign-up `<form>` with: a labeled email input (`type=\"email\"`, `required`), a labeled password input (`type=\"password\"`, `minlength=\"8\"`), and a submit button. Every input needs an `id`, a `name` and a `<label for>`.",
+        "starter": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <title>Join Zuno</title>\n  </head>\n  <body>\n    <h1>Create your account</h1>\n    <!-- Build the form -->\n  </body>\n</html>",
+        "solution": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <title>Join Zuno</title>\n  </head>\n  <body>\n    <h1>Create your account</h1>\n    <form action=\"/signup\" method=\"post\">\n      <label for=\"email\">Email address</label>\n      <input id=\"email\" name=\"email\" type=\"email\" required autocomplete=\"email\" />\n\n      <label for=\"password\">Password</label>\n      <input id=\"password\" name=\"password\" type=\"password\" minlength=\"8\" required autocomplete=\"new-password\" />\n\n      <button type=\"submit\">Create account</button>\n    </form>\n  </body>\n</html>",
+        "checks": [
+          {
+            "kind": "dom",
+            "label": "A <form> wraps the fields",
+            "selector": "form"
+          },
+          {
+            "kind": "js",
+            "label": "The email input is type=email and required",
+            "expression": "(() => { const i = document.querySelector('input[type=\"email\"]'); return !!i && i.required; })()"
+          },
+          {
+            "kind": "js",
+            "label": "Both inputs have a label with a matching for",
+            "expression": "[...document.querySelectorAll('input')].every(i => i.id && document.querySelector(`label[for=\"${i.id}\"]`))"
+          },
+          {
+            "kind": "js",
+            "label": "The password field masks input and demands 8+ characters",
+            "expression": "(() => { const p = document.querySelector('input[type=\"password\"]'); return !!p && Number(p.getAttribute('minlength')) >= 8; })()"
+          },
+          {
+            "kind": "js",
+            "label": "A submit button exists",
+            "expression": "!!document.querySelector('button[type=\"submit\"], input[type=\"submit\"]')"
+          }
+        ],
+        "hints": [
+          "Each `label` needs `for=\"id-of-input\"` — the id and for values must match exactly.",
+          "`minlength` is an attribute, not a CSS property: `minlength=\"8\"`."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "html-05-q1",
+          "prompt": "Why does an input need a name attribute?",
+          "options": [
+            "So CSS can target it",
+            "So its value is included when the form is submitted",
+            "So the label can point at it",
+            "It is optional and purely decorative"
+          ],
+          "answer": 1,
+          "explain": "The name becomes the key in the submitted form data. No name, no value sent."
+        },
+        {
+          "id": "html-05-q2",
+          "prompt": "Which is the best label for a group of radio buttons?",
+          "options": [
+            "A <p> above the group",
+            "A <fieldset> with a <legend>",
+            "A placeholder on the first radio",
+            "An aria-label on each radio"
+          ],
+          "answer": 1,
+          "explain": "<fieldset> + <legend> groups the choices and names the question natively."
+        }
+      ]
+    },
+    {
+      "id": "html-06",
+      "level": "advanced",
+      "title": "Tables and data",
+      "summary": "Real tabular data, with headers that announce themselves.",
+      "minutes": 10,
+      "xp": 70,
+      "objectives": [
+        "Separate structure into thead, tbody and tfoot",
+        "Use scope to bind headers to cells",
+        "Never use a table for layout"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "Tables are for data that has rows and columns. That is a narrow use case, and when it applies, nothing else comes close."
+        },
+        {
+          "type": "code",
+          "language": "html",
+          "code": "<table>\n  <caption>Plan comparison</caption>\n  <thead>\n    <tr>\n      <th scope=\"col\">Feature</th>\n      <th scope=\"col\">Free</th>\n      <th scope=\"col\">Pro</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th scope=\"row\">Lessons</th>\n      <td>21</td>\n      <td>All</td>\n    </tr>\n  </tbody>\n</table>"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`<caption>` describes the table. It is the first thing a screen reader announces.",
+            "`<thead>`, `<tbody>` and `<tfoot>` group rows so browsers and assistive tech can treat them differently.",
+            "`scope=\"col\"` on a header means “this header labels the column below me”; `scope=\"row\"` labels the row beside it.",
+            "Use `<th>` for headers, `<td>` for data. The distinction is announced, not just bolded."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "warn",
+          "title": "Tables are not layouts",
+          "body": "Using a table to place a sidebar was normal in 2004. Today it breaks responsiveness and screen readers announce a data grid that does not exist. Use CSS grid."
+        },
+        {
+          "type": "text",
+          "body": "If a table needs horizontal scrolling on small screens, wrap it in a container with `overflow-x: auto` rather than shrinking the text."
+        }
+      ],
+      "exercise": {
+        "kind": "html",
+        "brief": "Build a pricing table with a `<caption>`, a `<thead>` containing two `<th scope=\"col\">` headers (Plan, Price), and a `<tbody>` with three rows of data.",
+        "starter": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <title>Plans</title>\n  </head>\n  <body>\n    <h1>Plans</h1>\n    <!-- Build the table -->\n  </body>\n</html>",
+        "solution": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <title>Plans</title>\n  </head>\n  <body>\n    <h1>Plans</h1>\n    <table>\n      <caption>Zuno plan comparison</caption>\n      <thead>\n        <tr>\n          <th scope=\"col\">Plan</th>\n          <th scope=\"col\">Price</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr>\n          <td>Free</td>\n          <td>$0</td>\n        </tr>\n        <tr>\n          <td>Pro monthly</td>\n          <td>$12</td>\n        </tr>\n        <tr>\n          <td>Pro yearly</td>\n          <td>$96</td>\n        </tr>\n      </tbody>\n    </table>\n  </body>\n</html>",
+        "checks": [
+          {
+            "kind": "dom",
+            "label": "A <table> exists",
+            "selector": "table"
+          },
+          {
+            "kind": "dom",
+            "label": "The table has a <caption>",
+            "selector": "table > caption"
+          },
+          {
+            "kind": "js",
+            "label": "Two column headers are marked with scope=col",
+            "expression": "document.querySelectorAll('thead th[scope=\"col\"]').length === 2"
+          },
+          {
+            "kind": "js",
+            "label": "The body holds three rows of data",
+            "expression": "document.querySelectorAll('tbody tr').length === 3"
+          },
+          {
+            "kind": "js",
+            "label": "Each row has two data cells",
+            "expression": "[...document.querySelectorAll('tbody tr')].every(r => r.querySelectorAll('td').length === 2)"
+          }
+        ],
+        "hints": [
+          "The header row lives inside `<thead>`, the data rows inside `<tbody>`.",
+          "`scope` goes on the `<th>` element: `<th scope=\"col\">Plan</th>`."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "html-06-q1",
+          "prompt": "What does scope=\"row\" tell assistive technology?",
+          "options": [
+            "This cell spans the whole row",
+            "This header labels the cells to its right",
+            "This row is the header row",
+            "This cell is scrollable"
+          ],
+          "answer": 1,
+          "explain": "A row header names the data cells beside it — useful for tables with a label column."
+        },
+        {
+          "id": "html-06-q2",
+          "prompt": "You need two columns of content in a layout. What should you use?",
+          "options": [
+            "A table with two cells",
+            "CSS grid or flexbox",
+            "Float",
+            "A definition list"
+          ],
+          "answer": 1,
+          "explain": "Layout belongs to CSS. Tables are for data only."
+        }
+      ]
+    },
+    {
+      "id": "html-07",
+      "level": "advanced",
+      "title": "Media, metadata and accessible widgets",
+      "summary": "Figures, disclosure widgets and the tags search engines and screen readers read first.",
+      "minutes": 12,
+      "xp": 75,
+      "objectives": [
+        "Pair media with captions using figure and figcaption",
+        "Use details and summary instead of a JS accordion",
+        "Give icon-only buttons an accessible name"
+      ],
+      "sections": [
+        {
+          "type": "text",
+          "body": "The last HTML lesson is about the details that separate a page that works from a page that is pleasant to use with a keyboard, a screen reader, or a search engine."
+        },
+        {
+          "type": "code",
+          "language": "html",
+          "code": "<figure>\n  <img src=\"tide.jpg\" alt=\"Low tide exposing a wide band of wet sand\" />\n  <figcaption>Low tide, 06:40. The sand held the light for an hour.</figcaption>\n</figure>\n\n<details>\n  <summary>What is included in Pro?</summary>\n  <p>All lessons, the playground and offline progress.</p>\n</details>\n\n<button aria-label=\"Close dialog\">\n  <svg aria-hidden=\"true\">…</svg>\n</button>"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`<figure>` groups media with its caption. `<figcaption>` must be the first or last child.",
+            "`<details>`/`<summary>` is a native disclosure widget: keyboard support, open/close state and animation hooks, zero JavaScript.",
+            "An icon-only button needs a name. `aria-label` provides it; `aria-hidden=\"true\"` hides the decorative SVG.",
+            "`<meta name=\"description\">` is the snippet search engines usually show. Keep it under ~155 characters."
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "tip",
+          "title": "Test with the Tab key",
+          "body": "Everything interactive must be reachable with Tab and operable with Enter or Space. If you cannot do it without a mouse, neither can a lot of your visitors."
+        },
+        {
+          "type": "text",
+          "body": "Prefer the native element every time. `<details>` beats a hand-rolled accordion, `<dialog>` beats a modal div, `<button>` beats a clickable div. Less code, more behaviour."
+        }
+      ],
+      "exercise": {
+        "kind": "html",
+        "brief": "Add a `<meta name=\"description\">` with at least 40 characters, a `<figure>` containing an image and a `<figcaption>`, a `<details>` with a `<summary>`, and an icon-only `<button>` with an `aria-label`.",
+        "starter": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <title>Zuno Journal</title>\n  </head>\n  <body>\n    <h1>Field notes</h1>\n    <!-- Media, disclosure and metadata -->\n  </body>\n</html>",
+        "solution": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"description\" content=\"Field notes from the coast: tides, wind and slow mornings, written while learning to build for the web.\" />\n    <title>Zuno Journal</title>\n  </head>\n  <body>\n    <h1>Field notes</h1>\n    <figure>\n      <img src=\"https://picsum.photos/seed/tide/640/360\" alt=\"Low tide exposing a wide band of wet sand\" />\n      <figcaption>Low tide, 06:40.</figcaption>\n    </figure>\n    <details>\n      <summary>What is included in Pro?</summary>\n      <p>All lessons, the playground and offline progress.</p>\n    </details>\n    <button type=\"button\" aria-label=\"Close dialog\">×</button>\n  </body>\n</html>",
+        "checks": [
+          {
+            "kind": "js",
+            "label": "The meta description is at least 40 characters",
+            "expression": "(document.querySelector('meta[name=\"description\"]')?.getAttribute('content') || '').trim().length >= 40"
+          },
+          {
+            "kind": "js",
+            "label": "A figure wraps the image and its caption",
+            "expression": "!!document.querySelector('figure > img') && !!document.querySelector('figure > figcaption')"
+          },
+          {
+            "kind": "js",
+            "label": "A details element has a summary",
+            "expression": "!!document.querySelector('details > summary')"
+          },
+          {
+            "kind": "js",
+            "label": "The icon button has an accessible name",
+            "expression": "[...document.querySelectorAll('button')].some(b => (b.getAttribute('aria-label') || '').trim().length > 3)"
+          },
+          {
+            "kind": "js",
+            "label": "The image still has alt text",
+            "expression": "(document.querySelector('figure img')?.getAttribute('alt') || '').trim().length > 8"
+          }
+        ],
+        "hints": [
+          "`figcaption` goes inside `figure`, directly after the image.",
+          "`aria-label` is an attribute on the button, not text inside it."
+        ]
+      },
+      "quiz": [
+        {
+          "id": "html-07-q1",
+          "prompt": "Why prefer <details> over a JavaScript accordion?",
+          "options": [
+            "It is faster to style",
+            "Keyboard support, state and semantics come free and correct",
+            "JavaScript cannot build accordions",
+            "It animates automatically"
+          ],
+          "answer": 1,
+          "explain": "Native disclosure handles focus, Enter/Space, and exposes expanded state. You inherit all of it."
+        },
+        {
+          "id": "html-07-q2",
+          "prompt": "An icon-only button needs which attribute to be announced correctly?",
+          "options": [
+            "title",
+            "aria-label",
+            "alt",
+            "name"
+          ],
+          "answer": 1,
+          "explain": "aria-label supplies the accessible name. title is a tooltip and is not reliably announced."
+        }
+      ]
+    }
+  ]
+}
