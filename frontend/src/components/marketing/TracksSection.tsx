@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Icon } from '../ui/Icon';
+import { motion, useReducedMotion } from 'framer-motion';
 import { tracks } from '../../lib/curriculum';
+import { fadeUp, stagger, viewportOnce } from '../../lib/motion';
 
 const highlights: Record<string, string[]> = {
   html: ['Semantic documents', 'Forms with real labels', 'Accessible media'],
@@ -10,6 +12,8 @@ const highlights: Record<string, string[]> = {
 };
 
 export function TracksSection() {
+  const reduceMotion = useReducedMotion();
+
   return (
     <section className="section" id="curriculum">
       <div className="container">
@@ -25,12 +29,18 @@ export function TracksSection() {
           </p>
         </div>
 
-        <div className="track-grid">
+        <motion.div
+          className="track-grid"
+          variants={stagger(0, 0.08)}
+          initial={reduceMotion ? false : 'hidden'}
+          whileInView="shown"
+          viewport={viewportOnce}
+        >
           {tracks.map((track, index) => {
             const minutes = track.lessons.reduce((sum, lesson) => sum + lesson.minutes, 0);
             const xp = track.lessons.reduce((sum, lesson) => sum + lesson.xp, 0);
             return (
-              <article key={track.id} className={`track-card track-card--${track.id}`}>
+              <motion.article key={track.id} className={`track-card track-card--${track.id}`} variants={fadeUp}>
                 <div className="track-card-top">
                   <span className="track-index">0{index + 1}</span>
                   <span className="track-tag">{track.tagline}</span>
@@ -54,10 +64,10 @@ export function TracksSection() {
                     <Icon name="arrowRight" size={15} />
                   </Link>
                 </div>
-              </article>
+              </motion.article>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

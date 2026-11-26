@@ -1,3 +1,5 @@
+import { motion, useReducedMotion } from 'framer-motion';
+import { scaleIn, stagger, viewportOnce } from '../../lib/motion';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon } from '../ui/Icon';
@@ -20,6 +22,7 @@ const proFeatures = [
 
 export function PricingSection() {
   const [yearly, setYearly] = useState(true);
+  const reduceMotion = useReducedMotion();
 
   return (
     <section className="section section--tint" id="pricing">
@@ -54,8 +57,14 @@ export function PricingSection() {
           </div>
         </div>
 
-        <div className="price-grid">
-          <article className="price-card">
+        <motion.div
+          className="price-grid"
+          variants={stagger(0.05, 0.1)}
+          initial={reduceMotion ? false : 'hidden'}
+          whileInView="shown"
+          viewport={viewportOnce}
+        >
+          <motion.article className="price-card" variants={scaleIn}>
             <header>
               <span className="price-name">Free</span>
               <p className="price-amount">
@@ -75,9 +84,9 @@ export function PricingSection() {
             <Link to="/learn" className="btn btn--ghost btn--block">
               Start learning
             </Link>
-          </article>
+          </motion.article>
 
-          <article className="price-card price-card--pro">
+          <motion.article className="price-card price-card--pro" variants={scaleIn}>
             <header>
               <div className="price-pro-head">
                 <span className="price-name">Pro</span>
@@ -103,8 +112,8 @@ export function PricingSection() {
               Start 14-day trial
             </button>
             <p className="price-fine">No card required for the free plan. Cancel in two clicks.</p>
-          </article>
-        </div>
+          </motion.article>
+        </motion.div>
       </div>
     </section>
   );

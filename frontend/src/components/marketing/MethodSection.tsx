@@ -1,3 +1,7 @@
+import { motion, useReducedMotion } from 'framer-motion';
+import { AmbientScene } from './AmbientScene';
+import { fadeUp, stagger, viewportOnce } from '../../lib/motion';
+
 const steps = [
   {
     index: '01',
@@ -20,8 +24,13 @@ const steps = [
 ];
 
 export function MethodSection() {
+  const reduceMotion = useReducedMotion();
+
   return (
-    <section className="section section--tint" id="method">
+    <section className="section section--tint method" id="method">
+      <div className="method-scene">
+        <AmbientScene variant="knot" />
+      </div>
       <div className="container">
         <div className="section-head">
           <div>
@@ -36,18 +45,24 @@ export function MethodSection() {
           </p>
         </div>
 
-        <ol className="method-grid">
+        <motion.ol
+          className="method-grid"
+          variants={stagger(0.05, 0.12)}
+          initial={reduceMotion ? false : 'hidden'}
+          whileInView="shown"
+          viewport={viewportOnce}
+        >
           {steps.map((step) => (
-            <li key={step.index} className="method-step">
+            <motion.li key={step.index} className="method-step" variants={fadeUp}>
               <div className="method-step-top">
                 <span className="method-index">{step.index}</span>
                 <span className="method-tag mono">{step.artefact}</span>
               </div>
               <h3>{step.title}</h3>
               <p>{step.body}</p>
-            </li>
+            </motion.li>
           ))}
-        </ol>
+        </motion.ol>
       </div>
     </section>
   );

@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom';
+import { motion, useScroll, useSpring } from 'framer-motion';
 import { Logo } from '../ui/Logo';
 import { Icon } from '../ui/Icon';
 
 export function MarketingNav() {
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 160, damping: 30, restDelta: 0.001 });
+
   return (
     <header className="m-nav">
       <div className="container m-nav-inner">
@@ -23,6 +27,7 @@ export function MarketingNav() {
           </Link>
         </div>
       </div>
+      <motion.div className="m-nav-progress" style={{ scaleX: progress }} aria-hidden="true" />
     </header>
   );
 }

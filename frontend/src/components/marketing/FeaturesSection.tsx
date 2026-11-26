@@ -1,3 +1,5 @@
+import { motion, useReducedMotion } from 'framer-motion';
+import { fadeUp, stagger, viewportOnce } from '../../lib/motion';
 import { Icon } from '../ui/Icon';
 
 function EditorVisual() {
@@ -103,6 +105,8 @@ function TerminalVisual() {
 }
 
 export function FeaturesSection() {
+  const reduceMotion = useReducedMotion();
+
   return (
     <section className="section">
       <div className="container">
@@ -117,8 +121,14 @@ export function FeaturesSection() {
           </p>
         </div>
 
-        <div className="feat-grid">
-          <article className="feat-card feat-card--wide">
+        <motion.div
+          className="feat-grid"
+          variants={stagger(0, 0.08)}
+          initial={reduceMotion ? false : 'hidden'}
+          whileInView="shown"
+          viewport={viewportOnce}
+        >
+          <motion.article className="feat-card feat-card--wide" variants={fadeUp}>
             <div className="feat-copy">
               <span className="feat-icon">
                 <Icon name="code" size={18} />
@@ -130,9 +140,9 @@ export function FeaturesSection() {
               </p>
             </div>
             <EditorVisual />
-          </article>
+          </motion.article>
 
-          <article className="feat-card feat-card--wide">
+          <motion.article className="feat-card feat-card--wide" variants={fadeUp}>
             <div className="feat-copy">
               <span className="feat-icon">
                 <Icon name="target" size={18} />
@@ -144,9 +154,9 @@ export function FeaturesSection() {
               </p>
             </div>
             <ChecksVisual />
-          </article>
+          </motion.article>
 
-          <article className="feat-card">
+          <motion.article className="feat-card" variants={fadeUp}>
             <div className="feat-copy">
               <span className="feat-icon">
                 <Icon name="flame" size={18} />
@@ -155,9 +165,9 @@ export function FeaturesSection() {
               <p>XP, levels and a daily streak that records the days you actually showed up.</p>
             </div>
             <StreakVisual />
-          </article>
+          </motion.article>
 
-          <article className="feat-card">
+          <motion.article className="feat-card" variants={fadeUp}>
             <div className="feat-copy">
               <span className="feat-icon">
                 <Icon name="terminal" size={18} />
@@ -166,8 +176,8 @@ export function FeaturesSection() {
               <p>Three panes, no brief, instant output. For the ideas that arrive between lessons.</p>
             </div>
             <TerminalVisual />
-          </article>
-        </div>
+          </motion.article>
+        </motion.div>
       </div>
     </section>
   );

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { completedCount, todayCompletions, trackStats, useProgress } from '../../lib/progress';
 import { Icon } from '../ui/Icon';
 import { Logo } from '../ui/Logo';
@@ -17,6 +18,7 @@ export function AppShell() {
   const { state, level } = useProgress();
   const location = useLocation();
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const reduceMotion = useReducedMotion();
   const stats = trackStats(state);
   const done = completedCount(state);
   const today = todayCompletions(state);
@@ -129,7 +131,17 @@ export function AppShell() {
         </header>
 
         <main className="shell-content">
-          <Outlet />
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={location.pathname}
+              initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduceMotion ? undefined : { opacity: 0, y: -6 }}
+              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <Outlet />
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
 

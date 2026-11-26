@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Icon } from '../ui/Icon';
 import { Logo } from '../ui/Logo';
+import { fadeUp, scaleIn, stagger, viewportOnce } from '../../lib/motion';
 
 const faqs = [
   {
@@ -30,6 +32,8 @@ const faqs = [
 ];
 
 export function FaqSection() {
+  const reduceMotion = useReducedMotion();
+
   return (
     <section className="section">
       <div className="container faq-grid">
@@ -47,9 +51,15 @@ export function FaqSection() {
             <Icon name="arrowRight" size={15} />
           </Link>
         </div>
-        <div className="faq-list">
+        <motion.div
+          className="faq-list"
+          variants={stagger(0.05, 0.05)}
+          initial={reduceMotion ? false : 'hidden'}
+          whileInView="shown"
+          viewport={viewportOnce}
+        >
           {faqs.map((faq) => (
-            <details key={faq.q} className="faq-item">
+            <motion.details key={faq.q} className="faq-item" variants={fadeUp}>
               <summary>
                 <span>{faq.q}</span>
                 <span className="faq-toggle" aria-hidden="true">
@@ -57,19 +67,27 @@ export function FaqSection() {
                 </span>
               </summary>
               <p>{faq.a}</p>
-            </details>
+            </motion.details>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
 }
 
 export function ClosingCta() {
+  const reduceMotion = useReducedMotion();
+
   return (
     <section className="section">
       <div className="container">
-        <div className="closing">
+        <motion.div
+          className="closing"
+          variants={scaleIn}
+          initial={reduceMotion ? false : 'hidden'}
+          whileInView="shown"
+          viewport={viewportOnce}
+        >
           <div className="closing-copy">
             <p className="eyebrow eyebrow--light">Ready when you are</p>
             <h2>
@@ -90,7 +108,7 @@ export function ClosingCta() {
               Or open the playground
             </Link>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
