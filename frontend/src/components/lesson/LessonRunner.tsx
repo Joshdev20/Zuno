@@ -1,5 +1,6 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { getLesson, getTrack, lessonTrack, levelLabel, neighbours } from '../../lib/curriculum';
 import { useProgress } from '../../lib/progress';
 import type { Drill, Lesson, QuizQuestion, Section, Track } from '../../lib/types';
@@ -9,6 +10,7 @@ import { Inline } from './Inline';
 import { NotFound } from '../../pages/NotFound';
 import { isLessonUnlocked } from '../../lib/progress';
 import { DrillStep } from './drills/DrillStep';
+import { ProjectPreview } from './ProjectPreview';
 
 const Workspace = lazy(() =>
   import('./Workspace').then((module) => ({ default: module.Workspace })),
@@ -26,9 +28,10 @@ function groupSections(sections: Section[]): Section[][] {
   const groups: Section[][] = [];
   for (const section of sections) {
     const last = groups[groups.length - 1];
+    const opensWithHeading = last?.length === 1 && last[0].type === 'heading';
     const prose = section.type === 'text';
-    const lastHasProse = Boolean(last?.some((entry) => entry.type === 'text'));
-    if (!last || (prose && lastHasProse)) groups.push([section]);
+    const lastHasProse = Boolean(last?.some((entry) => entry.type === 'text' || entry.type === 'heading'));
+    if (!last || section.type === 'heading' || (prose && lastHasProse && !opensWithHeading)) groups.push([section]);
     else last.push(section);
   }
   return groups;
@@ -120,6 +123,15 @@ function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
   });
 
   const progress = ((index + 1) / steps.length) * 100;
+  const reduceMotion = useReducedMotion();
+  const stepMotion = reduceMotion
+    ? {}
+    : {
+        initial: { opacity: 0, y: 10 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: -6 },
+        transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] as const },
+      };
 
   if (!unlocked && !state.completed[lesson.id]) return <LockedNotice lesson={lesson} track={track} />;
 
@@ -139,11 +151,17 @@ function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
           {index + 1}/{steps.length}
         </span>
         <div className="runner-bar" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100}>
-          <span style={{ width: `${progress}%` }} />
+          <motion.span
+            initial={false}
+            animate={{ width: `${progress}%` }}
+            transition={{ type: 'spring', stiffness: 180, damping: 26 }}
+          />
         </div>
       </header>
 
       <main className="runner-main">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div key={index} className="runner-step-shell" {...stepMotion}>
         {step.kind === 'intro' && (
           <div className="runner-step">
             <div className="runner-chips">
@@ -156,6 +174,7 @@ function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
             </div>
             <h1 className="runner-h1">{lesson.title}</h1>
             <p className="runner-lede">{lesson.summary}</p>
+            <ProjectPreview lesson={lesson} />
             <section className="objectives">
               <p className="objectives-label">By the end of this lesson</p>
               <ul>
@@ -274,6 +293,8 @@ function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
             </div>
           </div>
         )}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {step.kind !== 'done' && (

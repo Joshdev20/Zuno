@@ -90,6 +90,12 @@
   padding: 40px 24px 140px;
 }
 
+.runner-step-shell {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
 .runner-step {
   width: 100%;
   margin-bottom: auto;

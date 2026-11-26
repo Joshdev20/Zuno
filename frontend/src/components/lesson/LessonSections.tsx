@@ -6,6 +6,13 @@ export function LessonSections({ sections }: { sections: Section[] }) {
   return (
     <div className="prose">
       {sections.map((section, index) => {
+        if (section.type === 'heading') {
+          return (
+            <h3 key={index} className="prose-heading">
+              <Inline text={section.body} />
+            </h3>
+          );
+        }
         if (section.type === 'text') {
           return (
             <p key={index}>

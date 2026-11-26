@@ -9,7 +9,7 @@
       "level": "beginner",
       "title": "Values and variables",
       "summary": "const, let, types and the template literal you will use every day.",
-      "minutes": 8,
+      "minutes": 12,
       "xp": 45,
       "objectives": [
         "Choose between const and let",
@@ -18,32 +18,92 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "A name for a value"
+        },
+        {
           "type": "text",
-          "body": "A variable is a name for a value. JavaScript gives you three ways to create one, and you should use two of them."
+          "body": "A variable is a name bound to a value. That is the whole idea, and the two things you can do with it are read it and reassign it. JavaScript gives you three keywords for creating one, and you should use two of them: `const` and `let`. `var` is the third, and it exists mostly so that old code keeps working."
+        },
+        {
+          "type": "text",
+          "body": "The distinction that matters is not “constant value” but **constant binding**. `const` means the name will never point at a different value. It does not freeze the value itself — a `const` array can still be pushed to. Beginners expect `const` to mean immutable; it means the arrow cannot be redrawn."
+        },
+        {
+          "type": "heading",
+          "body": "const, let, and the value behind them"
         },
         {
           "type": "code",
           "language": "js",
-          "code": "const name = 'Ada';\nlet streak = 3;\nstreak = streak + 1;\n\nconst message = `${name} has a ${streak} day streak.`;"
+          "code": "const name = 'Ada';\nlet streak = 3;\n\nstreak = streak + 1;      // fine: let can be rebound\n// name = 'Grace';        // TypeError: const cannot be rebound\n\nconst scores = [72, 88];\nscores.push(95);          // fine: the array is still the same array\n\nconst message = `${name} has a ${streak}-day streak.`;\nconsole.log(message);     // Ada has a 4-day streak.",
+          "caption": "const binds a name; it does not freeze a value"
         },
         {
           "type": "list",
           "items": [
-            "`const` means the binding never changes. The value it points to can still be mutated if it is an object.",
-            "`let` is for values that get reassigned: counters, accumulators, state.",
-            "`var` is function-scoped and hoisted in a way that surprises people. Do not use it in new code.",
-            "Template literals use backticks and `${}` and produce strings without concatenation."
+            "`const` is the default. Write it first; when the editor complains that you reassign, change that one to `let`.",
+            "`let` is for values that genuinely change: counters, accumulators, loop state.",
+            "`var` is function-scoped rather than block-scoped, and it is hoisted with a value of `undefined`. Both behaviours surprise people, so skip it.",
+            "Names are `camelCase`, and they describe contents (`userCount`, not `n`). You will read this code more often than you write it."
           ]
+        },
+        {
+          "type": "heading",
+          "body": "Template literals"
+        },
+        {
+          "type": "text",
+          "body": "Backticks give you interpolation with `${…}` and real multi-line strings. Almost every string you build from variables should be a template literal, because the alternative — gluing pieces together with `+` — loses the shape of the sentence and invites missing spaces."
+        },
+        {
+          "type": "code",
+          "language": "js",
+          "code": "const user = { name: 'Ada', age: 36 };\n\n// fiddly\nconst a = user.name + ' is ' + user.age + ' years old.';\n\n// obvious\nconst b = `${user.name} is ${user.age} years old.`;\n\n// multi-line, no \\n needed\nconst card = `\n  <h2>${user.name}</h2>\n  <p>${user.age}</p>\n`;",
+          "caption": "Same output, less to get wrong"
+        },
+        {
+          "type": "heading",
+          "body": "The primitive types"
+        },
+        {
+          "type": "text",
+          "body": "JavaScript has seven primitives: `string`, `number`, `boolean`, `undefined`, `null`, `symbol` and `bigint`. Everything else — arrays, functions, dates, DOM nodes — is an object. Two of them trip people up: `undefined` means “no value was assigned”, while `null` means “deliberately empty”. A variable that has never been set is `undefined`; a field the user cleared should be `null`."
+        },
+        {
+          "type": "text",
+          "body": "`typeof` tells you which primitive you have, with one famous exception: `typeof null` returns `'object'`, a bug from 1995 that cannot be fixed without breaking the web. Use `value === null` when it matters."
         },
         {
           "type": "callout",
           "tone": "tip",
           "title": "Start with const",
-          "body": "Write `const` first. When the editor complains that you reassign, change it to `let`. That habit prevents a whole category of accidental mutation bugs."
+          "body": "Write `const` first and let the error message promote it to `let` when reassignment is genuinely needed. That habit prevents a whole class of “who changed this?” bugs, and it documents intent at the same time."
         },
         {
-          "type": "text",
-          "body": "The primitive types are `string`, `number`, `boolean`, `undefined`, `null`, `symbol` and `bigint`. Everything else — arrays, functions, dates — is an object. `typeof` tells you which one you have."
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Why can you `push` to a `const` array?",
+            "What is the difference between `undefined` and `null`?",
+            "Which keyword would you avoid, and why?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`const` by default, `let` when it changes, `var` never.",
+            "`const` fixes the binding, not the value.",
+            "Template literals for anything built from variables.",
+            "`undefined` is unassigned, `null` is deliberately empty."
+          ]
         }
       ],
       "drills": [
@@ -166,14 +226,18 @@
           "answer": 1,
           "explain": "Arrays are objects. Use Array.isArray() to test for an array."
         }
-      ]
+      ],
+      "build": {
+        "title": "A sentence builder",
+        "blurb": "A function that takes a name and an age and returns a template literal."
+      }
     },
     {
       "id": "js-02",
       "level": "beginner",
       "title": "Logic and conditionals",
       "summary": "Comparisons, if/else and the ternary you should not overuse.",
-      "minutes": 8,
+      "minutes": 12,
       "xp": 45,
       "objectives": [
         "Use strict equality",
@@ -182,33 +246,88 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "Programs decide things"
+        },
+        {
           "type": "text",
-          "body": "Programs decide things. In JavaScript the decisions are `if`, `else if`, `else`, and the ternary expression for short choices."
+          "body": "`if`, `else if` and `else` are how a program chooses a path. Underneath them sit two ideas: a **condition** is any expression that becomes truthy or falsy, and a **comparison** produces a boolean. Master those two and conditionals stop being syntax you copy and become a way of thinking."
+        },
+        {
+          "type": "heading",
+          "body": "Return early and the branches disappear"
         },
         {
           "type": "code",
           "language": "js",
           "code": "function grade(score) {\n  if (score >= 90) return 'A';\n  if (score >= 80) return 'B';\n  if (score >= 70) return 'C';\n  return 'F';\n}",
-          "caption": "Early returns flatten the logic"
+          "caption": "Four flat lines instead of nested ifs"
+        },
+        {
+          "type": "text",
+          "body": "Each `return` ends the function, so the conditions never need `else`. This is the single most useful refactor in day-to-day JavaScript: instead of nesting the happy path deeper and deeper, handle the failures first and return, then leave the main logic at the left margin. A function with four levels of indentation is four functions pretending to be one."
         },
         {
           "type": "list",
           "items": [
-            "`===` compares value and type. `==` converts first, which is how `'' == 0` becomes true.",
-            "`&&` and `||` return a value, not just a boolean. `user && user.name` short-circuits.",
-            "`??` falls back only for `null` and `undefined`, unlike `||` which also catches `0` and `''`.",
-            "Return early. A function with four levels of nesting is four functions waiting to happen."
+            "`===` compares value and type. `==` converts types first, so `0 == ''` is true and `'1' == 1` is true. Use `===` unless you have a specific reason.",
+            "`&&` and `||` return a **value**, not a boolean. `user && user.name` gives you the name, or the first falsy operand.",
+            "`??` falls back only for `null` and `undefined`, while `||` also falls back for `0`, `''` and `false`. For numbers and counts, `??` is almost always what you meant.",
+            "`!` flips truthiness; `!!value` converts anything to a real boolean when you need one."
           ]
         },
         {
-          "type": "callout",
-          "tone": "note",
-          "title": "Falsy values",
-          "body": "`false`, `0`, `-0`, `0n`, `''`, `null`, `undefined` and `NaN` are falsy. Everything else — including `[]` and `{}` — is truthy."
+          "type": "heading",
+          "body": "Truthiness, and why `0` bites"
         },
         {
           "type": "text",
-          "body": "Once the branches cover every case, the last `return` acts as the default. That is why the example has no final `else`."
+          "body": "Falsy values are `false`, `0`, `-0`, `0n`, `''`, `null`, `undefined` and `NaN`. Everything else is truthy — including `[]` and `{}`, which surprises people coming from other languages. That means `if (items.length)` is the safe test for a non-empty array, while `if (items)` is always true."
+        },
+        {
+          "type": "code",
+          "language": "js",
+          "code": "const count = 0;\n\nconst a = count || 10;   // 10  — 0 is falsy\nconst b = count ?? 10;   // 0   — only null/undefined fall back\n\nconst items = [];\nif (items) console.log('always runs');\nif (items.length) console.log('never runs');",
+          "caption": "Two operators that look interchangeable and are not"
+        },
+        {
+          "type": "callout",
+          "tone": "warn",
+          "title": "Do not nest ternaries",
+          "body": "A ternary is a fine one-liner for choosing between two values. Three ternaries chained together is a puzzle. When the choice needs explanation, use `if` statements — clarity beats cleverness in code that someone else will debug."
+        },
+        {
+          "type": "heading",
+          "body": "Guarding with the early return"
+        },
+        {
+          "type": "text",
+          "body": "Most production conditionals are guards: reject bad input at the top, then work with values you can trust. `if (!user) return null;` and `if (!user.active) return null;` at the start of a function keep everything after them free of checks. This is called a guard clause, and it turns deeply nested code into a list of rules."
+        },
+        {
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Why does `0 || 10` give 10 but `0 ?? 10` gives 0?",
+            "What does `if (items)` miss that `if (items.length)` catches?",
+            "When is a ternary clearer than an `if`?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Compare with `===`.",
+            "`??` for defaults, `||` for booleans.",
+            "Return early; keep the happy path at the left margin.",
+            "`[]` and `{}` are truthy — check `.length` instead."
+          ]
         }
       ],
       "drills": [
@@ -339,14 +458,18 @@
           "answer": 1,
           "explain": "=== compares without converting. (!== is also strict, but the question asks for a comparison of equality.)"
         }
-      ]
+      ],
+      "build": {
+        "title": "A grade calculator",
+        "blurb": "A function that returns A, B, C or F using early returns instead of nested ifs."
+      }
     },
     {
       "id": "js-03",
       "level": "beginner",
       "title": "Loops and arrays",
       "summary": "Iterate, accumulate and transform without mutating what you were given.",
-      "minutes": 10,
+      "minutes": 13,
       "xp": 50,
       "objectives": [
         "Loop with for and for...of",
@@ -355,32 +478,92 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "Ordered data, visited in order"
+        },
+        {
           "type": "text",
-          "body": "An array is an ordered list. A loop is how you visit every item. Together they are the backbone of most code you will write."
+          "body": "An array is an ordered list with integer indexes starting at zero. A loop is how you visit every item. Together they are the backbone of most code you will write: reading a list from an API, filtering it, and rendering something for each entry."
+        },
+        {
+          "type": "heading",
+          "body": "Two loops, two jobs"
         },
         {
           "type": "code",
           "language": "js",
-          "code": "const scores = [72, 88, 95];\n\nfor (const score of scores) {\n  console.log(score);\n}\n\nconst doubled = scores.map((score) => score * 2);"
+          "code": "const scores = [72, 88, 95];\n\n// values, and you can break out early\nfor (const score of scores) {\n  if (score > 90) break;\n  console.log(score);\n}\n\n// indexes, when you need the position\nfor (let i = 0; i < scores.length; i += 1) {\n  console.log(i, scores[i]);\n}",
+          "caption": "for...of for values, classic for when you need i"
         },
         {
           "type": "list",
           "items": [
-            "`for...of` gives you values. `for...in` gives you keys as strings — avoid it for arrays.",
-            "`array.length` is one more than the last index. Indexes start at 0.",
-            "`map`, `filter` and `reduce` return new arrays or values; `push` and `splice` mutate in place.",
-            "`push` adds to the end, `pop` removes from the end, `includes` tests membership."
+            "`for...of` gives you values. `for...in` gives you keys as **strings**, including inherited ones — never use it on an array.",
+            "`array.length` is one more than the last index. Indexes start at 0, so the last item is `items[items.length - 1]`.",
+            "`map`, `filter` and `reduce` return new arrays or values. `push`, `pop`, `splice` and `sort` change the array in place.",
+            "`includes` asks a yes/no question; `indexOf` tells you where. `find` returns the first matching item."
           ]
+        },
+        {
+          "type": "heading",
+          "body": "Build new arrays instead of editing old ones"
+        },
+        {
+          "type": "text",
+          "body": "`map` transforms every item and returns a new array of the same length. `filter` keeps the items that pass a test. Neither touches the original. That property is why they compose: you can chain `filter` then `map` and read the result left to right, like a sentence."
+        },
+        {
+          "type": "code",
+          "language": "js",
+          "code": "const scores = [72, 88, 95];\n\nconst passing = scores.filter((score) => score >= 80);\nconst curved = passing.map((score) => score + 5);\n\nconsole.log(scores);   // [72, 88, 95] — untouched\nconsole.log(curved);   // [93, 100]",
+          "caption": "filter and map leave the input alone"
+        },
+        {
+          "type": "heading",
+          "body": "Mutation, and the copy that saves you"
+        },
+        {
+          "type": "text",
+          "body": "`const copy = [...items]` makes a shallow copy — a new array with the same item references. Mutating the copy's structure is safe; mutating an object inside it is not, because both arrays point at the same object. Mutating an argument the caller still holds is one of the most common sources of “it changed by itself” bugs."
         },
         {
           "type": "callout",
           "tone": "tip",
           "title": "Copy before you mutate",
-          "body": "`const copy = [...items]` gives you a shallow copy. Mutating an argument that the caller still holds is one of the most common sources of “why did that change?” bugs."
+          "body": "If a function needs to sort or reverse an array it was given, copy first: `[...items].sort()`. The caller's order is not yours to change."
+        },
+        {
+          "type": "heading",
+          "body": "When a loop beats map"
         },
         {
           "type": "text",
-          "body": "Prefer `for...of` when you need to break early or perform side effects. Prefer `map`/`filter` when you are building a new value from an old one."
+          "body": "Use `map`/`filter` when you are building a value from a list. Use `for...of` when you need to break early, await something per item, or perform side effects like writing to the DOM. Choosing the wrong one is not a bug, but it does make the code harder to read — the method names are documentation."
+        },
+        {
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Which loop gives you the index, and which gives you the value?",
+            "Why does `[...items].sort()` not reorder the caller's array?",
+            "What does `map` return if the callback returns nothing?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Indexes start at 0; `length` is one past the end.",
+            "`for...of` for values, classic `for` for indexes.",
+            "`map`/`filter` return new arrays; `push`/`sort` mutate.",
+            "Copy before sorting or mutating an argument."
+          ]
         }
       ],
       "drills": [
@@ -487,14 +670,18 @@
           "answer": 1,
           "explain": "Indexes start at 0, so the last index is length - 1 = 3."
         }
-      ]
+      ],
+      "build": {
+        "title": "A non-mutating array transform",
+        "blurb": "A function that doubles every number and leaves the caller's array untouched."
+      }
     },
     {
       "id": "js-04",
       "level": "intermediate",
       "title": "Functions that compose",
       "summary": "Parameters, returns, arrows and the two array methods you will live in.",
-      "minutes": 12,
+      "minutes": 14,
       "xp": 65,
       "objectives": [
         "Design functions around return values",
@@ -503,32 +690,84 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "Functions are the unit of understanding"
+        },
+        {
           "type": "text",
-          "body": "A good function takes data, returns data, and does not reach outside itself. That shape is what makes code testable and composable."
+          "body": "A good function takes data in, returns data out, and does not reach outside itself for anything else. That shape makes code testable, because you can call it with known input and check the output without a browser, a database, or a click. A function that reads global state and writes to the DOM can only be tested by hand."
+        },
+        {
+          "type": "heading",
+          "body": "Small functions, chained"
         },
         {
           "type": "code",
           "language": "js",
-          "code": "const activeNames = (users) =>\n  users.filter((user) => user.active).map((user) => user.name);\n\nconst total = (...numbers) =>\n  numbers.reduce((sum, n) => sum + n, 0);\n\nfunction greet(name, greeting = 'Hello') {\n  return `${greeting}, ${name}`;\n}"
+          "code": "const isActive = (user) => user.active;\nconst nameOf = (user) => user.name;\n\nconst activeNames = (users) => users.filter(isActive).map(nameOf);\n\nactiveNames([\n  { name: 'Ada', active: true },\n  { name: 'Grace', active: false },\n  { name: 'Alan', active: true },\n]);\n// ['Ada', 'Alan']",
+          "caption": "Two tiny helpers, one readable pipeline"
         },
         {
           "type": "list",
           "items": [
-            "Arrow functions inherit `this` from the surrounding scope. Use them for callbacks, not for methods.",
-            "Default parameters keep call sites short: `greet('Ada')` works.",
-            "`...rest` collects arguments into an array, which pairs well with `reduce`.",
-            "Chain `filter` then `map` to go from a list of objects to a list of values."
+            "Arrow functions inherit `this` from the surrounding scope, which is why they are the default for callbacks. Use a `function` declaration when you need your own `this` or want hoisting.",
+            "An arrow with braces needs an explicit `return`. `(x) => { x * 2 }` returns `undefined` — a silent bug that type checkers catch and JavaScript does not.",
+            "Default parameters keep call sites short: `greet(name, greeting = 'Hello')` works with one argument or two.",
+            "`...rest` collects the remaining arguments into a real array: `sum(...nums)` pairs naturally with `sum(1, 2, 3)`."
           ]
+        },
+        {
+          "type": "heading",
+          "body": "Parameters you can read at the call site"
+        },
+        {
+          "type": "text",
+          "body": "Positional arguments stop being self-documenting at about three. `createUser('Ada', 36, true, false)` is unreadable without opening the function. Take an object instead — `createUser({ name, age, admin, verified })` — and the call site explains itself, arguments can be omitted, and adding a fifth option later does not break existing callers."
+        },
+        {
+          "type": "code",
+          "language": "js",
+          "code": "function createUser({ name, age = 18, admin = false }) {\n  return { name, age, admin };\n}\n\ncreateUser({ name: 'Ada' });                 // age 18, admin false\ncreateUser({ name: 'Grace', admin: true });  // reads like a sentence",
+          "caption": "Options object with defaults"
+        },
+        {
+          "type": "heading",
+          "body": "Pure and impure"
+        },
+        {
+          "type": "text",
+          "body": "A pure function returns the same output for the same input and changes nothing else. `(a, b) => a + b` is pure. `items.push(x)` is impure: it changes something outside itself. Pure functions are easier to reason about, easier to test and safe to cache. You cannot build a UI from pure functions alone, but you can keep the logic pure and push the impurity to the edges."
         },
         {
           "type": "callout",
           "tone": "warn",
           "title": "Brace your arrows",
-          "body": "An arrow with braces needs an explicit `return`. Forgetting it returns `undefined` and the bug is invisible until the value is used."
+          "body": "`(x) => { x * 2 }` returns `undefined`. Either drop the braces — `(x) => x * 2` — or write `return`. This mistake is invisible until something downstream reads `undefined`."
         },
         {
-          "type": "text",
-          "body": "When a function needs three or more positional arguments, take an object instead. Call sites become self-documenting: `createLesson({ track, title, xp })`."
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Why is an options object better than four positional parameters?",
+            "What does an arrow function do differently with `this`?",
+            "Which of `filter` and `map` can change the array length?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Take data, return data, touch nothing else.",
+            "Small named helpers make pipelines readable.",
+            "Arrows need an explicit `return` when braced.",
+            "Three or more parameters? Take an object."
+          ]
         }
       ],
       "drills": [
@@ -642,14 +881,18 @@
           "answer": 1,
           "explain": "Braces start a block. Wrap the object in parentheses to return it directly."
         }
-      ]
+      ],
+      "build": {
+        "title": "A filter-and-map pipeline",
+        "blurb": "Two small helpers composed into one readable line that returns active user names."
+      }
     },
     {
       "id": "js-05",
       "level": "intermediate",
       "title": "Objects and the DOM",
       "summary": "Select elements, change them, and respond to a click.",
-      "minutes": 13,
+      "minutes": 15,
       "xp": 70,
       "objectives": [
         "Select elements with querySelector",
@@ -658,32 +901,84 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "The page as a live tree"
+        },
+        {
           "type": "text",
-          "body": "The DOM is a live tree of objects that mirrors your HTML. JavaScript can read it, change it, and listen to it."
+          "body": "The DOM is an object graph that mirrors your HTML. JavaScript can read it, change it, and listen to it. Every element you can see in the inspector is a JavaScript object with properties and methods, which is why `document.querySelector('.card').textContent = 'Hi'` changes the page."
+        },
+        {
+          "type": "heading",
+          "body": "Select, read, write, listen"
         },
         {
           "type": "code",
           "language": "js",
-          "code": "const button = document.querySelector('#counter');\nconst output = document.querySelector('#count');\n\nlet count = 0;\n\nbutton.addEventListener('click', () => {\n  count += 1;\n  output.textContent = String(count);\n});"
+          "code": "const button = document.querySelector('#counter');\nconst output = document.querySelector('#count');\n\nlet count = 0;\n\nbutton.addEventListener('click', () => {\n  count += 1;\n  output.textContent = String(count);\n});",
+          "caption": "One source of truth, one projection into the page"
         },
         {
           "type": "list",
           "items": [
-            "`querySelector` returns the first match; `querySelectorAll` returns a NodeList you can spread into an array.",
-            "`textContent` sets text safely. `innerHTML` parses markup, which is how injection bugs get in.",
-            "`addEventListener('click', fn)` keeps behaviour out of the HTML. Inline `onclick` cannot be tested or reused.",
-            "State lives in a variable; the DOM is a projection of that state. Update the variable first, then render."
+            "`querySelector` returns the first match or `null`; `querySelectorAll` returns a static list you can iterate with `for...of`.",
+            "`textContent` sets text safely. `innerHTML` parses markup, which is how you render HTML and also how you open an injection hole with user input.",
+            "`addEventListener('click', fn)` keeps behaviour out of the markup. Inline `onclick` attributes cannot be removed, cannot be reused and mix two languages in one line.",
+            "State lives in a variable; the DOM is a projection of that state. When they disagree, the bug is that you updated one and not the other."
           ]
+        },
+        {
+          "type": "heading",
+          "body": "The event object"
+        },
+        {
+          "type": "text",
+          "body": "Every listener receives an event. `event.target` is the element that was clicked — useful for event delegation, where one listener on a list handles clicks on any child. `event.preventDefault()` stops the browser's default behaviour, such as a form submitting or a link navigating."
+        },
+        {
+          "type": "code",
+          "language": "js",
+          "code": "document.querySelector('form').addEventListener('submit', (event) => {\n  event.preventDefault();\n  const data = new FormData(event.target);\n  console.log(Object.fromEntries(data));\n});",
+          "caption": "Take over the submit without losing the form"
+        },
+        {
+          "type": "heading",
+          "body": "Two sources of truth"
+        },
+        {
+          "type": "text",
+          "body": "The classic DOM bug: the page shows 3, the variable says 2. It happens when code writes to the DOM in one place and to the variable in another, and one path forgets. The fix is a rule — the variable is the truth, the DOM is redrawn from it — and a single `render()` function that both paths call."
         },
         {
           "type": "callout",
           "tone": "note",
-          "title": "The event object",
-          "body": "Every listener receives an event: `event.target` is what was clicked, `event.preventDefault()` stops the default action, `event.key` tells you which key was pressed."
+          "title": "Keep rendering in one function",
+          "body": "When a click changes state, call `render()`. Do not hand-edit three separate elements from three separate handlers; that is how the page drifts away from your data."
         },
         {
-          "type": "text",
-          "body": "If your UI ever shows a value that disagrees with your variable, you have two sources of truth. Pick one — the variable — and always render from it."
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Why is `textContent` safer than `innerHTML`?",
+            "What is `event.target` when you click a `<span>` inside a `<button>`?",
+            "How do you stop a form from reloading the page?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`querySelector` for one, `querySelectorAll` for many.",
+            "`textContent` for text, `innerHTML` only for trusted markup.",
+            "`addEventListener`, never inline handlers.",
+            "State first, DOM second, one render path."
+          ]
         }
       ],
       "drills": [
@@ -791,14 +1086,18 @@
           "answer": 1,
           "explain": "One source of truth in JS, then render. Reading state back out of the DOM causes drift."
         }
-      ]
+      ],
+      "build": {
+        "title": "A working counter",
+        "blurb": "A button, a state variable and a single render path that keeps the page honest."
+      }
     },
     {
       "id": "js-06",
       "level": "advanced",
       "title": "Async, promises and errors",
       "summary": "Fetch data, await it, and handle the case where it fails.",
-      "minutes": 14,
+      "minutes": 16,
       "xp": 85,
       "objectives": [
         "Use async/await instead of promise chains",
@@ -807,32 +1106,88 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "JavaScript does not wait"
+        },
+        {
           "type": "text",
-          "body": "Network work takes time. JavaScript does not wait: it returns a **promise** and continues. `async`/`await` lets you write that as if it were sequential."
+          "body": "Network work takes time, and JavaScript will not block the page while it happens. Instead, an asynchronous function returns a **promise**: an object representing a value that will arrive later. `async`/`await` lets you write code that reads top to bottom while still being non-blocking, which is why it replaced the old `.then()` chains."
+        },
+        {
+          "type": "text",
+          "body": "The mental model: `await` pauses *this function*, not the browser. Everything else on the page keeps running. When the promise settles, the function resumes with the value — or throws, if it rejected."
+        },
+        {
+          "type": "heading",
+          "body": "Fetch, check, parse, handle"
         },
         {
           "type": "code",
           "language": "js",
-          "code": "async function loadUser(id) {\n  const response = await fetch(`/api/users/${id}`);\n  if (!response.ok) throw new Error('User not found');\n  const user = await response.json();\n  return user.name;\n}"
+          "code": "async function loadUser(id) {\n  try {\n    const response = await fetch(`/api/users/${id}`);\n    if (!response.ok) {\n      throw new Error(`Request failed: ${response.status}`);\n    }\n    return await response.json();\n  } catch (error) {\n    console.error(error);\n    return null;\n  }\n}",
+          "caption": "The four steps every request needs"
         },
         {
           "type": "list",
           "items": [
-            "An `async` function always returns a promise. `await` unwraps another promise inside it.",
-            "`try/catch` handles rejections and thrown errors in the same block.",
-            "`Promise.all([a, b])` runs requests in parallel; awaiting them one by one is slower for no reason.",
-            "A rejected promise that nobody catches becomes an unhandled rejection. Handle it or let it propagate deliberately."
+            "`fetch` does **not** reject on a 404 or 500 — it resolves with `ok: false`. Without the check, your error handling never runs and you parse an error page as data.",
+            "`response.json()` is itself asynchronous, so it needs `await` too.",
+            "`try/catch` handles rejections and thrown errors in one place, which is why `await` beats nested `.then()` callbacks.",
+            "A rejected promise nobody catches becomes an unhandled rejection — the browser logs it, and your user sees a spinner forever."
           ]
+        },
+        {
+          "type": "heading",
+          "body": "Parallel, not sequential"
+        },
+        {
+          "type": "text",
+          "body": "Awaiting one request after another adds their durations together. If the requests are independent, start them together and wait once: `Promise.all` runs them in parallel and resolves when all have finished. `Promise.allSettled` waits for all of them even if some fail, which is what you usually want for a dashboard made of several panels."
+        },
+        {
+          "type": "code",
+          "language": "js",
+          "code": "// sequential: 2 × 300ms = 600ms\nconst user = await fetchUser(id);\nconst posts = await fetchPosts(id);\n\n// parallel: about 300ms\nconst [user2, posts2] = await Promise.all([fetchUser(id), fetchPosts(id)]);",
+          "caption": "Independent work belongs in parallel"
         },
         {
           "type": "callout",
           "tone": "warn",
-          "title": "Check response.ok",
-          "body": "fetch does not reject on a 404 or 500. It resolves with `ok: false`. Without the check, your error handling never runs."
+          "title": "The forgotten await",
+          "body": "If you get `[object Promise]` where you expected data, you forgot `await`. If a function returns a promise and you never await or return it, the error disappears into the void."
+        },
+        {
+          "type": "heading",
+          "body": "Timeouts and cancellation"
         },
         {
           "type": "text",
-          "body": "Forgetting `await` is the most common async bug: you get a promise where you expected a value, and it prints as `[object Promise]`. If a value looks like that, you missed an await."
+          "body": "`fetch` has no built-in timeout, so a request that never answers leaves a spinner forever. `AbortSignal.timeout(8000)` cancels it, and an `AbortController` lets you cancel when the user navigates away. Both surface as an error you can catch, which is exactly what you want."
+        },
+        {
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Does `fetch` reject on a 500? What do you have to check?",
+            "Why is `await` in a loop usually a performance bug?",
+            "What happens to a promise nobody catches?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`async` returns a promise; `await` unwraps it.",
+            "Check `response.ok` before parsing.",
+            "Independent requests go in `Promise.all`.",
+            "Catch failures, or they become silent."
+          ]
         }
       ],
       "drills": [
@@ -943,14 +1298,18 @@
           "answer": 1,
           "explain": "HTTP errors are still responses. Only network failures reject the promise."
         }
-      ]
+      ],
+      "build": {
+        "title": "A resilient data loader",
+        "blurb": "An async function that checks `response.ok`, parses JSON and survives a failure."
+      }
     },
     {
       "id": "js-07",
       "level": "advanced",
       "title": "Classes and clean state",
       "summary": "Encapsulate behaviour, expose getters, and keep totals honest.",
-      "minutes": 14,
+      "minutes": 16,
       "xp": 90,
       "objectives": [
         "Write a class with a constructor and methods",
@@ -959,32 +1318,84 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "Data and the operations on it"
+        },
+        {
           "type": "text",
-          "body": "A class is a template for objects that share behaviour. Use one when data and the operations on it belong together — a cart, a timer, a game board."
+          "body": "A class is a template for objects that share behaviour. Reach for one when a set of values and the functions that act on them belong together — a cart and its total, a timer and its remaining seconds. For a single transformation, a plain function is simpler and better."
+        },
+        {
+          "type": "heading",
+          "body": "Private fields and derived getters"
         },
         {
           "type": "code",
           "language": "js",
-          "code": "class Cart {\n  #items = [];\n\n  add(name, price) {\n    this.#items.push({ name, price });\n  }\n\n  remove(name) {\n    this.#items = this.#items.filter((item) => item.name !== name);\n  }\n\n  get total() {\n    return this.#items.reduce((sum, item) => sum + item.price, 0);\n  }\n\n  get count() {\n    return this.#items.length;\n  }\n}"
+          "code": "class Cart {\n  #items = [];\n\n  add(name, price) {\n    this.#items.push({ name, price });\n  }\n\n  remove(name) {\n    this.#items = this.#items.filter((item) => item.name !== name);\n  }\n\n  get total() {\n    return this.#items.reduce((sum, item) => sum + item.price, 0);\n  }\n\n  get count() {\n    return this.#items.length;\n  }\n}",
+          "caption": "Private storage, public behaviour, computed values"
         },
         {
           "type": "list",
           "items": [
-            "`#items` is a private field: outside code cannot read or replace it, so the invariant stays intact.",
-            "A `get` accessor is read like a property: `cart.total`, not `cart.total()`.",
-            "Derive totals in a getter instead of storing a `total` field you must keep in sync.",
-            "Methods that change state should be the only way to change it. That is the whole point of the class."
+            "`#items` is a private field. Outside code cannot read or replace it, so the only way to change the cart is through its methods — and those can keep the data valid.",
+            "A `get` accessor is read like a property: `cart.total`, not `cart.total()`. It recomputes on every read, so it can never be stale.",
+            "Methods that change state are the only way in. That is encapsulation: not secrecy for its own sake, but a guarantee that the invariants hold.",
+            "`this` inside a method refers to the instance. Detach a method and `this` is lost — pass an arrow that calls it, or bind it once."
           ]
         },
         {
-          "type": "callout",
-          "tone": "tip",
-          "title": "Derive, do not duplicate",
-          "body": "Every stored duplicate is a chance for two values to disagree. Compute the total from the items each time you need it; the cost is trivial and the bug class disappears."
+          "type": "heading",
+          "body": "Derive, never duplicate"
         },
         {
           "type": "text",
-          "body": "Reach for a class when you have several related operations. For a single transformation, a plain function is simpler and just as testable."
+          "body": "The bug the getter prevents: storing `this.total` alongside `this.items`, then forgetting to update it in `remove()`. Every stored duplicate is a chance for two values to disagree, and the disagreement shows up as a wrong number in the UI hours later. Compute from the source of truth and the class of bug disappears."
+        },
+        {
+          "type": "code",
+          "language": "js",
+          "code": "const cart = new Cart();\ncart.add('Notebook', 12);\ncart.add('Pen', 3);\n\nconsole.log(cart.count);  // 2\nconsole.log(cart.total);  // 15\n\ncart.remove('Pen');\nconsole.log(cart.total);  // 12 — recomputed, cannot be stale",
+          "caption": "Totals that cannot drift"
+        },
+        {
+          "type": "heading",
+          "body": "When not to use a class"
+        },
+        {
+          "type": "text",
+          "body": "If the object has no state and no behaviour to protect — `formatPrice(amount)`, `slugify(title)` — a function is the right shape. Classes earn their keep when several operations share the same private data. Reaching for a class for a single helper adds ceremony without adding safety."
+        },
+        {
+          "type": "callout",
+          "tone": "note",
+          "title": "Same idea, other syntax",
+          "body": "A closure does the same job: `function createCart() { let items = []; return { add, remove, get total() {} } }`. Prefer whichever reads better for the codebase; the principle — hide the data, expose the operations — is identical."
+        },
+        {
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Why can `cart.total` not be stale?",
+            "What does `#items` prevent that `this.items` does not?",
+            "When is a plain function the better choice?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Classes bundle data with the operations that keep it valid.",
+            "Private fields make the invariants enforceable.",
+            "Getters for derived values — never store the duplicate.",
+            "Functions for transformations, classes for state."
+          ]
         }
       ],
       "drills": [
@@ -1095,7 +1506,11 @@
           "answer": 1,
           "explain": "Private fields are enforced by the language, not by convention like the underscore prefix."
         }
-      ]
+      ],
+      "build": {
+        "title": "A shopping cart class",
+        "blurb": "Private items, an add and a remove, and totals that can never go stale."
+      }
     }
   ]
 }

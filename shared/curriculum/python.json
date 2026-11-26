@@ -9,7 +9,7 @@
       "level": "beginner",
       "title": "Printing and variables",
       "summary": "Get a line onto the screen, then store it under a name.",
-      "minutes": 8,
+      "minutes": 11,
       "xp": 45,
       "objectives": [
         "Call print() with text",
@@ -18,30 +18,87 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "Getting a value onto the screen"
+        },
+        {
           "type": "text",
-          "body": "`print()` writes a value to the console. It is the first function most Python programmers use, and it stays useful for the rest of your career."
+          "body": "`print()` writes a value to the console. It is the first function most Python programmers learn and the one they keep using for the rest of their lives, because it is the fastest way to answer the question “what does this actually hold?”."
         },
         {
           "type": "code",
           "language": "python",
-          "code": "print(\"Hello, world\")",
-          "caption": "The quotes mark a string. Without them, Python looks for a name called Hello."
+          "code": "print(\"Hello, world\")\nprint(2 + 2)\nprint(\"score:\", 42)",
+          "caption": "One function, any number of values"
         },
         {
           "type": "text",
-          "body": "A variable is a name pointing at a value. Python has no `let` or `const`: you assign and the name exists."
+          "body": "`print` accepts several arguments and separates them with a space, which is why `print(\"score:\", 42)` gives `score: 42` without you building the string by hand. It always ends with a newline, so consecutive calls appear on separate lines."
+        },
+        {
+          "type": "heading",
+          "body": "Variables are names, not boxes"
+        },
+        {
+          "type": "text",
+          "body": "Python has no `let` or `const`. You assign, and the name exists. A variable is a **label pointing at a value** rather than a container holding one, which is why two names can point at the same list and why reassigning one does not change the other."
         },
         {
           "type": "code",
           "language": "python",
-          "code": "name = \"Ada\"\nprint(name)\nprint(name + \" is learning\")",
-          "caption": "+ joins two strings. You cannot join a string and a number without converting first."
+          "code": "name = \"Ada\"\nprint(name)                 # Ada\nprint(name + \" is learning\")  # Ada is learning\n\nscore = 10\nscore = score + 5           # rebinding: now 15\nscore += 2                  # same thing, shorter",
+          "caption": "Assign, then read it back"
+        },
+        {
+          "type": "text",
+          "body": "Notice that Python does not ask you to declare a type. `name` holds text now; nothing stops you assigning a number to it later. The type belongs to the value, not the name — which is why `\"3\" + 1` fails while `3 + 1` works."
+        },
+        {
+          "type": "heading",
+          "body": "Naming things"
+        },
+        {
+          "type": "text",
+          "body": "The convention is lowercase words joined by underscores: `first_name`, `total_score`, `is_ready`. Names cannot start with a digit and cannot contain spaces. Beyond the rules, the goal is a name that removes the need for a comment — `elapsed_seconds` beats `t`, and `users_who_clicked` beats `list2`."
         },
         {
           "type": "callout",
           "tone": "tip",
-          "title": "Naming",
-          "body": "Lowercase words joined by underscores is the convention: `first_name`, `total_score`. Names cannot start with a digit."
+          "title": "Print often while learning",
+          "body": "In the browser console here, and in any editor, `print()` is a legitimate debugging tool. Printing a value at the point where you are unsure is faster than reasoning about code you cannot see."
+        },
+        {
+          "type": "heading",
+          "body": "Strings need quotes, numbers do not"
+        },
+        {
+          "type": "text",
+          "body": "`\"42\"` is text. `42` is a number. They print the same, and they behave completely differently: `\"42\" + 1` raises a `TypeError` because Python will not guess whether you meant 43 or \"421\". When a value comes from a text field or a file, it is a string, and you convert it with `int(...)` or `float(...)` before doing arithmetic."
+        },
+        {
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "What does `print(\"a\", 1)` output, and why is there a space?",
+            "Why does `\"3\" + 1` fail?",
+            "What is a good name for a variable holding a number of seconds?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`print()` shows values; it returns nothing useful.",
+            "Assigning creates the name — no declaration needed.",
+            "Names are `snake_case` and should read as nouns.",
+            "Text and numbers are different types even when they look alike."
+          ]
         }
       ],
       "drills": [
@@ -153,14 +210,18 @@
           "answer": 2,
           "explain": "Names may contain letters, digits and underscores, but cannot start with a digit and cannot contain spaces or hyphens."
         }
-      ]
+      ],
+      "build": {
+        "title": "A greeting script",
+        "blurb": "A variable and a print call that puts a sentence on the screen."
+      }
     },
     {
       "id": "python-02",
       "level": "beginner",
       "title": "Strings and f-strings",
       "summary": "Build sentences from values without painful concatenation.",
-      "minutes": 9,
+      "minutes": 12,
       "xp": 45,
       "objectives": [
         "Format text with f-strings",
@@ -169,29 +230,90 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "Building sentences from values"
+        },
+        {
           "type": "text",
-          "body": "An f-string is a string with an `f` in front. Anything inside braces is evaluated and dropped into the text."
+          "body": "An f-string is a string with an `f` in front of the quote. Anything inside braces is evaluated and dropped into the text at that spot. It is the standard way to build a sentence from variables in modern Python, because it keeps the sentence in one piece instead of gluing fragments with `+`."
         },
         {
           "type": "code",
           "language": "python",
-          "code": "name = \"Ada\"\nage = 36\nprint(f\"{name} is {age} years old.\")",
-          "caption": "Braces hold expressions. The dot at the end is part of the text, not the expression."
+          "code": "name = \"Ada\"\nage = 36\n\nprint(f\"{name} is {age} years old.\")\nprint(f\"Next year: {age + 1}\")\nprint(f\"{name.upper()} in 10 years: {age + 10}\")",
+          "caption": "Expressions, not just names, inside braces"
         },
         {
           "type": "text",
-          "body": "Strings have methods, called with a dot. `name.upper()` returns a new string; it does not change the original."
+          "body": "The braces accept any expression, not only a variable: arithmetic, method calls, even a function call. That means you rarely need a temporary variable just to format something."
+        },
+        {
+          "type": "heading",
+          "body": "Strings have methods"
+        },
+        {
+          "type": "text",
+          "body": "A method is a function attached to a value, called with a dot. `name.upper()` returns a new, uppercase string. It does not change `name` — strings are **immutable**, so every method returns a new string and leaves the original untouched."
         },
         {
           "type": "code",
           "language": "python",
-          "code": "name = \"  ada  \"\nprint(name.strip().title())  # \"Ada\"\nprint(len(name))             # 7"
+          "code": "name = \"  ada  \"\n\nprint(name.strip())        # \"ada\"\nprint(name.strip().title()) # \"Ada\"\nprint(name.upper())        # \"  ADA  \"\nprint(len(name))           # 7  — the spaces count\n\nname.strip()               # does nothing: result thrown away\nclean = name.strip()       # this is how you keep it",
+          "caption": "Methods return; they do not mutate"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`strip()` removes whitespace from both ends — the fix for almost every value that came from user input.",
+            "`upper()`, `lower()` and `title()` change case; `replace(a, b)` swaps text.",
+            "`split(\",\")` turns a string into a list; `\", \".join(items)` turns a list back into a string.",
+            "`len(s)` is a function, not a method — no dot."
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "Numbers and text are not interchangeable"
+        },
+        {
+          "type": "text",
+          "body": "`input()` and text fields always give you strings. `int(\"36\")` and `float(\"1.5\")` convert; `str(36)` goes the other way. An f-string converts automatically, which is why `f\"{age}\"` works with a number — but `age + \" years\"` does not."
+        },
+        {
+          "type": "code",
+          "language": "python",
+          "code": "age_text = \"36\"\nage = int(age_text)\n\nprint(age + 1)          # 37\nprint(age_text + \"1\")   # \"361\" — text glued together",
+          "caption": "Same characters, different meaning"
         },
         {
           "type": "callout",
           "tone": "warn",
           "title": "Strings are immutable",
-          "body": "`name.upper()` returns a new string. Writing `name.upper()` on its own changes nothing — assign the result."
+          "body": "`name.upper()` on its own changes nothing — you have to assign the result. Half of all beginner string bugs are a returned value that was never stored."
+        },
+        {
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "What does `f\"{2 + 2}\"` produce?",
+            "Why is `name.strip()` alone a no-op?",
+            "What is the difference between `\"36\" + \"1\"` and `36 + 1`?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "f-strings for anything built from values.",
+            "Methods return new strings; assign to keep them.",
+            "`strip()` before you compare user input.",
+            "Convert with `int()`/`float()` before arithmetic."
+          ]
         }
       ],
       "drills": [
@@ -304,14 +426,18 @@
           "answer": 2,
           "explain": "`len` counts every character, spaces included: two plus three plus two."
         }
-      ]
+      ],
+      "build": {
+        "title": "A formatted sentence",
+        "blurb": "An f-string that builds text from a name and an age, with the punctuation intact."
+      }
     },
     {
       "id": "python-03",
       "level": "beginner",
       "title": "Decisions with if and else",
       "summary": "Make the program choose a branch, and return early when it should.",
-      "minutes": 10,
+      "minutes": 13,
       "xp": 55,
       "objectives": [
         "Write if / elif / else",
@@ -320,29 +446,90 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "A program that chooses"
+        },
+        {
           "type": "text",
-          "body": "An `if` block runs when its condition is true. The colon opens the block and the indentation defines what is inside it."
+          "body": "An `if` block runs when its condition is true. The colon opens the block and the indentation defines what is inside it — Python uses whitespace as syntax, so four spaces is not a style preference, it is the language. `elif` chains alternatives, and `else` catches everything that is left."
+        },
+        {
+          "type": "heading",
+          "body": "The chain, top to bottom"
         },
         {
           "type": "code",
           "language": "python",
-          "code": "score = 82\n\nif score >= 90:\n    print(\"A\")\nelif score >= 80:\n    print(\"B\")\nelse:\n    print(\"C\")",
-          "caption": "Only one branch runs. Conditions are checked top to bottom, so order matters."
+          "code": "score = 82\n\nif score >= 90:\n    print(\"A\")\nelif score >= 80:\n    print(\"B\")\nelif score >= 70:\n    print(\"C\")\nelse:\n    print(\"F\")",
+          "caption": "First true branch wins, the rest are skipped"
         },
         {
           "type": "text",
-          "body": "Combine conditions with `and`, `or` and `not`. Comparison uses `==` for equality and `=` only for assignment."
+          "body": "Only one branch of a chain ever runs. Python checks the conditions in order and stops at the first true one, which is why the conditions do not need an upper bound: by the time you reach `score >= 80`, you already know the score is under 90."
+        },
+        {
+          "type": "heading",
+          "body": "Combining conditions"
         },
         {
           "type": "code",
           "language": "python",
-          "code": "age = 20\nhas_ticket = True\n\nif age >= 18 and has_ticket:\n    print(\"Enter\")\n    \nif not has_ticket:\n    print(\"Buy a ticket first\")"
+          "code": "age = 20\nhas_ticket = True\n\nif age >= 18 and has_ticket:\n    print(\"Enter\")\n\nif not has_ticket:\n    print(\"Buy a ticket first\")\n\nif age < 13 or age > 65:\n    print(\"Discount\")",
+          "caption": "and, or, not — plain English"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`==` compares; `=` assigns. Mixing them up is the most common syntax error in the first week.",
+            "`and` needs both sides true; `or` needs one; `not` flips a boolean.",
+            "`in` tests membership: `if \"admin\" in roles:` reads better than a chain of `==`.",
+            "Chained comparisons work as maths does: `if 0 < score <= 100:`."
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "Truthiness"
+        },
+        {
+          "type": "text",
+          "body": "Any value can be used as a condition. Empty strings, empty lists, `0`, `0.0`, `None` and `False` are falsy; everything else is truthy. That makes `if items:` the idiomatic test for a non-empty list, and `if not name:` the idiomatic test for a missing name."
+        },
+        {
+          "type": "code",
+          "language": "python",
+          "code": "items = []\n\nif items:\n    print(\"has items\")\nelse:\n    print(\"empty\")     # this runs\n\nname = \"\"\nif not name:\n    print(\"name required\")",
+          "caption": "Empty things are falsy"
         },
         {
           "type": "callout",
           "tone": "note",
-          "title": "Truthiness",
-          "body": "Empty strings, empty lists, `0` and `None` are falsy. `if items:` is idiomatic for 'if the list is not empty'."
+          "title": "Return early",
+          "body": "Inside a function, handle the failure first and `return`, then keep the main path unindented. Three levels of nested `if` usually means three guard clauses waiting to be extracted."
+        },
+        {
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Why does the chain not need `score < 90` on the second condition?",
+            "What is falsy besides `False`?",
+            "What is the difference between `==` and `=`?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Colon opens the block, indentation defines it.",
+            "Only the first true branch runs.",
+            "`and`, `or`, `not`, `in` — no symbols needed.",
+            "Empty values are falsy; use that."
+          ]
         }
       ],
       "drills": [
@@ -464,14 +651,18 @@
           "answer": 0,
           "explain": "Python chains comparisons: it means `3 > 2 and 2 > 1`."
         }
-      ]
+      ],
+      "build": {
+        "title": "A grade function",
+        "blurb": "An if/elif/else chain that turns a score into a letter."
+      }
     },
     {
       "id": "python-04",
       "level": "beginner",
       "title": "Loops and ranges",
       "summary": "Repeat work without copying and pasting.",
-      "minutes": 10,
+      "minutes": 13,
       "xp": 55,
       "objectives": [
         "Loop with for and range",
@@ -480,30 +671,90 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "Repeat without copying and pasting"
+        },
+        {
           "type": "text",
-          "body": "`for` walks a sequence. `range(n)` produces the numbers 0 up to but not including n."
+          "body": "`for` walks a sequence — a list, a string, a range of numbers. Each pass binds the next item to the loop variable and runs the indented body. When the sequence runs out, the loop ends and execution continues after it."
         },
         {
           "type": "code",
           "language": "python",
-          "code": "for i in range(3):\n    print(i)   # 0, 1, 2",
-          "caption": "The stop value is excluded. That is why range(3) gives three numbers."
+          "code": "for i in range(3):\n    print(i)        # 0, 1, 2\n\nfor letter in \"abc\":\n    print(letter)   # a, b, c",
+          "caption": "Anything iterable can be looped"
         },
         {
           "type": "text",
-          "body": "A loop usually carries a result forward in a variable declared before it."
+          "body": "`range(n)` produces `0` up to but **not including** `n`. That off-by-one is deliberate: `range(3)` gives three numbers, which matches how lists are indexed. `range(1, 6)` gives 1 to 5, and `range(0, 10, 2)` gives every second number."
+        },
+        {
+          "type": "heading",
+          "body": "Accumulating a result"
+        },
+        {
+          "type": "text",
+          "body": "A loop usually carries a value forward in a variable created before it. This pattern — start with an empty result, update it on every pass, read it afterwards — is behind most calculations you will write."
         },
         {
           "type": "code",
           "language": "python",
-          "code": "total = 0\nfor n in range(1, 6):\n    total = total + n\nprint(total)   # 15",
-          "caption": "range(1, 6) is 1,2,3,4,5. Both bounds count: start included, stop excluded."
+          "code": "total = 0\n\nfor n in range(1, 6):\n    total = total + n\n\nprint(total)   # 15",
+          "caption": "Initialise, update, read"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`total = total + n` can be written `total += n`.",
+            "The variable must exist before the loop, or the first update fails.",
+            "If the loop never runs, the result is the initial value — decide what that should mean.",
+            "`sum(numbers)`, `max(numbers)` and `min(numbers)` already exist; reach for them before writing the loop."
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "Filtering inside a loop"
+        },
+        {
+          "type": "code",
+          "language": "python",
+          "code": "total = 0\n\nfor n in range(1, 21):\n    if n % 2 == 0:\n        total += n\n\nprint(total)   # 110",
+          "caption": "A condition inside the loop decides what counts"
+        },
+        {
+          "type": "text",
+          "body": "`%` is the remainder operator: `n % 2 == 0` is true exactly when `n` is even. Reading it as “the remainder after dividing by two is zero” is the fastest way to remember it, and it generalises — `n % 3 == 0` finds multiples of three."
         },
         {
           "type": "callout",
           "tone": "warn",
           "title": "Endless loops",
-          "body": "A `while` loop that never becomes false hangs the tab. Always change the condition inside the body."
+          "body": "A `while` loop repeats until its condition becomes false. If the body never changes the condition, the loop never ends and the tab locks up. Always identify which line moves the loop toward finishing."
+        },
+        {
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "How many numbers does `range(1, 6)` produce, and which ones?",
+            "Why must the accumulator exist before the loop?",
+            "What does `n % 2 == 0` test?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`for` walks a sequence; `range(n)` stops before `n`.",
+            "Accumulate in a variable declared before the loop.",
+            "`%` is remainder — use it for even/odd and multiples.",
+            "Prefer `sum`/`max`/`min` when they already do the job."
+          ]
         }
       ],
       "drills": [
@@ -612,14 +863,18 @@
           "answer": 1,
           "explain": "Start 2, stop before 8, step 2: 2, 4, 6."
         }
-      ]
+      ],
+      "build": {
+        "title": "An accumulator",
+        "blurb": "A loop that adds only the even numbers and stores the result."
+      }
     },
     {
       "id": "python-05",
       "level": "beginner",
       "title": "Lists that hold real data",
       "summary": "Store many values, then measure and filter them.",
-      "minutes": 10,
+      "minutes": 13,
       "xp": 55,
       "objectives": [
         "Create and index a list",
@@ -628,29 +883,90 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "Many values, one name"
+        },
+        {
           "type": "text",
-          "body": "A list is an ordered collection written in square brackets. Indexes start at 0."
+          "body": "A list is an ordered collection written in square brackets. Order is guaranteed, duplicates are allowed, and each item has a position called an index. Lists are the workhorse of Python: rows from a file, scores, names, coordinates."
         },
         {
           "type": "code",
           "language": "python",
-          "code": "scores = [72, 88, 91]\nprint(scores[0])    # 72\nprint(scores[-1])   # 91\nprint(len(scores))  # 3",
-          "caption": "Negative indexes count from the end, which is handy for the last item."
+          "code": "scores = [72, 88, 91]\n\nprint(scores[0])     # 72  — first\nprint(scores[-1])    # 91  — last\nprint(len(scores))   # 3\nprint(scores[0:2])   # [72, 88] — a slice",
+          "caption": "Index from the front, or from the back"
         },
         {
           "type": "text",
-          "body": "Lists grow with `append` and are usually walked with a loop."
+          "body": "Indexes start at 0, so a list of three items has indexes 0, 1 and 2. Negative indexes count from the end, which is why `scores[-1]` is the last item without arithmetic. Asking for an index that does not exist raises `IndexError` — the list does not silently return `None`."
+        },
+        {
+          "type": "heading",
+          "body": "Growing a list"
         },
         {
           "type": "code",
           "language": "python",
-          "code": "scores = [72, 88]\nscores.append(91)\n\nfor score in scores:\n    print(score)"
+          "code": "scores = [72, 88]\nscores.append(91)\nprint(scores)            # [72, 88, 91]\n\nfor score in scores:\n    print(score)",
+          "caption": "append adds one item to the end"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`append(x)` adds one item; `extend([a, b])` adds several; `insert(0, x)` puts one at the front.",
+            "`remove(x)` deletes the first matching value; `pop()` removes and returns the last item.",
+            "`sorted(scores)` returns a new sorted list; `scores.sort()` reorders the original in place.",
+            "`x in scores` tests membership without a loop."
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "Built-ins that already do the work"
+        },
+        {
+          "type": "text",
+          "body": "Before writing a loop, check whether Python has the answer built in. `sum`, `len`, `max`, `min` and `sorted` cover most of what beginners write by hand, and they are faster and harder to get wrong."
+        },
+        {
+          "type": "code",
+          "language": "python",
+          "code": "scores = [72, 88, 91]\n\ntotal = sum(scores)              # 251\naverage = sum(scores) / len(scores)   # 83.67\nhighest = max(scores)            # 91\npassing = [s for s in scores if s >= 80]   # [88, 91]",
+          "caption": "Four results, four built-ins"
+        },
+        {
+          "type": "text",
+          "body": "The last line is a **list comprehension**: build a new list by describing it, instead of appending in a loop. `[s for s in scores if s >= 80]` reads as “each s in scores, where s is at least 80”. It is the same idea as `filter`, written in Python's own shorthand."
         },
         {
           "type": "callout",
           "tone": "tip",
-          "title": "Built-ins that do the work",
-          "body": "`sum(scores)` and `max(scores)` exist. Reach for them before writing a loop."
+          "title": "Dividing gives a float",
+          "body": "`/` always returns a float in Python 3 — `sum([1, 2]) / 2` is `1.5`, not `1`. If you need whole-number division, use `//`. This is why an “average” is a float even when the total is even."
+        },
+        {
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "What is `scores[-1]` for a three-item list, and why?",
+            "Which returns a new list: `sorted(x)` or `x.sort()`?",
+            "How do you compute an average without a loop?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Indexes start at 0; negative indexes count from the end.",
+            "`append` grows a list; `len` measures it.",
+            "Reach for `sum`, `max`, `sorted` before writing a loop.",
+            "Comprehensions build new lists by description."
+          ]
         }
       ],
       "drills": [
@@ -762,14 +1078,18 @@
           "answer": 1,
           "explain": "Slices include the start and exclude the end, so `[0:2]` is items 0 and 1."
         }
-      ]
+      ],
+      "build": {
+        "title": "A score report",
+        "blurb": "A list, a length and a division that produces an average."
+      }
     },
     {
       "id": "python-06",
       "level": "beginner",
       "title": "Functions that return values",
       "summary": "Name a calculation once and reuse it everywhere.",
-      "minutes": 11,
+      "minutes": 14,
       "xp": 60,
       "objectives": [
         "Define a function with def",
@@ -778,29 +1098,86 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "Name a calculation once"
+        },
+        {
           "type": "text",
-          "body": "`def` names a function. The body is indented, and `return` sends a value back to the caller."
+          "body": "`def` gives a name to a block of work. The body is indented, the parameters are the inputs, and `return` sends a value back to whoever called it. A function that returns a value can be used anywhere a value fits — printed, stored, passed to another function, tested."
         },
         {
           "type": "code",
           "language": "python",
-          "code": "def double(n):\n    return n * 2\n\nprint(double(21))   # 42",
-          "caption": "Without `return`, the function gives back None — a common source of confusion."
+          "code": "def double(n):\n    return n * 2\n\nprint(double(21))        # 42\nresult = double(5) + 1   # 11 — usable in an expression",
+          "caption": "Return a value, do not just print it"
         },
         {
           "type": "text",
-          "body": "Parameters can have defaults, which keeps call sites short."
+          "body": "`print` and `return` are different jobs. `print` shows something to a human and returns `None`; `return` hands a value back to the program. A function that prints instead of returning cannot be reused in a calculation, and it cannot be tested without capturing output."
+        },
+        {
+          "type": "heading",
+          "body": "Defaults and readability"
         },
         {
           "type": "code",
           "language": "python",
-          "code": "def greet(name, greeting=\"Hello\"):\n    return f\"{greeting}, {name}!\"\n\nprint(greet(\"Ada\"))\nprint(greet(\"Ada\", \"Welcome\"))"
+          "code": "def greet(name, greeting=\"Hello\"):\n    return f\"{greeting}, {name}!\"\n\nprint(greet(\"Ada\"))                 # Hello, Ada!\nprint(greet(\"Ada\", \"Good morning\")) # Good morning, Ada!",
+          "caption": "Defaults keep the common call short"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Parameters with defaults must come after the ones without.",
+            "Call with keywords when the meaning is not obvious: `greet(name=\"Ada\", greeting=\"Hi\")`.",
+            "A function with no `return` returns `None`. That is a valid choice for a side effect, and a bug when you expected a value.",
+            "Keep functions small enough to hold in your head — one job, one name."
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "Compose small pieces"
+        },
+        {
+          "type": "text",
+          "body": "The reason to write small functions is composition. Each one is easy to read, easy to test and easy to reuse, and the caller reads like a sentence. Three small functions beat one clever function that does all three jobs, because you can debug them one at a time."
+        },
+        {
+          "type": "code",
+          "language": "python",
+          "code": "def average(numbers):\n    return sum(numbers) / len(numbers)\n\ndef rounded_average(numbers, digits=1):\n    return round(average(numbers), digits)\n\nprint(rounded_average([72, 88, 91]))   # 83.7",
+          "caption": "One job each, composed by name"
         },
         {
           "type": "callout",
-          "tone": "note",
-          "title": "Small functions compose",
-          "body": "A function that does one thing can be tested, reused and read quickly. Three small functions beat one clever one."
+          "tone": "warn",
+          "title": "Return, do not print",
+          "body": "If the brief asks for a value, `return` it. Printing inside the function passes your manual test and fails every automated one — including the checks on this page."
+        },
+        {
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "What does a function return if it has no `return`?",
+            "Why is `return` more useful than `print` inside a function?",
+            "Where must default parameters sit in the signature?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`def` names work; `return` hands back a value.",
+            "Print is for humans, return is for the program.",
+            "Defaults go last, and keywords clarify call sites.",
+            "Small functions compose; big ones hide bugs."
+          ]
         }
       ],
       "drills": [
@@ -915,7 +1292,11 @@
           "answer": 1,
           "explain": "The inner `print` writes `hi`, then the function returns `None`, which the outer `print` also shows."
         }
-      ]
+      ],
+      "build": {
+        "title": "A reusable function",
+        "blurb": "A def that returns a sentence, with a default argument and no printing inside."
+      }
     }
   ]
 }

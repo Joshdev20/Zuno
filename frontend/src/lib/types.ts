@@ -2,6 +2,10 @@ export type Level = 'beginner' | 'intermediate' | 'advanced';
 export type TrackId = 'html' | 'css' | 'js' | 'python';
 export type ExerciseKind = 'html' | 'css' | 'js' | 'python';
 
+export interface SectionHeading {
+  type: 'heading';
+  body: string;
+}
 export interface SectionText {
   type: 'text';
   body: string;
@@ -23,7 +27,7 @@ export interface SectionCallout {
   body: string;
 }
 
-export type Section = SectionText | SectionCode | SectionList | SectionCallout;
+export type Section = SectionHeading | SectionText | SectionCode | SectionList | SectionCallout;
 
 export interface Check {
   kind: 'dom' | 'js' | 'style' | 'source' | 'console' | 'python';
@@ -109,6 +113,11 @@ export type Drill =
       after?: number;
     };
 
+export interface LessonBuild {
+  title: string;
+  blurb: string;
+}
+
 export interface Lesson {
   id: string;
   level: Level;
@@ -123,6 +132,7 @@ export interface Lesson {
   quiz: QuizQuestion[];
   challenge?: boolean;
   project?: boolean;
+  build?: LessonBuild;
 }
 
 export interface Track {
