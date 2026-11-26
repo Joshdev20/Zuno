@@ -1,7 +1,9 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion';
+import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
 import { Icon } from '../ui/Icon';
+import { SplitText } from '../ui/SplitText';
+import { trackSpotlight } from '../../lib/useSpotlight';
 import { AmbientScene } from './AmbientScene';
 import { totalLessons, totalMinutes } from '../../lib/curriculum';
 
@@ -21,7 +23,7 @@ const line = {
 function HeroMock() {
   return (
     <div className="hero-visual" aria-hidden="true">
-      <div className="mock">
+      <div className="mock spotlight" onPointerMove={trackSpotlight}>
         <div className="mock-chrome">
           <span className="mock-dots">
             <i />
@@ -153,6 +155,10 @@ function HeroMock() {
 export function Hero() {
   const reduceMotion = useReducedMotion();
   const stage = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
+  const visualY = useTransform(scrollYProgress, [0, 1], [0, 90]);
+  const visualFade = useTransform(scrollYProgress, [0, 0.9], [1, 0.35]);
 
   const tiltX = useMotionValue(0);
   const tiltY = useMotionValue(0);
@@ -174,7 +180,7 @@ export function Hero() {
   };
 
   return (
-    <section className="hero">
+    <section className="hero" ref={heroRef}>
       <AmbientScene />
 
       <div className="container hero-grid">
@@ -187,11 +193,11 @@ export function Hero() {
           <motion.p className="eyebrow" variants={line}>
             Interactive curriculum · HTML · CSS · JavaScript · Python
           </motion.p>
-          <motion.h1 className="hero-title" variants={line}>
-            Learn the web
+          <h1 className="hero-title">
+            <SplitText text="Learn the web" delay={0.12} />
             <br />
-            by <em>building</em> it.
-          </motion.h1>
+            <SplitText text="by building it." emWords={['building']} delay={0.26} />
+          </h1>
           <motion.p className="hero-lede" variants={line}>
             {totalLessons} short lessons, written to be read once and used immediately. Write real code in the
             browser, get checked in milliseconds, and keep a streak that makes the habit stick.
@@ -212,17 +218,20 @@ export function Hero() {
             <li>Progress saved locally</li>
           </motion.ul>
         </motion.div>
-        <div
+        <motion.div
           className="hero-stage"
           ref={stage}
           onPointerMove={onMove}
           onPointerLeave={onLeave}
-          style={{ perspective: 1200 }}
+          style={reduceMotion ? { perspective: 1200 } : { perspective: 1200, y: visualY, opacity: visualFade }}
+          initial={reduceMotion ? false : { opacity: 0, y: 26 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.18 }}
         >
           <motion.div style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}>
             <HeroMock />
           </motion.div>
-        </div>
+        </motion.div>
       </div>
 
       <div className="strip">

@@ -11,6 +11,7 @@ import { NotFound } from '../../pages/NotFound';
 import { isLessonUnlocked } from '../../lib/progress';
 import { DrillStep } from './drills/DrillStep';
 import { ProjectPreview } from './ProjectPreview';
+import { EASE_IN_OUT, EASE_OUT, POP, fadeUp, stagger } from '../../lib/motion';
 
 const Workspace = lazy(() =>
   import('./Workspace').then((module) => ({ default: module.Workspace })),
@@ -255,7 +256,29 @@ function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
         {step.kind === 'done' && (
           <div className="runner-step runner-done">
             <span className="runner-done-mark">
-              <Icon name="check" size={22} />
+              <motion.span
+                className="runner-done-burst"
+                aria-hidden="true"
+                initial={reduceMotion ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                {Array.from({ length: 10 }).map((_, ringIndex) => (
+                  <motion.i
+                    key={ringIndex}
+                    style={{ rotate: `${ringIndex * 36}deg` }}
+                    initial={reduceMotion ? false : { scaleY: 0.2, opacity: 0 }}
+                    animate={{ scaleY: [0.2, 1, 0.85], opacity: [0, 0.9, 0] }}
+                    transition={{ duration: 1.1, delay: 0.1 + ringIndex * 0.03, ease: EASE_OUT }}
+                  />
+                ))}
+              </motion.span>
+              <motion.span
+                initial={reduceMotion ? false : { scale: 0.3, rotate: -20 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={POP}
+              >
+                <Icon name="check" size={22} />
+              </motion.span>
             </span>
             <h1 className="runner-h1">Lesson complete.</h1>
             <p className="runner-lede">
@@ -330,6 +353,7 @@ function QuizStep({
   solved: boolean;
   onChoose: (option: number) => void;
 }) {
+  const reduceMotion = useReducedMotion();
   const correct = choice === question.answer;
   return (
     <div className="runner-step">
@@ -339,7 +363,12 @@ function QuizStep({
       <h2 className="runner-h2">
         <Inline text={question.prompt} />
       </h2>
-      <ul className="runner-options">
+      <motion.ul
+        className="runner-options"
+        variants={stagger(0, 0.05)}
+        initial={reduceMotion ? false : 'hidden'}
+        animate="shown"
+      >
         {question.options.map((option, optionIndex) => {
           const state = solved || (choice !== null && correct)
             ? optionIndex === question.answer
@@ -349,26 +378,43 @@ function QuizStep({
               ? 'is-wrong'
               : '';
           return (
-            <li key={option}>
-              <button
+            <motion.li key={option} variants={fadeUp}>
+              <motion.button
                 type="button"
                 className={`runner-option ${state}`}
                 onClick={() => onChoose(optionIndex)}
                 disabled={solved}
+                animate={state === 'is-wrong' ? { x: [0, -6, 6, -3, 0] } : { x: 0 }}
+                whileTap={reduceMotion ? undefined : { scale: 0.99 }}
+                transition={{ duration: 0.32, ease: EASE_IN_OUT }}
               >
                 <span className="runner-option-key">{String.fromCharCode(65 + optionIndex)}</span>
                 <span className="runner-option-copy">
                   <Inline text={option} />
                 </span>
-                {state === 'is-correct' && <Icon name="check" size={15} />}
+                {state === 'is-correct' && (
+                  <motion.span
+                    initial={reduceMotion ? false : { scale: 0.4, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={POP}
+                    className="runner-option-mark"
+                  >
+                    <Icon name="check" size={15} />
+                  </motion.span>
+                )}
                 {state === 'is-wrong' && <Icon name="close" size={15} />}
-              </button>
-            </li>
+              </motion.button>
+            </motion.li>
           );
         })}
-      </ul>
+      </motion.ul>
       {choice !== null && (
-        <div className={`runner-feedback ${correct ? 'is-ok' : 'is-bad'}`}>
+        <motion.div
+          className={`runner-feedback ${correct ? 'is-ok' : 'is-bad'}`}
+          initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: EASE_OUT }}
+        >
           <p className="runner-feedback-title">{correct ? 'Correct.' : 'Not quite — try again.'}</p>
           {correct ? (
             <p>
@@ -377,7 +423,7 @@ function QuizStep({
           ) : (
             <p>Re-read the step above and pick the option that matches it. The explanation unlocks when you get there.</p>
           )}
-        </div>
+        </motion.div>
       )}
     </div>
   );

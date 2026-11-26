@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom';
 import { Icon } from '../ui/Icon';
 import { motion, useReducedMotion } from 'framer-motion';
 import { tracks } from '../../lib/curriculum';
-import { fadeUp, stagger, viewportOnce } from '../../lib/motion';
+import { POP, fadeUp, stagger, viewportOnce } from '../../lib/motion';
+import { trackSpotlight } from '../../lib/useSpotlight';
 
 const highlights: Record<string, string[]> = {
   html: ['Semantic documents', 'Forms with real labels', 'Accessible media'],
@@ -40,7 +41,14 @@ export function TracksSection() {
             const minutes = track.lessons.reduce((sum, lesson) => sum + lesson.minutes, 0);
             const xp = track.lessons.reduce((sum, lesson) => sum + lesson.xp, 0);
             return (
-              <motion.article key={track.id} className={`track-card track-card--${track.id}`} variants={fadeUp}>
+              <motion.article
+                key={track.id}
+                className={`track-card track-card--${track.id} spotlight`}
+                variants={fadeUp}
+                onPointerMove={trackSpotlight}
+                whileHover={reduceMotion ? undefined : { y: -6 }}
+                transition={POP}
+              >
                 <div className="track-card-top">
                   <span className="track-index">0{index + 1}</span>
                   <span className="track-tag">{track.tagline}</span>

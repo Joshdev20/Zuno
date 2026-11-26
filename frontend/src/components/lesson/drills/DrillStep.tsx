@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import type { Drill } from '../../../lib/types';
 import { matchesAnswer, shuffleWithSeed } from '../../../lib/validate';
 import { CodeTokens } from '../../ui/CodeTokens';
 import { Icon } from '../../ui/Icon';
 import { Inline } from '../Inline';
+import { EASE_IN_OUT, POP, fadeUp, stagger } from '../../../lib/motion';
 
 interface DrillStepProps {
   drill: Drill;
@@ -92,9 +94,15 @@ function ChoiceDrill({
   onWrong: () => void;
 }) {
   const [picked, setPicked] = useState<number | null>(null);
+  const reduceMotion = useReducedMotion();
 
   return (
-    <ul className="runner-options">
+    <motion.ul
+      className="runner-options"
+      variants={stagger(0, 0.05)}
+      initial={reduceMotion ? false : 'hidden'}
+      animate="shown"
+    >
       {drill.options.map((option, index) => {
         const state = solved
           ? index === drill.answer
@@ -106,11 +114,14 @@ function ChoiceDrill({
               : 'is-wrong'
             : '';
         return (
-          <li key={option}>
-            <button
+          <motion.li key={option} variants={fadeUp}>
+            <motion.button
               type="button"
               className={`runner-option ${state}`}
               disabled={solved}
+              animate={state === 'is-wrong' ? { x: [0, -6, 6, -3, 0] } : { x: 0 }}
+              whileTap={reduceMotion ? undefined : { scale: 0.99 }}
+              transition={{ duration: 0.32, ease: EASE_IN_OUT }}
               onClick={() => {
                 if (solved) return;
                 setPicked(index);
@@ -122,13 +133,22 @@ function ChoiceDrill({
               <span className="runner-option-copy">
                 <Inline text={option} />
               </span>
-              {state === 'is-correct' && <Icon name="check" size={15} />}
+              {state === 'is-correct' && (
+                <motion.span
+                  className="runner-option-mark"
+                  initial={reduceMotion ? false : { scale: 0.4, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={POP}
+                >
+                  <Icon name="check" size={15} />
+                </motion.span>
+              )}
               {state === 'is-wrong' && <Icon name="close" size={15} />}
-            </button>
-          </li>
+            </motion.button>
+          </motion.li>
         );
       })}
-    </ul>
+    </motion.ul>
   );
 }
 

@@ -292,6 +292,7 @@
 }
 
 .runner-done-mark {
+  position: relative;
   display: grid;
   place-items: center;
   width: 46px;
@@ -299,6 +300,30 @@
   border-radius: 50%;
   background: var(--pine);
   color: #f2f5ff;
+}
+
+.runner-done-burst {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.runner-done-burst i {
+  position: absolute;
+  left: -1px;
+  top: -78px;
+  width: 2px;
+  height: 30px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, transparent, var(--pine));
+  transform-origin: 1px 78px;
+}
+
+.runner-option-mark {
+  display: inline-flex;
 }
 
 .runner-stats {

@@ -1,17 +1,25 @@
 import { motion, useReducedMotion } from 'framer-motion';
-import { fadeUp, stagger, viewportOnce } from '../../lib/motion';
+import { EASE_OUT, POP, fadeUp, stagger, viewportOnce } from '../../lib/motion';
 import { Icon } from '../ui/Icon';
+import { CountUp } from '../ui/CountUp';
 
 function EditorVisual() {
   return (
-    <div className="feat-visual feat-visual--code" aria-hidden="true">
-      <div className="feat-code-line">
+    <motion.div
+      className="feat-visual feat-visual--code"
+      aria-hidden="true"
+      variants={stagger(0.1, 0.12)}
+      initial="hidden"
+      whileInView="shown"
+      viewport={viewportOnce}
+    >
+      <motion.div className="feat-code-line" variants={fadeUp}>
         <span className="feat-ln">1</span>
         <code>
           <span className="tok-tag">.card</span> <span className="tok-punc">{'{'}</span>
         </code>
-      </div>
-      <div className="feat-code-line">
+      </motion.div>
+      <motion.div className="feat-code-line" variants={fadeUp}>
         <span className="feat-ln">2</span>
         <code>
           <span className="tok-indent" />
@@ -19,8 +27,8 @@ function EditorVisual() {
           <span className="tok-punc">:</span> <span className="tok-num">24px</span>
           <span className="tok-punc">;</span>
         </code>
-      </div>
-      <div className="feat-code-line">
+      </motion.div>
+      <motion.div className="feat-code-line" variants={fadeUp}>
         <span className="feat-ln">3</span>
         <code>
           <span className="tok-indent" />
@@ -28,41 +36,65 @@ function EditorVisual() {
           <span className="tok-punc">:</span> <span className="tok-num">12px</span>
           <span className="tok-punc">;</span>
         </code>
-      </div>
-      <div className="feat-code-line">
+      </motion.div>
+      <motion.div className="feat-code-line" variants={fadeUp}>
         <span className="feat-ln">4</span>
         <code>
           <span className="tok-punc">{'}'}</span>
           <span className="feat-caret" />
         </code>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
 function ChecksVisual() {
   return (
-    <div className="feat-visual feat-visual--checks" aria-hidden="true">
-      <div className="feat-check is-ok">
+    <motion.div
+      className="feat-visual feat-visual--checks"
+      aria-hidden="true"
+      variants={stagger(0.15, 0.28)}
+      initial="hidden"
+      whileInView="shown"
+      viewport={viewportOnce}
+    >
+      <motion.div
+        className="feat-check is-ok"
+        variants={{ hidden: { opacity: 0, x: -8 }, shown: { opacity: 1, x: 0, transition: POP } }}
+      >
         <span className="feat-check-icon">
           <Icon name="check" size={12} />
         </span>
         Document starts with &lt;!DOCTYPE html&gt;
-      </div>
-      <div className="feat-check is-ok">
+      </motion.div>
+      <motion.div
+        className="feat-check is-ok"
+        variants={{ hidden: { opacity: 0, x: -8 }, shown: { opacity: 1, x: 0, transition: POP } }}
+      >
         <span className="feat-check-icon">
           <Icon name="check" size={12} />
         </span>
         An &lt;h1&gt; introduces the page
-      </div>
-      <div className="feat-check is-bad">
+      </motion.div>
+      <motion.div
+        className="feat-check is-bad"
+        variants={{ hidden: { opacity: 0, x: -8 }, shown: { opacity: 1, x: 0, transition: POP } }}
+      >
         <span className="feat-check-icon">
           <Icon name="close" size={12} />
         </span>
         A paragraph follows the heading
-        <span className="feat-check-detail">No &lt;p&gt; found in the body</span>
-      </div>
-    </div>
+        <motion.span
+          className="feat-check-detail"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={viewportOnce}
+          transition={{ delay: 1.1, duration: 0.4, ease: EASE_OUT }}
+        >
+          No &lt;p&gt; found in the body
+        </motion.span>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -71,18 +103,34 @@ function StreakVisual() {
     <div className="feat-visual feat-visual--streak" aria-hidden="true">
       <div className="streak-row">
         {[1, 1, 1, 0, 1, 1, 1].map((filled, index) => (
-          <span key={index} className={`streak-dot${filled ? ' is-filled' : ''}`} />
+          <motion.span
+            key={index}
+            className={`streak-dot${filled ? ' is-filled' : ''}`}
+            initial={{ scale: 0.4, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            viewport={viewportOnce}
+            transition={{ ...POP, delay: 0.1 + index * 0.06 }}
+          />
         ))}
       </div>
       <div className="streak-stats">
         <span>
-          <strong>4</strong> day streak
+          <strong>
+            <CountUp value={4} duration={0.9} />
+          </strong>{' '}
+          day streak
         </span>
         <span>
-          <strong>260</strong> XP
+          <strong>
+            <CountUp value={260} duration={1.2} />
+          </strong>{' '}
+          XP
         </span>
         <span>
-          <strong>3</strong> badges
+          <strong>
+            <CountUp value={3} duration={0.9} />
+          </strong>{' '}
+          badges
         </span>
       </div>
     </div>
@@ -91,16 +139,27 @@ function StreakVisual() {
 
 function TerminalVisual() {
   return (
-    <div className="feat-visual feat-visual--terminal" aria-hidden="true">
-      <p>
+    <motion.div
+      className="feat-visual feat-visual--terminal"
+      aria-hidden="true"
+      variants={stagger(0.1, 0.22)}
+      initial="hidden"
+      whileInView="shown"
+      viewport={viewportOnce}
+    >
+      <motion.p variants={fadeUp}>
         <span className="term-prompt">›</span> doubleAll([1, 2, 3])
-      </p>
-      <p className="term-out">[2, 4, 6]</p>
-      <p>
+      </motion.p>
+      <motion.p className="term-out" variants={fadeUp}>
+        [2, 4, 6]
+      </motion.p>
+      <motion.p variants={fadeUp}>
         <span className="term-prompt">›</span> cart.total
-      </p>
-      <p className="term-out">20</p>
-    </div>
+      </motion.p>
+      <motion.p className="term-out" variants={fadeUp}>
+        20
+      </motion.p>
+    </motion.div>
   );
 }
 
@@ -110,16 +169,22 @@ export function FeaturesSection() {
   return (
     <section className="section">
       <div className="container">
-        <div className="section-head">
-          <div>
+        <motion.div
+          className="section-head"
+          variants={stagger(0, 0.08)}
+          initial={reduceMotion ? false : 'hidden'}
+          whileInView="shown"
+          viewport={viewportOnce}
+        >
+          <motion.div variants={fadeUp}>
             <p className="eyebrow">What is inside</p>
             <h2 className="section-title">Everything you need, nothing you don't.</h2>
-          </div>
-          <p className="section-note">
+          </motion.div>
+          <motion.p className="section-note" variants={fadeUp}>
             No dashboards to configure, no plugin ecosystem to learn. An editor, a preview, checks and a record of what
             you have done.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         <motion.div
           className="feat-grid"

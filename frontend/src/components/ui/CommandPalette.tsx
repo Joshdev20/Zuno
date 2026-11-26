@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { EASE_OUT } from '../../lib/motion';
 import { allLessons, tracks } from '../../lib/curriculum';
 import { Icon } from './Icon';
 
@@ -36,6 +38,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const reduceMotion = useReducedMotion();
 
   const results = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -65,8 +68,6 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
     return () => window.removeEventListener('keydown', onKey);
   }, [open, onClose]);
 
-  if (!open) return null;
-
   const go = (item: PaletteItem | undefined) => {
     if (!item) return;
     navigate(item.to);
@@ -74,14 +75,28 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
   };
 
   return (
-    <div className="palette-backdrop" onMouseDown={onClose} role="presentation">
-      <div
-        className="palette"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Quick search"
-        onMouseDown={(event) => event.stopPropagation()}
-      >
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="palette-backdrop"
+          onMouseDown={onClose}
+          role="presentation"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+        >
+          <motion.div
+            className="palette"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Quick search"
+            onMouseDown={(event) => event.stopPropagation()}
+            initial={reduceMotion ? false : { opacity: 0, y: 14, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.98 }}
+            transition={{ duration: 0.26, ease: EASE_OUT }}
+          >
         <div className="palette-input">
           <Icon name="search" size={17} />
           <input
@@ -136,7 +151,9 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
             <kbd>↵</kbd> to open
           </span>
         </div>
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

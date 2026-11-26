@@ -5,7 +5,9 @@ import { explainPythonError, runPython, type PythonRun } from '../../lib/python'
 import { useSandbox } from '../../lib/useSandbox';
 import { fileForKind } from '../../lib/curriculum';
 import type { CheckResult, Lesson } from '../../lib/types';
+import { motion, useReducedMotion } from 'framer-motion';
 import { CodeEditor } from './CodeEditor';
+import { EASE_OUT, POP, stagger } from '../../lib/motion';
 import { Icon } from '../ui/Icon';
 
 type Tab = 'preview' | 'console' | 'checks';
@@ -43,6 +45,8 @@ export function Workspace({
   const [code, setCode] = useState(() => readDraft(draftKey, lesson.exercise.starter));
   const [tab, setTab] = useState<Tab>(lesson.exercise.kind === 'js' ? 'console' : 'preview');
   const [results, setResults] = useState<CheckResult[] | null>(null);
+  const [runId, setRunId] = useState(0);
+  const reduceMotion = useReducedMotion();
   const [pyRun, setPyRun] = useState<PythonRun | null>(null);
   const [checking, setChecking] = useState(false);
   const { srcDoc, result, timedOut, run } = useSandbox();
@@ -100,6 +104,7 @@ export function Workspace({
     if (!result || !pending.current) return;
     pending.current = false;
     setResults(mergeResults(checks, result.results, codeRef.current));
+    setRunId((current) => current + 1);
     setChecking(false);
     setTab('checks');
   }, [result, checks]);
@@ -266,19 +271,45 @@ export function Workspace({
                       {allPassed ? 'Everything checks out.' : 'Fix the items below and check again.'}
                     </span>
                   </div>
-                  <ul className="checks-list">
+                  <motion.ul
+                    key={runId}
+                    className="checks-list"
+                    variants={stagger(0.05, 0.06)}
+                    initial={reduceMotion ? false : 'hidden'}
+                    animate="shown"
+                  >
                     {results.map((entry, index) => (
-                      <li key={`${entry.label}-${index}`} className={entry.ok ? 'is-ok' : 'is-bad'}>
-                        <span className="check-mark">
+                      <motion.li
+                        key={`${entry.label}-${index}`}
+                        className={entry.ok ? 'is-ok' : 'is-bad'}
+                        variants={{
+                          hidden: { opacity: 0, x: -10 },
+                          shown: { opacity: 1, x: 0, transition: POP },
+                        }}
+                      >
+                        <motion.span
+                          className="check-mark"
+                          initial={reduceMotion ? false : { scale: 0.4 }}
+                          animate={{ scale: 1 }}
+                          transition={POP}
+                        >
                           <Icon name={entry.ok ? 'check' : 'close'} size={12} />
-                        </span>
+                        </motion.span>
                         <span className="check-copy">
                           <span>{entry.label}</span>
-                          {!entry.ok && entry.detail && <small>{entry.detail}</small>}
+                          {!entry.ok && entry.detail && (
+                            <motion.small
+                              initial={reduceMotion ? false : { opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: 0.35, duration: 0.4, ease: EASE_OUT }}
+                            >
+                              {entry.detail}
+                            </motion.small>
+                          )}
                         </span>
-                      </li>
+                      </motion.li>
                     ))}
-                  </ul>
+                  </motion.ul>
                 </>
               )}
             </div>

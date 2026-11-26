@@ -432,6 +432,36 @@
   border-bottom: 1px solid var(--line-soft);
 }
 
+/* ---------- hero motion ---------- */
+
+@keyframes float-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -7px, 0);
+  }
+}
+
+.hero-float--streak {
+  animation: float-drift 7s ease-in-out infinite;
+}
+
+.hero-float--xp {
+  animation: float-drift 8.6s ease-in-out 0.9s infinite;
+}
+
+.mock.spotlight::after {
+  background: radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%), rgba(123, 92, 255, 0.2), transparent 70%);
+  border-radius: 18px;
+}
+
+.hero-stage {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
 /* ---------- method section scene ---------- */
 
 .method {
@@ -635,10 +665,25 @@
 
 /* ---------- method ---------- */
 
+.method-track {
+  position: relative;
+}
+
+.method-rule {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line-strong) 10%, var(--line-strong) 90%, transparent);
+  transform-origin: left center;
+}
+
 .method-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 40px;
+  padding-top: 34px;
 }
 
 .method-step {
@@ -864,6 +909,8 @@
 }
 
 .billing-toggle button {
+  position: relative;
+  isolation: isolate;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -878,8 +925,20 @@
 }
 
 .billing-toggle button.is-active {
-  background: var(--pine);
+  background: transparent;
   color: #ffffff;
+}
+
+.billing-pill {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: var(--radius-pill);
+  background: var(--pine);
+}
+
+.billing-toggle button > span:not(.billing-pill) {
+  position: relative;
 }
 
 .billing-save {
@@ -954,10 +1013,15 @@
 }
 
 .price-amount {
+  position: relative;
   display: flex;
   align-items: baseline;
   gap: 9px;
   margin: 14px 0 8px;
+}
+
+.price-desc {
+  min-height: 18px;
 }
 
 .price-value {
@@ -1060,29 +1124,40 @@
   padding: 18px 0;
 }
 
-.faq-item summary {
+.faq-trigger {
   display: flex;
+  width: 100%;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
   font-size: 14.5px;
   font-weight: 500;
+  text-align: left;
+  color: var(--ink);
   cursor: pointer;
-  list-style: none;
+  transition: color var(--dur-2) var(--ease-out);
 }
 
-.faq-item summary::-webkit-details-marker {
-  display: none;
+.faq-trigger:hover {
+  color: var(--pine);
 }
 
 .faq-toggle {
+  display: inline-flex;
   color: var(--muted);
-  transition: transform 220ms var(--ease);
   flex: none;
 }
 
-.faq-item[open] .faq-toggle {
-  transform: rotate(180deg);
+.faq-item.is-open .faq-toggle {
+  color: var(--pine);
+}
+
+.faq-item.is-open .faq-trigger {
+  color: var(--pine);
+}
+
+.faq-answer p {
+  padding-right: 28px;
 }
 
 .faq-item p {
@@ -1137,8 +1212,37 @@
 }
 
 .closing-btn {
+  position: relative;
+  overflow: hidden;
   background: #ffffff;
   color: var(--pine-dark);
+}
+
+.closing-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 25%, rgba(123, 92, 255, 0.22) 50%, transparent 75%);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+
+.closing-btn:hover::after {
+  animation: sweep 1.05s var(--ease-out);
+}
+
+.closing-btn svg {
+  transition: transform var(--dur-2) var(--ease-out);
+}
+
+.closing-btn:hover svg {
+  transform: translateX(4px);
+}
+
+@keyframes sweep {
+  to {
+    transform: translateX(120%);
+  }
 }
 
 .closing-btn:hover {

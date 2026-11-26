@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
 import { allLessons, lessonTrack, totalLessons, totalXp } from '../lib/curriculum';
 import {
   completedCount,
@@ -11,6 +12,8 @@ import {
 import { earnedBadges, badges } from '../lib/badges';
 import { Icon } from '../components/ui/Icon';
 import { ProgressBar, Ring } from '../components/ui/Meters';
+import { CountUp } from '../components/ui/CountUp';
+import { POP, fadeUp, scaleIn, stagger, viewportOnce } from '../lib/motion';
 
 function greeting(): string {
   const hour = new Date().getHours();
@@ -20,6 +23,7 @@ function greeting(): string {
 }
 
 export function Dashboard() {
+  const reduceMotion = useReducedMotion();
   const { state, level } = useProgress();
   const next = nextLessonFor(state);
   const nextTrack = next ? lessonTrack.get(next.id) : undefined;
@@ -35,8 +39,13 @@ export function Dashboard() {
   }, []);
 
   return (
-    <div className="page fade-in">
-      <header className="page-head">
+    <motion.div
+      className="page"
+      variants={stagger(0.04, 0.07)}
+      initial={reduceMotion ? false : 'hidden'}
+      animate="shown"
+    >
+      <motion.header className="page-head" variants={fadeUp}>
         <div>
           <p className="eyebrow">
             {new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}
@@ -61,52 +70,65 @@ export function Dashboard() {
             Achievements
           </Link>
         </div>
-      </header>
+      </motion.header>
 
-      <section className="stat-row">
-        <article className="stat-card">
+      <motion.section className="stat-row" variants={fadeUp}>
+        <motion.article className="stat-card" variants={fadeUp} whileHover={reduceMotion ? undefined : { y: -3 }} transition={POP}>
           <span className="stat-icon stat-icon--clay">
             <Icon name="flame" size={17} />
           </span>
           <div>
-            <p className="stat-value">{state.streak.count}</p>
+            <p className="stat-value">
+              <CountUp value={state.streak.count} duration={0.8} />
+            </p>
             <p className="stat-label">day streak</p>
           </div>
           <div className="stat-days" aria-hidden="true">
-            {Array.from({ length: 7 }).map((_, index) => (
-              <span key={index} className={`stat-day${index >= 7 - Math.min(7, state.streak.count) ? ' is-on' : ''}`} />
-            ))}
+            {Array.from({ length: 7 }).map((_, index) => {
+              const on = index >= 7 - Math.min(7, state.streak.count);
+              return (
+                <motion.span
+                  key={index}
+                  className={`stat-day${on ? ' is-on' : ''}`}
+                  initial={reduceMotion ? false : { scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ ...POP, delay: 0.25 + index * 0.05 }}
+                />
+              );
+            })}
           </div>
-        </article>
+        </motion.article>
 
-        <article className="stat-card">
+        <motion.article className="stat-card" variants={fadeUp} whileHover={reduceMotion ? undefined : { y: -3 }} transition={POP}>
           <span className="stat-icon stat-icon--brass">
             <Icon name="bolt" size={17} />
           </span>
           <div>
-            <p className="stat-value">{state.xp}</p>
+            <p className="stat-value">
+              <CountUp value={state.xp} duration={1.1} />
+            </p>
             <p className="stat-label">total XP</p>
           </div>
           <span className="stat-badge mono">
             L{level.level} {level.label}
           </span>
-        </article>
+        </motion.article>
 
-        <article className="stat-card">
+        <motion.article className="stat-card" variants={fadeUp} whileHover={reduceMotion ? undefined : { y: -3 }} transition={POP}>
           <span className="stat-icon stat-icon--pine">
             <Icon name="book" size={17} />
           </span>
           <div>
             <p className="stat-value">
-              {done}
+              <CountUp value={done} duration={0.9} />
               <span className="stat-value-sub">/{totalLessons}</span>
             </p>
             <p className="stat-label">lessons complete</p>
           </div>
           <ProgressBar value={done / totalLessons} height={4} />
-        </article>
+        </motion.article>
 
-        <article className="stat-card">
+        <motion.article className="stat-card" variants={fadeUp} whileHover={reduceMotion ? undefined : { y: -3 }} transition={POP}>
           <span className="stat-icon stat-icon--ink">
             <Icon name="target" size={17} />
           </span>
@@ -117,11 +139,17 @@ export function Dashboard() {
           <Ring value={today > 0 ? 1 : 0} size={38} stroke={3}>
             <span className="ring-tiny">{today > 0 ? '✓' : '0'}</span>
           </Ring>
-        </article>
-      </section>
+        </motion.article>
+      </motion.section>
 
       <div className="dash-grid">
-        <section className="continue-card">
+        <motion.section
+          className="continue-card"
+          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={viewportOnce}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        >
           <div className="continue-top">
             <p className="eyebrow">{done === 0 ? 'Start here' : 'Continue where you left off'}</p>
             {nextTrack && (
@@ -169,10 +197,16 @@ export function Dashboard() {
             </div>
             <ProgressBar value={done / totalLessons} height={5} />
           </div>
-        </section>
+        </motion.section>
 
-        <aside className="side-stack">
-          <section className="side-card">
+        <motion.aside
+          className="side-stack"
+          variants={stagger(0.05, 0.1)}
+          initial={reduceMotion ? false : 'hidden'}
+          whileInView="shown"
+          viewport={viewportOnce}
+        >
+          <motion.section className="side-card" variants={scaleIn}>
             <div className="side-card-head">
               <h3>Tracks</h3>
               <span className="mono muted">{stats.length}</span>
@@ -200,9 +234,9 @@ export function Dashboard() {
                 </li>
               ))}
             </ul>
-          </section>
+          </motion.section>
 
-          <section className="side-card">
+          <motion.section className="side-card" variants={scaleIn}>
             <div className="side-card-head">
               <h3>Up next</h3>
               <span className="mono muted">{remaining.length} left</span>
@@ -229,11 +263,17 @@ export function Dashboard() {
                 })}
               </ul>
             )}
-          </section>
-        </aside>
+          </motion.section>
+        </motion.aside>
       </div>
 
-      <section className="badge-strip">
+      <motion.section
+        className="badge-strip"
+        initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={viewportOnce}
+        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      >
         <div className="badge-strip-head">
           <h3>Achievements</h3>
           <span className="mono muted">
@@ -259,7 +299,7 @@ export function Dashboard() {
             );
           })}
         </ul>
-      </section>
-    </div>
+      </motion.section>
+    </motion.div>
   );
 }
