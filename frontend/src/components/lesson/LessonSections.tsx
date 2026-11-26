@@ -1,10 +1,18 @@
 import type { Section } from '../../lib/types';
+import { CodeTokens } from '../ui/CodeTokens';
 import { Inline } from './Inline';
 
 export function LessonSections({ sections }: { sections: Section[] }) {
   return (
     <div className="prose">
       {sections.map((section, index) => {
+        if (section.type === 'heading') {
+          return (
+            <h3 key={index} className="prose-heading">
+              <Inline text={section.body} />
+            </h3>
+          );
+        }
         if (section.type === 'text') {
           return (
             <p key={index}>
@@ -19,7 +27,9 @@ export function LessonSections({ sections }: { sections: Section[] }) {
                 <span>{section.language}</span>
               </div>
               <pre>
-                <code>{section.code}</code>
+                <code>
+                  <CodeTokens code={section.code} language={section.language} />
+                </code>
               </pre>
               {section.caption && <figcaption>{section.caption}</figcaption>}
             </figure>

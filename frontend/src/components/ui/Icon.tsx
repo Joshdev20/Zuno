@@ -13,6 +13,25 @@ const paths = {
       <path d="m11 18-6-6 6-6" />
     </>
   ),
+  arrowUp: (
+    <>
+      <path d="M12 19V5" />
+      <path d="m6 11 6-6 6 6" />
+    </>
+  ),
+  arrowDown: (
+    <>
+      <path d="M12 5v14" />
+      <path d="m18 13-6 6-6-6" />
+    </>
+  ),
+  bulb: (
+    <>
+      <path d="M9 18h6" />
+      <path d="M10 22h4" />
+      <path d="M12 2a7 7 0 0 0-4 12.7V18h8v-3.3A7 7 0 0 0 12 2Z" />
+    </>
+  ),
   arrowUpRight: (
     <>
       <path d="M7 17 17 7" />

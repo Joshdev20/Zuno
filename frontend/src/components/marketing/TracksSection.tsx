@@ -1,34 +1,54 @@
 import { Link } from 'react-router-dom';
 import { Icon } from '../ui/Icon';
+import { motion, useReducedMotion } from 'framer-motion';
 import { tracks } from '../../lib/curriculum';
+import { POP, fadeUp, stagger, viewportOnce } from '../../lib/motion';
+import { trackSpotlight } from '../../lib/useSpotlight';
 
 const highlights: Record<string, string[]> = {
   html: ['Semantic documents', 'Forms with real labels', 'Accessible media'],
   css: ['The box model', 'Flexbox and grid', 'Theming with tokens'],
   js: ['Values and logic', 'DOM events', 'Async and classes'],
+  python: ['Printing and variables', 'Loops over data', 'Functions that return'],
 };
 
 export function TracksSection() {
+  const reduceMotion = useReducedMotion();
+
   return (
     <section className="section" id="curriculum">
       <div className="container">
         <div className="section-head">
           <div>
             <p className="eyebrow">The curriculum</p>
-            <h2 className="section-title">Three tracks. One habit.</h2>
+            <h2 className="section-title">Four tracks. One habit.</h2>
           </div>
           <p className="section-note">
             Each track runs from first principles to the details that separate a page that works from a page that feels
-            considered. Lessons unlock in order, but nothing is locked behind a paywall.
+            considered. HTML, CSS and JavaScript run in a live preview; Python runs in a real interpreter loaded in
+            your browser. Lessons unlock in order, and nothing is locked behind a paywall.
           </p>
         </div>
 
-        <div className="track-grid">
+        <motion.div
+          className="track-grid"
+          variants={stagger(0, 0.08)}
+          initial={reduceMotion ? false : 'hidden'}
+          whileInView="shown"
+          viewport={viewportOnce}
+        >
           {tracks.map((track, index) => {
             const minutes = track.lessons.reduce((sum, lesson) => sum + lesson.minutes, 0);
             const xp = track.lessons.reduce((sum, lesson) => sum + lesson.xp, 0);
             return (
-              <article key={track.id} className={`track-card track-card--${track.id}`}>
+              <motion.article
+                key={track.id}
+                className={`track-card track-card--${track.id} spotlight`}
+                variants={fadeUp}
+                onPointerMove={trackSpotlight}
+                whileHover={reduceMotion ? undefined : { y: -6 }}
+                transition={POP}
+              >
                 <div className="track-card-top">
                   <span className="track-index">0{index + 1}</span>
                   <span className="track-tag">{track.tagline}</span>
@@ -52,10 +72,10 @@ export function TracksSection() {
                     <Icon name="arrowRight" size={15} />
                   </Link>
                 </div>
-              </article>
+              </motion.article>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

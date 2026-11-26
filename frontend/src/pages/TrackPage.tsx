@@ -1,14 +1,17 @@
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
 import { getTrack, levelLabel, tracks } from '../lib/curriculum';
-import { useProgress } from '../lib/progress';
+import { isLessonUnlocked, useProgress } from '../lib/progress';
 import { Icon } from '../components/ui/Icon';
 import { ProgressBar, Ring } from '../components/ui/Meters';
 import { NotFound } from './NotFound';
+import { fadeUp, stagger, viewportOnce } from '../lib/motion';
 
 const order = ['beginner', 'intermediate', 'advanced'] as const;
 
 export function TrackPage() {
+  const reduceMotion = useReducedMotion();
   const { trackId } = useParams();
   const track = getTrack(trackId);
   const { state } = useProgress();
@@ -27,17 +30,22 @@ export function TrackPage() {
   const otherTracks = tracks.filter((entry) => entry.id !== track.id);
 
   return (
-    <div className="page fade-in">
-      <div className="lesson-crumbs">
+    <motion.div
+      className="page"
+      variants={stagger(0.04, 0.07)}
+      initial={reduceMotion ? false : 'hidden'}
+      animate="shown"
+    >
+      <motion.div className="lesson-crumbs" variants={fadeUp}>
         <Link to="/learn" className="back-link">
           <Icon name="arrowLeft" size={14} />
           Today
         </Link>
         <span className="crumb-sep">/</span>
         <span className="mono">{track.name}</span>
-      </div>
+      </motion.div>
 
-      <header className="track-head">
+      <motion.header className="track-head" variants={fadeUp}>
         <div className="track-head-copy">
           <p className="eyebrow">{track.tagline} track</p>
           <h1 className="page-title">{track.name}</h1>
@@ -61,13 +69,20 @@ export function TrackPage() {
             <span className="ring-sub mono">complete</span>
           </Ring>
         </div>
-      </header>
+      </motion.header>
 
-      {order.map((level) => {
+      {order.map((level, levelIndex) => {
         const lessons = track.lessons.filter((lesson) => lesson.level === level);
         if (lessons.length === 0) return null;
         return (
-          <section key={level} className="level-block">
+          <motion.section
+            key={level}
+            className="level-block"
+            initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={viewportOnce}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: levelIndex * 0.05 }}
+          >
             <div className="level-head">
               <h2>{levelLabel[level]}</h2>
               <span className="level-rule" />
@@ -78,6 +93,25 @@ export function TrackPage() {
                 const index = track.lessons.findIndex((entry) => entry.id === lesson.id);
                 const complete = Boolean(state.completed[lesson.id]);
                 const isNext = nextLesson?.id === lesson.id;
+                const locked = !complete && !isLessonUnlocked(state, track, lesson);
+                if (locked) {
+                  return (
+                    <li key={lesson.id}>
+                      <div className="lesson-row is-locked">
+                        <span className="lesson-status">
+                          <Icon name="lock" size={13} />
+                        </span>
+                        <span className="lesson-row-main">
+                          <span className="lesson-row-title">{lesson.title}</span>
+                          <span className="lesson-row-summary">Finish the previous lesson to unlock.</span>
+                        </span>
+                        <span className="lesson-row-meta mono">
+                          {lesson.minutes} min · {lesson.xp} XP
+                        </span>
+                      </div>
+                    </li>
+                  );
+                }
                 return (
                   <li key={lesson.id}>
                     <Link
@@ -103,11 +137,17 @@ export function TrackPage() {
                 );
               })}
             </ul>
-          </section>
+          </motion.section>
         );
       })}
 
-      <section className="track-foot">
+      <motion.section
+        className="track-foot"
+        initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={viewportOnce}
+        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      >
         <h2 className="track-foot-title">Keep going</h2>
         <div className="track-foot-grid">
           {otherTracks.map((entry) => {
@@ -124,14 +164,14 @@ export function TrackPage() {
                 <ProgressBar
                   value={entryDone / entry.lessons.length}
                   height={3}
-                  tone={entry.id === 'css' ? 'clay' : entry.id === 'js' ? 'brass' : 'pine'}
+                  tone={entry.id === 'css' ? 'clay' : entry.id === 'js' ? 'brass' : entry.id === 'python' ? 'slate' : 'pine'}
                 />
                 <Icon name="arrowRight" size={15} />
               </Link>
             );
           })}
         </div>
-      </section>
-    </div>
+      </motion.section>
+    </motion.div>
   );
 }

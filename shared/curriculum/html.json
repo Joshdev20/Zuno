@@ -9,7 +9,7 @@
       "level": "beginner",
       "title": "The shape of a page",
       "summary": "Every website is one document with a head and a body. Build your first one.",
-      "minutes": 7,
+      "minutes": 12,
       "xp": 40,
       "objectives": [
         "Write a valid HTML document from scratch",
@@ -18,37 +18,158 @@
       ],
       "sections": [
         {
-          "type": "text",
-          "body": "Every page you have ever visited is a text file that a browser reads top to bottom. HTML gives that text structure: this is a heading, this is a paragraph, this is a link. You are not styling anything yet. You are describing what things **are**."
+          "type": "heading",
+          "body": "A page is a tree, not a pile of text"
         },
         {
           "type": "text",
-          "body": "A complete document has four parts that never change:"
+          "body": "When a browser receives your HTML file it does not paint it straight away. It reads the tags and builds a **tree** in memory — the Document Object Model, or DOM. Every element you write becomes a node with a parent and children. That is why indentation matters even though the browser ignores it: the indentation is a picture of the tree you are building."
+        },
+        {
+          "type": "text",
+          "body": "This single idea explains almost everything else in HTML. A heading inside a section is a child of that section. Two paragraphs are siblings. A tag you forget to close becomes the parent of everything after it, which is how one missing `</div>` can wreck a whole page. Keep the tree in your head and the syntax stops feeling arbitrary."
+        },
+        {
+          "type": "heading",
+          "body": "The four parts that never change"
+        },
+        {
+          "type": "text",
+          "body": "Every valid document has the same skeleton. It looks like ceremony, but each line does a job:"
         },
         {
           "type": "code",
           "language": "html",
-          "code": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <title>Zuno Journal</title>\n  </head>\n  <body>\n    <h1>Field notes from the coast</h1>\n    <p>Three days of wind, salt and very average coffee.</p>\n  </body>\n</html>",
+          "code": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Zuno Journal</title>\n  </head>\n  <body>\n    <h1>Field notes from the coast</h1>\n    <p>Three days of wind, salt and very average coffee.</p>\n  </body>\n</html>",
           "caption": "The smallest page worth writing"
         },
         {
           "type": "list",
           "items": [
-            "`<!DOCTYPE html>` tells the browser to use modern standards mode. Leave it out and you get 1999 behaviour.",
-            "`<head>` holds information **about** the page: the title, character set, descriptions, styles.",
-            "`<body>` holds everything a visitor can actually see.",
-            "`lang=\"en\"` on `<html>` tells screen readers which language to pronounce."
+            "`<!DOCTYPE html>` is not a tag with a closing partner. It switches the browser out of quirks mode and into standards mode. Omit it and the browser emulates 1999 layout bugs.",
+            "`<html>` is the root node and holds every other element. Its `lang` attribute tells screen readers which voice to use and helps search engines with language targeting.",
+            "`<head>` is metadata: information **about** the page. Nothing in it is drawn in the viewport.",
+            "`<body>` is the document itself — everything a visitor can see or interact with.",
+            "`<meta charset=\"UTF-8\">` must come early. It tells the browser how to decode bytes into characters, so an em dash or an accent does not turn into mojibake.",
+            "`<meta name=\"viewport\">` is what makes a page readable on a phone instead of a shrunken desktop."
           ]
         },
         {
-          "type": "callout",
-          "tone": "tip",
-          "title": "Indentation is for humans",
-          "body": "The browser does not care about whitespace between tags, but the next person reading your file does. Two spaces per level, one element per line, and your future self will thank you."
+          "type": "heading",
+          "body": "How the browser reads your file"
         },
         {
           "type": "text",
-          "body": "One rule matters more than the rest: elements **nest** or sit side by side, they never overlap. If you open a tag inside a paragraph, close it before you close the paragraph."
+          "body": "The browser streams the file from top to bottom. When it hits `<head>` it collects metadata and starts fetching stylesheets. When it reaches `<body>` it starts building and painting the visible tree. That order is why a stylesheet in the head avoids a flash of unstyled content, and why a script at the end of the body does not block the first paint."
+        },
+        {
+          "type": "text",
+          "body": "You never see this happen, but it explains two things you will hit soon: an element that appears before the CSS finishes loading looks unstyled for a moment, and a slow script in the head makes the whole page wait. Order in the file is order in time."
+        },
+        {
+          "type": "heading",
+          "body": "Nesting, and why closing tags matter"
+        },
+        {
+          "type": "code",
+          "language": "html",
+          "code": "<!-- correct: children close before their parent -->\n<p>Wind from the <strong>north-east</strong>, all morning.</p>\n\n<!-- wrong: overlapping tags -->\n<p>Wind from the <strong>north-east, all morning.</p></strong>",
+          "caption": "Elements nest, they never overlap"
+        },
+        {
+          "type": "text",
+          "body": "Elements either sit inside one another or side by side. They never cross. When the browser meets badly overlapped tags it guesses — it will close the paragraph for you and leave the stray `</strong>` to be ignored or repaired. The page may still look fine, so the mistake survives until a later change breaks it. Browsers are forgiving; your debugging time is not."
+        },
+        {
+          "type": "callout",
+          "tone": "warn",
+          "title": "One stray tag breaks the tree",
+          "body": "If a section suddenly swallows the footer, or a paragraph turns bold halfway down the page, the cause is almost always an unclosed tag earlier in the file. Before you debug the CSS, count your opening and closing tags in that area."
+        },
+        {
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "What breaks if you delete `<!DOCTYPE html>`?",
+            "Which element holds the page title shown in a browser tab, and is it visible in the page itself?",
+            "Where would you put a stylesheet link, and why there?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "HTML describes **what things are**, not what they look like. Styling is CSS's job.",
+            "The skeleton is fixed: doctype, `html`, `head`, `body`.",
+            "`head` is metadata, `body` is the document.",
+            "Tags nest into a tree. Close children before parents."
+          ]
+        }
+      ],
+      "drills": [
+        {
+          "kind": "choice",
+          "prompt": "Which element declares the language of the whole document?",
+          "options": [
+            "`<html lang=\"en\">`",
+            "`<meta charset=\"utf-8\">`",
+            "`<head>`",
+            "`<body>`"
+          ],
+          "answer": 0,
+          "explain": "The `lang` attribute on `<html>` tells screen readers and search engines which language the page is written in. The charset meta describes encoding, not language.",
+          "hints": [
+            "Language is not an encoding.",
+            "The attribute lives on the outermost element."
+          ]
+        },
+        {
+          "kind": "order",
+          "prompt": "Put the skeleton of a page in the order the browser reads it.",
+          "lines": [
+            "<!doctype html>",
+            "<html lang=\"en\">",
+            "<head>",
+            "<meta charset=\"utf-8\">",
+            "<title>Zuno</title>",
+            "</head>",
+            "<body>",
+            "<p>Hello</p>",
+            "</body>",
+            "</html>"
+          ],
+          "explain": "Doctype first, then the root element, then head and body in that order. The doctype is what puts the browser in standards mode.",
+          "hints": [
+            "The doctype is not inside `<html>`.",
+            "The head closes before the body opens."
+          ]
+        },
+        {
+          "kind": "find",
+          "prompt": "One line stops this page from being valid. Which one?",
+          "lines": [
+            "<!doctype html>",
+            "<html lang=\"en\">",
+            "<head>",
+            "  <title>Field notes",
+            "</head>",
+            "<body>",
+            "  <h1>Field notes</h1>",
+            "</body>",
+            "</html>"
+          ],
+          "bad": 3,
+          "explain": "`<title>` is never self-closing. Without `</title>` everything after it is parsed as title text.",
+          "hints": [
+            "Look for an element that opens and never closes.",
+            "It sits in the head."
+          ]
         }
       ],
       "exercise": {
@@ -113,14 +234,18 @@
           "answer": 1,
           "explain": "Elements are either fully inside another element or siblings next to it. Overlapping tags produce unpredictable trees."
         }
-      ]
+      ],
+      "build": {
+        "title": "A field journal page",
+        "blurb": "A complete document with a real head, a heading and a paragraph — the skeleton every later lesson builds on."
+      }
     },
     {
       "id": "html-02",
       "level": "beginner",
       "title": "Text that reads well",
       "summary": "Headings, paragraphs, lists and emphasis — the typography of HTML.",
-      "minutes": 8,
+      "minutes": 13,
       "xp": 45,
       "objectives": [
         "Use a heading hierarchy instead of bold text",
@@ -129,32 +254,128 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "Two readers, one structure"
+        },
+        {
           "type": "text",
-          "body": "Sighted users skim. Screen reader users jump between headings. Both behaviours depend on you choosing the right element rather than making text *look* big."
+          "body": "Every page has at least two audiences. Sighted readers **skim** — they scan for the shape of the page before they read a word. Screen reader users often navigate by jumping between headings, never listening to the paragraphs in between. Both behaviours depend on the same thing: that your document has real structure instead of text that merely looks structured."
+        },
+        {
+          "type": "text",
+          "body": "That is the whole argument for semantic HTML. `<h2>` is not “big bold text”. It is a declaration that a section starts here, and every tool downstream — screen readers, search engines, reader modes, browser outline views — reads that declaration."
+        },
+        {
+          "type": "heading",
+          "body": "A document with a spine"
         },
         {
           "type": "code",
           "language": "html",
-          "code": "<h1>Brew guide</h1>\n<h2>Water</h2>\n<p>Start with soft water. Hard water mutes the acidity.</p>\n<h2>Ratio</h2>\n<p>Use <strong>60 grams per litre</strong>. Adjust after tasting.</p>\n<ul>\n  <li>Weigh the beans</li>\n  <li>Rinse the filter</li>\n  <li>Pour slowly</li>\n</ul>"
+          "code": "<h1>Brew guide</h1>\n\n<h2>Water</h2>\n<p>Start with soft water. Hard water mutes the acidity.</p>\n\n<h2>Ratio</h2>\n<p>Use <strong>60 g per litre</strong>. Adjust after the first cup, not before.</p>\n\n<h2>Method</h2>\n<ol>\n  <li>Rinse the filter.</li>\n  <li>Bloom for 30 seconds.</li>\n  <li>Pour in two stages.</li>\n</ol>",
+          "caption": "Headings create a table of contents for free"
         },
         {
           "type": "list",
           "items": [
-            "`<h1>` once per page. `<h2>` for sections, `<h3>` for subsections. Never skip a level for looks.",
-            "`<p>` is for prose. If you need a line break inside a paragraph, `<br>` exists, but a new paragraph is usually correct.",
-            "`<ul>` is unordered (order does not matter), `<ol>` is ordered (steps, rankings).",
-            "`<strong>` marks importance, `<em>` marks emphasis. A screen reader can change its voice for both."
+            "`<h1>` appears once per page and names it. `<h2>` starts sections, `<h3>` subsections. Never skip a level to get a smaller font — that is a styling decision, not a structural one.",
+            "`<p>` is a paragraph of prose. A `<br>` inside a paragraph is a line break within the same thought; a new `<p>` is a new thought. Reach for `<p>` first.",
+            "`<ul>` is unordered — the order carries no meaning. `<ol>` is ordered — steps, rankings, anything where “first” matters. Screen readers announce the item numbers in an `<ol>`, which is why the recipe above is not a `<ul>`.",
+            "`<strong>` marks importance, `<em>` marks stress emphasis. Assistive technology can change its voice for both; `<b>` and `<i>` cannot communicate anything beyond looks."
           ]
+        },
+        {
+          "type": "heading",
+          "body": "Choosing between the lookalikes"
+        },
+        {
+          "type": "text",
+          "body": "The hard part is not memorising the tags, it is picking between near-synonyms. Ask what the text **means**, not how it should look. Is this phrase important in itself? `<strong>`. Would the sentence change meaning if you stressed this word out loud? `<em>`. Is this a list of steps? `<ol>`. Is it a set of related items? `<ul>`. Is it a term and its definition? `<dl>`."
+        },
+        {
+          "type": "text",
+          "body": "If the answer to all of those is “none of the above, I just want it bold”, the element is `<span>` and the styling belongs in CSS. A `<span>` is a neutral container: it carries no meaning, only a hook for styles."
         },
         {
           "type": "callout",
           "tone": "warn",
           "title": "Do not use headings to style text",
-          "body": "If a line should look bold but is not a section title, use `<strong>`. If it should look big, that is CSS. Heading levels describe document structure, and assistive tech relies on them."
+          "body": "If a line should look bold but is not a section title, use `<strong>`. If it should look big, that is CSS. Heading levels describe structure, and assistive technology builds its navigation menu from them — a fake heading sends people to the wrong place."
         },
         {
-          "type": "text",
-          "body": "Write the content first, then check: could someone navigate this page using only its headings? If the answer is no, the structure is wrong, not the styling."
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "You need a shopping list and a recipe. Which one is `<ul>` and which is `<ol>`, and why?",
+            "Why is `<h3>` immediately after `<h1>` a problem even if it looks right?",
+            "When is `<b>` acceptable?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Structure first, appearance later.",
+            "One `h1`, then levels in order.",
+            "`ul` for sets, `ol` for sequences, `dl` for term and definition.",
+            "`strong` and `em` carry meaning; `b` and `i` only carry paint."
+          ]
+        }
+      ],
+      "drills": [
+        {
+          "kind": "fill",
+          "prompt": "Mark the opening and closing tag of a level-two heading.",
+          "code": "<{{0}}>Why headings matter</{{1}}>",
+          "blanks": [
+            [
+              "h2"
+            ],
+            [
+              "h2"
+            ]
+          ],
+          "explain": "Heading elements are numbered `h1` to `h6`. An `h1` names the page; `h2` starts a section inside it.",
+          "hints": [
+            "Level two.",
+            "The closing tag matches the opening one exactly."
+          ]
+        },
+        {
+          "kind": "choice",
+          "prompt": "Which element should wrap a list where order matters?",
+          "options": [
+            "`<ul>`",
+            "`<ol>`",
+            "`<dl>`",
+            "`<menu>`"
+          ],
+          "answer": 1,
+          "explain": "`<ol>` is an ordered list: the browser numbers the items for you. Use `<ul>` when the sequence carries no meaning.",
+          "hints": [
+            "'Ordered' is in the name.",
+            "Unordered lists use bullets."
+          ]
+        },
+        {
+          "kind": "short",
+          "prompt": "Which element gives a paragraph of text?",
+          "answers": [
+            "p",
+            "<p>",
+            "<p></p>"
+          ],
+          "explain": "`<p>` is the paragraph element. Browsers add spacing around it by default, which is why it reads as a block of prose.",
+          "hints": [
+            "It is one letter.",
+            "It is the shortest block element you know."
+          ]
         }
       ],
       "exercise": {
@@ -219,14 +440,18 @@
           "answer": 2,
           "explain": "<strong> means “important”; <b> only means “bold”. Same pixels, different semantics."
         }
-      ]
+      ],
+      "build": {
+        "title": "A brew guide article",
+        "blurb": "A page with a heading hierarchy, two paragraphs, an emphasised warning and a three-step method list."
+      }
     },
     {
       "id": "html-03",
       "level": "beginner",
       "title": "Links and images",
       "summary": "The two elements that turn a document into the web.",
-      "minutes": 8,
+      "minutes": 13,
       "xp": 45,
       "objectives": [
         "Write relative and absolute links",
@@ -235,32 +460,137 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "The two elements that make it the web"
+        },
+        {
           "type": "text",
-          "body": "A page with no links is a dead end. `<a>` and `<img>` are the two elements that make a document part of the web, and both have one attribute you must never skip."
+          "body": "A document with no links is a dead end, and a page with no images is a wall of text. `<a>` and `<img>` are small elements with a large share of the accessibility surface of your site, because both depend on a human-written description that no tool can invent for you."
+        },
+        {
+          "type": "heading",
+          "body": "Links: where does this go, and what happens to the reader?"
         },
         {
           "type": "code",
           "language": "html",
-          "code": "<nav>\n  <a href=\"/learn\">Lessons</a>\n  <a href=\"https://developer.mozilla.org\" target=\"_blank\" rel=\"noreferrer\">MDN</a>\n</nav>\n<img src=\"coast.jpg\" alt=\"Fog rolling over a grey beach at dawn\" />"
+          "code": "<nav>\n  <a href=\"/learn\">Lessons</a>\n  <a href=\"#pricing\">Pricing on this page</a>\n  <a href=\"mailto:hello@zuno.dev\">Email us</a>\n  <a href=\"https://developer.mozilla.org\" target=\"_blank\" rel=\"noreferrer\">MDN</a>\n</nav>",
+          "caption": "Four links, four different kinds of destination"
         },
         {
           "type": "list",
           "items": [
-            "`href` accepts a full URL, a path like `/learn`, a fragment like `#pricing`, or `mailto:you@site.com`.",
-            "Link text should make sense out of context. “Read the CSS guide” beats “click here”.",
-            "`alt` describes the image for people who cannot see it. Empty `alt=\"\"` is correct for purely decorative images.",
-            "`target=\"_blank\"` opens a new tab. Add `rel=\"noreferrer\"` so the new page cannot access your tab."
+            "`href` takes a full URL, a site path (`/learn`), a fragment (`#pricing`), or a scheme like `mailto:` and `tel:`.",
+            "Link text is read out of context. A screen reader can list every link on the page, so “Read the CSS guide” works and “click here” becomes a list of identical anonymous items.",
+            "`target=\"_blank\"` opens a new tab. Pair it with `rel=\"noreferrer\"` so the new page cannot reach back through `window.opener`.",
+            "A link goes somewhere. A button does something. If it changes the page without navigating, it is a `<button>`."
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "Paths, relative to what?"
+        },
+        {
+          "type": "text",
+          "body": "Relative paths are resolved against the document that contains them, not against your project folder. `coast.jpg` looks in the same directory as the current file, `/coast.jpg` starts from the site root, and `../coast.jpg` climbs one directory first. This is why a page that works at `/learn/html` can break at `/learn/html/css` — the same relative path now points somewhere else."
+        },
+        {
+          "type": "text",
+          "body": "When in doubt, prefer root-relative paths (`/img/coast.jpg`) for assets that live in fixed places. They behave identically at every depth."
+        },
+        {
+          "type": "heading",
+          "body": "Images: the alt attribute is the image for some people"
+        },
+        {
+          "type": "code",
+          "language": "html",
+          "code": "<img src=\"/img/tide.jpg\" alt=\"Low tide exposing a wide band of wet sand\" width=\"1200\" height=\"800\" />\n\n<!-- decorative: nothing is lost if it is not described -->\n<img src=\"/img/divider.svg\" alt=\"\" />",
+          "caption": "Two images, two different jobs"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`alt` is what a screen reader announces and what appears if the file fails to load. Describe what the image shows and why it matters here.",
+            "Decorative images take `alt=\"\"` — an empty string tells assistive technology to skip it. Omitting `alt` entirely makes some readers announce the filename instead.",
+            "`width` and `height` let the browser reserve space before the bytes arrive, which stops the page jumping as images load.",
+            "`loading=\"lazy\"` defers off-screen images. Do not use it on the hero image; it delays the thing people came to see."
           ]
         },
         {
           "type": "callout",
           "tone": "tip",
           "title": "Alt text is a caption, not a filename",
-          "body": "Write what the image shows and why it matters here: “Fog rolling over a grey beach at dawn”, not “coast.jpg” and not “image”."
+          "body": "“Fog rolling over a grey beach at dawn” is alt text. “coast.jpg” and “image” are not. If the picture is a chart, the alt text should state the finding, not the chart type."
         },
         {
-          "type": "text",
-          "body": "Paths are relative to the document that contains them. `coast.jpg` looks next to the current file, `/coast.jpg` starts from the site root, `../coast.jpg` climbs one folder."
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Why does `/learn` behave the same from any page but `learn` does not?",
+            "When is `alt=\"\"` correct?",
+            "You have a link that opens a modal. What is wrong with it?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Links navigate; buttons act.",
+            "Root-relative paths are stable at any depth.",
+            "Every `<img>` needs an `alt` — descriptive, or empty if decorative.",
+            "Open in a new tab deliberately, with `rel=\"noreferrer\"`."
+          ]
+        }
+      ],
+      "drills": [
+        {
+          "kind": "fill",
+          "prompt": "Give the image a text alternative.",
+          "code": "<img src=\"cat.jpg\" {{0}}=\"A grey cat asleep on a keyboard\">",
+          "blanks": [
+            [
+              "alt"
+            ]
+          ],
+          "explain": "`alt` is what a screen reader announces and what shows if the image fails. Decorative images take `alt=\"\"`.",
+          "hints": [
+            "Three letters.",
+            "It stands for alternative text."
+          ]
+        },
+        {
+          "kind": "find",
+          "prompt": "Which line links to a page that will not load?",
+          "lines": [
+            "<a href=\"/learn\">Learn</a>",
+            "<a hraf=\"/playground\">Playground</a>",
+            "<a href=\"https://zuno.dev\">Docs</a>"
+          ],
+          "bad": 1,
+          "explain": "`hraf` is a typo. The attribute is `href`, so the browser treats the second link as having no destination.",
+          "hints": [
+            "Read the attribute names character by character.",
+            "One is misspelled."
+          ]
+        },
+        {
+          "kind": "short",
+          "prompt": "Which attribute holds a link's destination?",
+          "answers": [
+            "href"
+          ],
+          "explain": "`href` is the hypertext reference: the URL the link points at. `src` is for embedded resources like images and scripts.",
+          "hints": [
+            "Four letters.",
+            "It starts with h."
+          ]
         }
       ],
       "exercise": {
@@ -325,14 +655,18 @@
           "answer": 1,
           "explain": "An empty alt tells assistive tech to skip the image entirely, which is correct for decoration."
         }
-      ]
+      ],
+      "build": {
+        "title": "A nav bar and a captioned photo",
+        "blurb": "Two links — one internal, one external — and an image whose alt text does the work for screen readers."
+      }
     },
     {
       "id": "html-04",
       "level": "intermediate",
       "title": "Semantic structure",
       "summary": "Landmarks that make a page navigable for humans, screen readers and search engines.",
-      "minutes": 10,
+      "minutes": 15,
       "xp": 60,
       "objectives": [
         "Replace generic divs with landmark elements",
@@ -341,33 +675,139 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "Divs work until someone needs to navigate"
+        },
+        {
           "type": "text",
-          "body": "A page built from `<div>`s works until someone tries to navigate it. Screen readers offer a list of landmarks; search engines use the same structure to understand which part is the actual content."
+          "body": "A page built from `<div class=\"header\">` and `<div class=\"nav\">` looks identical to one built from real landmarks. The difference appears the moment a screen reader user opens the landmarks list, or a search engine decides which part of the page is the actual content. Class names mean nothing to those tools. Element names do."
+        },
+        {
+          "type": "heading",
+          "body": "The landmarks, one by one"
         },
         {
           "type": "code",
           "language": "html",
-          "code": "<header>\n  <a href=\"/\">Zuno</a>\n  <nav aria-label=\"Primary\">\n    <a href=\"/learn\">Learn</a>\n  </nav>\n</header>\n<main>\n  <h1>Field notes</h1>\n  <article>\n    <h2>Tide tables</h2>\n    <p>The tide turned an hour early.</p>\n  </article>\n</main>\n<footer>\n  <p>&copy; 2026 Zuno</p>\n</footer>"
+          "code": "<body>\n  <header>\n    <a href=\"/\">Zuno</a>\n    <nav aria-label=\"Primary\">\n      <a href=\"/learn\">Learn</a>\n      <a href=\"/playground\">Playground</a>\n    </nav>\n  </header>\n\n  <main>\n    <h1>Field notes</h1>\n    <article>\n      <h2>Tide tables</h2>\n      <p>...</p>\n    </article>\n  </main>\n\n  <footer>\n    <p>© 2026 Zuno</p>\n  </footer>\n</body>",
+          "caption": "A page skeleton made of landmarks"
         },
         {
           "type": "list",
           "items": [
-            "`<header>` and `<footer>` can appear on the page or inside an article. They describe their nearest section.",
-            "`<main>` holds the content unique to this page. Exactly one per document.",
-            "`<article>` is a self-contained unit: a post, a card, a comment. It should make sense on its own.",
-            "`<section>` groups related content and usually starts with a heading.",
-            "`<nav>` is for major link groups. Not every group of links needs one."
+            "`<header>` introduces its nearest sectioning parent — the page, or a single article. A blog post can have its own header.",
+            "`<nav>` wraps a group of **major** navigation links. A list of tags in a footer does not need one.",
+            "`<main>` holds the content unique to this page. Exactly one per document, and it must not be nested inside an article or section.",
+            "`<article>` is a self-contained unit that would still make sense syndicated on its own: a post, a comment, a product card.",
+            "`<section>` groups related content, and in practice should start with a heading. A section without a heading is usually just a `<div>`.",
+            "`<footer>` closes its parent with metadata: copyright, author, related links."
           ]
+        },
+        {
+          "type": "heading",
+          "body": "Choosing article or section"
+        },
+        {
+          "type": "text",
+          "body": "The test is portability. If you could copy this block onto another page and it would still make complete sense, it is an `<article>`. If it only makes sense as part of this page, it is a `<section>`. If it is a pure styling wrapper with no meaning at all, it is a `<div>` — and that is fine, as long as it is a deliberate choice rather than a reflex."
+        },
+        {
+          "type": "text",
+          "body": "Headings are what make either element useful. A `<section>` with no `<h2>` gives assistive technology nothing to announce, and readers nothing to skim. Structure and labels travel together."
         },
         {
           "type": "callout",
           "tone": "note",
           "title": "Landmarks replace ARIA",
-          "body": "A `<nav>` already exposes `role=\"navigation\"`. Writing both is noise. Native elements first, ARIA only when nothing native fits."
+          "body": "A `<nav>` already exposes `role=\"navigation\"`. Writing both is noise. Native elements first; ARIA only when no native element fits the job."
+        },
+        {
+          "type": "heading",
+          "body": "The skip link"
         },
         {
           "type": "text",
-          "body": "Rule of thumb: if you are about to write `<div class=\"header\">`, check whether `<header>` does the job. The class name is a strong hint that you already knew the meaning."
+          "body": "With landmarks in place, add one small affordance: a link at the top of the body that jumps straight to `<main>`. It is the first thing a keyboard user meets, it is usually hidden until focused, and it saves them tabbing through the entire navigation on every page."
+        },
+        {
+          "type": "code",
+          "language": "html",
+          "code": "<a class=\"skip-link\" href=\"#main\">Skip to content</a>\n\n<main id=\"main\">\n  <h1>Field notes</h1>\n</main>",
+          "caption": "Three lines that make every page cheaper to use"
+        },
+        {
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Why can there only be one `<main>`?",
+            "A product card on a listing page: article or section?",
+            "What is wrong with `<div class=\"nav\">`?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Landmarks are the page's table of contents for assistive technology.",
+            "`header`, `nav`, `main`, `article`, `section`, `footer` — learn the six and most `div`s disappear.",
+            "Article is portable; section is contextual; div is styling only.",
+            "Add a skip link to `#main`."
+          ]
+        }
+      ],
+      "drills": [
+        {
+          "kind": "choice",
+          "prompt": "Which element wraps the main navigation of a site?",
+          "options": [
+            "`<nav>`",
+            "`<menu>`",
+            "`<section>`",
+            "`<aside>`"
+          ],
+          "answer": 0,
+          "explain": "`<nav>` marks a block of navigation links. Screen readers can jump straight to it, and so can crawlers.",
+          "hints": [
+            "It is short for navigation.",
+            "`<menu>` is for command lists, not site links."
+          ]
+        },
+        {
+          "kind": "order",
+          "prompt": "Order the landmarks of a typical page.",
+          "lines": [
+            "<header>",
+            "  <nav>…</nav>",
+            "</header>",
+            "<main>",
+            "  <article>…</article>",
+            "</main>",
+            "<footer>…</footer>"
+          ],
+          "explain": "Header, main, footer is the reading order. Landmarks describe regions, never appearance.",
+          "hints": [
+            "Navigation sits inside the header.",
+            "Content lives in `<main>`."
+          ]
+        },
+        {
+          "kind": "short",
+          "prompt": "Which element holds the unique content of the page, used once per document?",
+          "answers": [
+            "main",
+            "<main>"
+          ],
+          "explain": "`<main>` is the single region holding the page's primary content. It also gives assistive tech a skip-to-content target.",
+          "hints": [
+            "Four letters.",
+            "There is exactly one."
+          ]
         }
       ],
       "exercise": {
@@ -437,14 +877,18 @@
           "answer": 1,
           "explain": "<article> means self-contained and independently distributable — exactly what a syndicated card is."
         }
-      ]
+      ],
+      "build": {
+        "title": "A landmark-structured page",
+        "blurb": "Header with navigation, a main area holding two articles, and a footer. No decorative divs."
+      }
     },
     {
       "id": "html-05",
       "level": "intermediate",
       "title": "Forms people can finish",
       "summary": "Labels, input types and validation that work before JavaScript exists.",
-      "minutes": 12,
+      "minutes": 17,
       "xp": 65,
       "objectives": [
         "Connect every input to a label",
@@ -453,33 +897,125 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "Forms are a conversation with a stranger"
+        },
+        {
           "type": "text",
-          "body": "Forms are where a website asks for something. Most form pain is self-inflicted: missing labels, `type=\"text\"` for an email, a submit handler that fights the browser."
+          "body": "Everything else on a page is you talking. A form is the one place a visitor talks back, and the cost of a bad one is measured in abandoned signups. Almost all form pain is self-inflicted: a missing label, `type=\"text\"` on an email field, a submit handler that fights the browser instead of using it."
+        },
+        {
+          "type": "text",
+          "body": "The mental model: the browser already knows how to validate, focus, autofill and submit. Your job is to describe the fields accurately enough that it can help. JavaScript comes last, not first."
+        },
+        {
+          "type": "heading",
+          "body": "A form that works without JavaScript"
         },
         {
           "type": "code",
           "language": "html",
-          "code": "<form action=\"/subscribe\" method=\"post\">\n  <label for=\"email\">Email address</label>\n  <input id=\"email\" name=\"email\" type=\"email\" required autocomplete=\"email\" />\n  <p class=\"hint\" id=\"email-hint\">We send one short lesson each weekday.</p>\n  <button type=\"submit\">Start learning</button>\n</form>"
+          "code": "<form action=\"/subscribe\" method=\"post\">\n  <label for=\"email\">Email address</label>\n  <input id=\"email\" name=\"email\" type=\"email\" autocomplete=\"email\" required />\n\n  <label for=\"password\">Password</label>\n  <input\n    id=\"password\"\n    name=\"password\"\n    type=\"password\"\n    autocomplete=\"new-password\"\n    minlength=\"8\"\n    required\n  />\n\n  <button type=\"submit\">Create account</button>\n</form>",
+          "caption": "Labels, types, names and native validation"
         },
         {
           "type": "list",
           "items": [
-            "`label for=\"email\"` must match the input's `id`. Clicking the label then focuses the field.",
-            "`type=\"email\"` gives you a validation rule and the @ keyboard on phones, for free.",
-            "`required`, `minlength`, `pattern` and `min` are enforced by the browser before submission.",
-            "`autocomplete` lets password managers and browsers fill the field correctly.",
-            "Every input needs a `name` or it will never reach the server."
+            "`<label for>` must match the input's `id`. Clicking the label then focuses the field, and screen readers announce the two together.",
+            "`type` is behaviour, not decoration: `email` gives you an `@` keyboard and a validation rule, `password` masks input, `number` gives a numeric keypad, `date` opens a picker.",
+            "`required`, `minlength`, `pattern` and `min` are enforced by the browser before submission, with messages translated into the user's language.",
+            "`name` is the key sent to the server. An input without `name` is invisible to the request.",
+            "`autocomplete` is what lets password managers and browsers fill fields correctly — `email`, `current-password`, `new-password`, `cc-number`."
           ]
+        },
+        {
+          "type": "heading",
+          "body": "Grouping choices"
+        },
+        {
+          "type": "text",
+          "body": "Radios and checkboxes are a different problem: one label per option does not explain what the group is asking. `<fieldset>` with a `<legend>` gives the group a name that assistive technology announces before the first option — “Delivery speed, three options, Standard, Express…”."
+        },
+        {
+          "type": "code",
+          "language": "html",
+          "code": "<fieldset>\n  <legend>Delivery speed</legend>\n\n  <label><input type=\"radio\" name=\"speed\" value=\"standard\" checked /> Standard, 3 days</label>\n  <label><input type=\"radio\" name=\"speed\" value=\"express\" /> Express, tomorrow</label>\n</fieldset>",
+          "caption": "fieldset names the question, labels name the answers"
         },
         {
           "type": "callout",
           "tone": "warn",
           "title": "Placeholder is not a label",
-          "body": "Placeholders vanish the moment someone types, have poor contrast, and are skipped by some screen readers. Use a real `<label>`; the placeholder is a hint at most."
+          "body": "Placeholders vanish the moment someone types, have poor contrast, and are skipped by some screen readers. Use a real `<label>`; keep the placeholder as a short hint at most, never as the only description of the field."
+        },
+        {
+          "type": "heading",
+          "body": "Errors people can act on"
         },
         {
           "type": "text",
-          "body": "Group related fields with `<fieldset>` and `<legend>` — especially radio buttons, where the legend answers “what am I choosing between?”."
+          "body": "When validation fails, say what is wrong and how to fix it, next to the field, in plain words. “Enter an email address, for example name@example.com” beats “Invalid input”. Tie the message to the field with `aria-describedby` so it is announced when the field receives focus."
+        },
+        {
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Why does an input need both `id` and `name`?",
+            "Which attribute gets you the right keyboard on a phone?",
+            "What does `<fieldset>` add that a `<div>` cannot?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Label every control, and connect it with `for`/`id`.",
+            "Pick the input type that describes the data.",
+            "Validate natively first, enhance with JavaScript second.",
+            "Group related choices with `fieldset` and `legend`."
+          ]
+        }
+      ],
+      "drills": [
+        {
+          "kind": "fill",
+          "prompt": "Ask the browser for an email field and a required name field.",
+          "code": "<label for=\"email\">Email</label>\n<input id=\"email\" {{0}}=\"email\" {{1}}>\n<input id=\"name\" type=\"text\" required>",
+          "blanks": [
+            [
+              "type"
+            ],
+            [
+              "required"
+            ]
+          ],
+          "explain": "`type=\"email\"` gives you keyboard and validation for free. `required` blocks submission while the field is empty, without any JavaScript.",
+          "hints": [
+            "The first one names the kind of control.",
+            "The second is a boolean attribute."
+          ]
+        },
+        {
+          "kind": "choice",
+          "prompt": "Why does `<label for=\"email\">` matter?",
+          "options": [
+            "It styles the input",
+            "It ties the label to the control so clicking it focuses the field",
+            "It validates the input",
+            "It makes the field required"
+          ],
+          "answer": 1,
+          "explain": "`for` matches the input's `id`, so the two are announced together and clicking the label focuses the field.",
+          "hints": [
+            "Think about what a screen reader says.",
+            "It is about association, not looks."
+          ]
         }
       ],
       "exercise": {
@@ -544,14 +1080,18 @@
           "answer": 1,
           "explain": "<fieldset> + <legend> groups the choices and names the question natively."
         }
-      ]
+      ],
+      "build": {
+        "title": "A sign-up form people can finish",
+        "blurb": "Labelled email and password fields with native validation, the right phone keyboards and autofill."
+      }
     },
     {
       "id": "html-06",
       "level": "advanced",
       "title": "Tables and data",
       "summary": "Real tabular data, with headers that announce themselves.",
-      "minutes": 10,
+      "minutes": 14,
       "xp": 70,
       "objectives": [
         "Separate structure into thead, tbody and tfoot",
@@ -560,32 +1100,116 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "Tables are for data with rows and columns"
+        },
+        {
           "type": "text",
-          "body": "Tables are for data that has rows and columns. That is a narrow use case, and when it applies, nothing else comes close."
+          "body": "Tables have a bad reputation because they were abused for layout for a decade. Used correctly they are precise and irreplaceable: when information genuinely has two axes, nothing else communicates it as clearly. When it does not, a table makes the content harder for everyone."
+        },
+        {
+          "type": "heading",
+          "body": "Anatomy of a data table"
         },
         {
           "type": "code",
           "language": "html",
-          "code": "<table>\n  <caption>Plan comparison</caption>\n  <thead>\n    <tr>\n      <th scope=\"col\">Feature</th>\n      <th scope=\"col\">Free</th>\n      <th scope=\"col\">Pro</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th scope=\"row\">Lessons</th>\n      <td>21</td>\n      <td>All</td>\n    </tr>\n  </tbody>\n</table>"
+          "code": "<table>\n  <caption>Plan comparison</caption>\n  <thead>\n    <tr>\n      <th scope=\"col\">Feature</th>\n      <th scope=\"col\">Free</th>\n      <th scope=\"col\">Pro</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th scope=\"row\">Lessons</th>\n      <td>21</td>\n      <td>All tracks</td>\n    </tr>\n  </tbody>\n</table>",
+          "caption": "Headers, a caption and scoped cells"
         },
         {
           "type": "list",
           "items": [
-            "`<caption>` describes the table. It is the first thing a screen reader announces.",
-            "`<thead>`, `<tbody>` and `<tfoot>` group rows so browsers and assistive tech can treat them differently.",
-            "`scope=\"col\"` on a header means “this header labels the column below me”; `scope=\"row\"` labels the row beside it.",
-            "Use `<th>` for headers, `<td>` for data. The distinction is announced, not just bolded."
+            "`<caption>` names the table and is announced first. It is not a heading — do not fake it with a `<p>` above the table.",
+            "`<thead>`, `<tbody>` and `<tfoot>` group rows by role. Browsers keep the header visible while scrolling and assistive technology can treat the groups separately.",
+            "`<th scope=\"col\">` says “this header labels the column below it”. `scope=\"row\"` says “this header labels the row beside it”. Without scope, a screen reader has to guess which header belongs to which cell.",
+            "`<td>` is data. `<th>` is a header. The difference is announced, not just bolded."
           ]
+        },
+        {
+          "type": "heading",
+          "body": "Reading a table out loud"
+        },
+        {
+          "type": "text",
+          "body": "Imagine announcing one cell with no visual context: “Pro, 12 euros”. A screen reader does exactly that, using the row and column headers bound by `scope`. If your headers are `<td>` elements styled bold, the announcement becomes “12 euros” and the number loses its meaning."
+        },
+        {
+          "type": "text",
+          "body": "This is also the test for whether you need a table at all. If you cannot name the rows and the columns, you have a list or a grid of cards, not a table."
         },
         {
           "type": "callout",
           "tone": "warn",
           "title": "Tables are not layouts",
-          "body": "Using a table to place a sidebar was normal in 2004. Today it breaks responsiveness and screen readers announce a data grid that does not exist. Use CSS grid."
+          "body": "Using a table to place a sidebar was normal in 2004. Today it breaks responsiveness, and screen readers announce a data grid that does not exist. Use CSS grid or flexbox."
+        },
+        {
+          "type": "heading",
+          "body": "Small screens"
         },
         {
           "type": "text",
-          "body": "If a table needs horizontal scrolling on small screens, wrap it in a container with `overflow-x: auto` rather than shrinking the text."
+          "body": "Tables have a minimum width; text does not. On narrow screens, wrap the table in a container with `overflow-x: auto` so it scrolls sideways instead of squeezing columns into unreadable slivers. If a table needs more than a scroll to work on a phone, it probably wants to become a list of cards at that breakpoint."
+        },
+        {
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Why does `scope` matter if the headers are already bold?",
+            "When does a table stop being the right element?",
+            "What is announced first when a screen reader reaches a table?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Only real tabular data goes in a table.",
+            "`caption` names it, `thead`/`tbody` structure it.",
+            "`th` plus `scope` is what makes a cell understandable on its own.",
+            "Wrap wide tables in a scroll container."
+          ]
+        }
+      ],
+      "drills": [
+        {
+          "kind": "order",
+          "prompt": "Build the smallest valid table.",
+          "lines": [
+            "<table>",
+            "  <thead>",
+            "    <tr><th scope=\"col\">Name</th></tr>",
+            "  </thead>",
+            "  <tbody>",
+            "    <tr><td>Ada</td></tr>",
+            "  </tbody>",
+            "</table>"
+          ],
+          "explain": "Head, body, rows, cells. `scope=\"col\"` tells assistive tech that the header describes the column below it.",
+          "hints": [
+            "Headers come before data.",
+            "Rows live inside a section."
+          ]
+        },
+        {
+          "kind": "short",
+          "prompt": "Which element marks a header cell in a table?",
+          "answers": [
+            "th",
+            "<th>"
+          ],
+          "explain": "`<th>` is a header cell; `<td>` is a data cell. Headers are read out before each cell value.",
+          "hints": [
+            "Two letters.",
+            "`td` is the other one."
+          ]
         }
       ],
       "exercise": {
@@ -650,14 +1274,18 @@
           "answer": 1,
           "explain": "Layout belongs to CSS. Tables are for data only."
         }
-      ]
+      ],
+      "build": {
+        "title": "A pricing table",
+        "blurb": "A captioned table with scoped column headers and three rows of real data."
+      }
     },
     {
       "id": "html-07",
       "level": "advanced",
       "title": "Media, metadata and accessible widgets",
       "summary": "Figures, disclosure widgets and the tags search engines and screen readers read first.",
-      "minutes": 12,
+      "minutes": 16,
       "xp": 75,
       "objectives": [
         "Pair media with captions using figure and figcaption",
@@ -666,32 +1294,129 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "The details that separate working from pleasant"
+        },
+        {
           "type": "text",
-          "body": "The last HTML lesson is about the details that separate a page that works from a page that is pleasant to use with a keyboard, a screen reader, or a search engine."
+          "body": "By now the page has structure, text, links, landmarks and a form. The last layer is the small set of elements that make a page feel finished: captioned media, native disclosure widgets, icon buttons that have a name, and metadata that search engines and social previews read before a human ever arrives."
+        },
+        {
+          "type": "heading",
+          "body": "Media with a caption that belongs to it"
         },
         {
           "type": "code",
           "language": "html",
-          "code": "<figure>\n  <img src=\"tide.jpg\" alt=\"Low tide exposing a wide band of wet sand\" />\n  <figcaption>Low tide, 06:40. The sand held the light for an hour.</figcaption>\n</figure>\n\n<details>\n  <summary>What is included in Pro?</summary>\n  <p>All lessons, the playground and offline progress.</p>\n</details>\n\n<button aria-label=\"Close dialog\">\n  <svg aria-hidden=\"true\">…</svg>\n</button>"
+          "code": "<figure>\n  <img src=\"/img/tide.jpg\" alt=\"Low tide exposing a wide band of wet sand\" />\n  <figcaption>Low tide, 06:40. The sandbar reappears for about ninety minutes.</figcaption>\n</figure>",
+          "caption": "figure binds the caption to the media"
         },
         {
-          "type": "list",
-          "items": [
-            "`<figure>` groups media with its caption. `<figcaption>` must be the first or last child.",
-            "`<details>`/`<summary>` is a native disclosure widget: keyboard support, open/close state and animation hooks, zero JavaScript.",
-            "An icon-only button needs a name. `aria-label` provides it; `aria-hidden=\"true\"` hides the decorative SVG.",
-            "`<meta name=\"description\">` is the snippet search engines usually show. Keep it under ~155 characters."
-          ]
+          "type": "text",
+          "body": "`<figure>` is any self-contained unit — an image, a code sample, a chart, a quote — with an optional `<figcaption>`. The caption must be the first or last child, and it is announced as part of the figure rather than as a stray paragraph after it. The `alt` describes the image; the caption adds context. They are not duplicates."
+        },
+        {
+          "type": "heading",
+          "body": "Disclosure without JavaScript"
+        },
+        {
+          "type": "code",
+          "language": "html",
+          "code": "<details>\n  <summary>What happens after the trial ends?</summary>\n  <p>Your progress stays. Lessons lock until you pick a plan.</p>\n</details>",
+          "caption": "details and summary: keyboard support included"
+        },
+        {
+          "type": "text",
+          "body": "`<details>` is a native accordion. It opens with Enter or Space, exposes its expanded state to assistive technology, works with find-in-page, and needs zero JavaScript. A hand-rolled version reproduces all of that badly, then breaks when someone tabs into it."
+        },
+        {
+          "type": "heading",
+          "body": "Buttons that only contain an icon"
+        },
+        {
+          "type": "text",
+          "body": "An icon button has no text for a screen reader to announce, so it needs a name from somewhere. `aria-label` supplies it. The SVG inside should be `aria-hidden=\"true\"` so the reader does not try to describe paths and shapes. And it must be a `<button>`, not a clickable `<div>` — a div is not focusable and does not respond to Enter."
+        },
+        {
+          "type": "code",
+          "language": "html",
+          "code": "<button type=\"button\" aria-label=\"Close dialog\">\n  <svg aria-hidden=\"true\" focusable=\"false\" viewBox=\"0 0 16 16\">\n    <path d=\"M4 4l8 8M12 4l-8 8\" stroke=\"currentColor\" stroke-width=\"1.5\" />\n  </svg>\n</button>",
+          "caption": "A name for the reader, pixels for the eye"
+        },
+        {
+          "type": "heading",
+          "body": "Metadata people never see but search engines do"
+        },
+        {
+          "type": "text",
+          "body": "`<title>` is the clickable headline in search results and the label on a browser tab. `<meta name=\"description\">` is the snippet underneath, usually truncated around 155 characters. Both should describe this specific page — a site-wide description is worse than none. `og:title` and `og:image` control what appears when the link is shared in a chat app."
         },
         {
           "type": "callout",
           "tone": "tip",
           "title": "Test with the Tab key",
-          "body": "Everything interactive must be reachable with Tab and operable with Enter or Space. If you cannot do it without a mouse, neither can a lot of your visitors."
+          "body": "Everything interactive must be reachable with Tab and operable with Enter or Space. If you cannot do it without a mouse, neither can a lot of your visitors — and it takes thirty seconds to check."
         },
         {
-          "type": "text",
-          "body": "Prefer the native element every time. `<details>` beats a hand-rolled accordion, `<dialog>` beats a modal div, `<button>` beats a clickable div. Less code, more behaviour."
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "What is the difference between an image's `alt` and its `figcaption`?",
+            "Why is `<details>` better than a JavaScript accordion?",
+            "How does a screen reader learn the name of an icon-only button?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`figure` and `figcaption` keep media and context together.",
+            "`details`/`summary` is a free, accessible disclosure widget.",
+            "Icon buttons need `aria-label`; the SVG needs `aria-hidden`.",
+            "Write a unique `title` and `description` for every page."
+          ]
+        }
+      ],
+      "drills": [
+        {
+          "kind": "choice",
+          "prompt": "A decorative background image should have which alt text?",
+          "options": [
+            "`alt=\"background\"`",
+            "`alt=\"\"`",
+            "No alt attribute at all",
+            "`alt=\"image\"`"
+          ],
+          "answer": 1,
+          "explain": "An empty `alt` marks the image as decorative, so screen readers skip it. Leaving the attribute out makes some readers announce the file name instead.",
+          "hints": [
+            "Decorative means it adds no information.",
+            "Empty is different from missing."
+          ]
+        },
+        {
+          "kind": "fill",
+          "prompt": "Load a video with controls and captions.",
+          "code": "<video {{0}} muted playsinline>\n  <source src=\"intro.mp4\" type=\"video/mp4\">\n  <{{1}} src=\"intro.vtt\" kind=\"captions\" srclang=\"en\">\n</video>",
+          "blanks": [
+            [
+              "controls"
+            ],
+            [
+              "track"
+            ]
+          ],
+          "explain": "`controls` gives the play button back to the user. `<track kind=\"captions\">` supplies the caption file.",
+          "hints": [
+            "The user needs a play button.",
+            "Captions are a track."
+          ]
         }
       ],
       "exercise": {
@@ -756,7 +1481,11 @@
           "answer": 1,
           "explain": "aria-label supplies the accessible name. title is a tooltip and is not reliably announced."
         }
-      ]
+      ],
+      "build": {
+        "title": "A shareable, accessible page shell",
+        "blurb": "A meta description, a figure with a caption, a details disclosure and an icon button with a name."
+      }
     }
   ]
 }

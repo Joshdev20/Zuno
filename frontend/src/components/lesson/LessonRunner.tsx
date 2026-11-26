@@ -1,12 +1,17 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { getLesson, getTrack, lessonTrack, levelLabel, neighbours } from '../../lib/curriculum';
 import { useProgress } from '../../lib/progress';
-import type { Lesson, QuizQuestion, Section, Track } from '../../lib/types';
+import type { Drill, Lesson, QuizQuestion, Section, Track } from '../../lib/types';
 import { Icon } from '../ui/Icon';
 import { LessonSections } from './LessonSections';
 import { Inline } from './Inline';
 import { NotFound } from '../../pages/NotFound';
+import { isLessonUnlocked } from '../../lib/progress';
+import { DrillStep } from './drills/DrillStep';
+import { ProjectPreview } from './ProjectPreview';
+import { EASE_IN_OUT, EASE_OUT, POP, fadeUp, stagger } from '../../lib/motion';
 
 const Workspace = lazy(() =>
   import('./Workspace').then((module) => ({ default: module.Workspace })),
@@ -15,6 +20,7 @@ const Workspace = lazy(() =>
 type Step =
   | { kind: 'intro' }
   | { kind: 'section'; sections: Section[] }
+  | { kind: 'drill'; drill: Drill; index: number }
   | { kind: 'practice' }
   | { kind: 'quiz'; question: QuizQuestion; index: number }
   | { kind: 'done' };
@@ -23,22 +29,30 @@ function groupSections(sections: Section[]): Section[][] {
   const groups: Section[][] = [];
   for (const section of sections) {
     const last = groups[groups.length - 1];
+    const opensWithHeading = last?.length === 1 && last[0].type === 'heading';
     const prose = section.type === 'text';
-    const lastHasProse = Boolean(last?.some((entry) => entry.type === 'text'));
-    if (!last || (prose && lastHasProse)) groups.push([section]);
+    const lastHasProse = Boolean(last?.some((entry) => entry.type === 'text' || entry.type === 'heading'));
+    if (!last || section.type === 'heading' || (prose && lastHasProse && !opensWithHeading)) groups.push([section]);
     else last.push(section);
   }
   return groups;
 }
 
 function buildSteps(lesson: Lesson): Step[] {
-  return [
-    { kind: 'intro' },
-    ...groupSections(lesson.sections).map((sections) => ({ kind: 'section', sections }) as Step),
-    { kind: 'practice' },
-    ...lesson.quiz.map((question, index) => ({ kind: 'quiz', question, index }) as Step),
-    { kind: 'done' },
-  ];
+  const groups = groupSections(lesson.sections);
+  const drills = lesson.drills ?? [];
+  const steps: Step[] = [{ kind: 'intro' }];
+  groups.forEach((sections, groupIndex) => {
+    steps.push({ kind: 'section', sections });
+    drills.forEach((drill, drillIndex) => {
+      const target = drill.after ?? groups.length - 1;
+      if (target === groupIndex) steps.push({ kind: 'drill', drill, index: drillIndex });
+    });
+  });
+  steps.push({ kind: 'practice' });
+  lesson.quiz.forEach((question, index) => steps.push({ kind: 'quiz', question, index }));
+  steps.push({ kind: 'done' });
+  return steps;
 }
 
 export function LessonRunner() {
@@ -53,6 +67,7 @@ export function LessonRunner() {
 
 function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
   const { state, completeLesson, completeQuiz, setResume } = useProgress();
+  const unlocked = isLessonUnlocked(state, track, lesson);
   const steps = useMemo(() => buildSteps(lesson), [lesson]);
   const stored = state.resume[lesson.id] ?? 0;
   const [index, setIndex] = useState(() => Math.min(Math.max(stored, 0), steps.length - 1));
@@ -60,6 +75,7 @@ function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
   const [choice, setChoice] = useState<number | null>(null);
   const [quizSolved, setQuizSolved] = useState<Record<number, boolean>>({});
   const [attempts, setAttempts] = useState<Record<number, number>>({});
+  const [drillSolved, setDrillSolved] = useState<Record<number, boolean>>({});
   const [banked, setBanked] = useState(Boolean(state.completed[lesson.id]));
 
   const step = steps[index];
@@ -81,7 +97,13 @@ function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
   const solved = useCallback(() => setExerciseSolved(true), []);
 
   const canContinue =
-    step.kind === 'practice' ? exerciseSolved : step.kind === 'quiz' ? Boolean(quizSolved[step.index]) : true;
+    step.kind === 'practice'
+      ? exerciseSolved
+      : step.kind === 'quiz'
+        ? Boolean(quizSolved[step.index])
+        : step.kind === 'drill'
+          ? Boolean(drillSolved[step.index])
+          : true;
 
   const advance = () => {
     if (step.kind === 'quiz') setChoice(null);
@@ -102,6 +124,17 @@ function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
   });
 
   const progress = ((index + 1) / steps.length) * 100;
+  const reduceMotion = useReducedMotion();
+  const stepMotion = reduceMotion
+    ? {}
+    : {
+        initial: { opacity: 0, y: 10 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: -6 },
+        transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] as const },
+      };
+
+  if (!unlocked && !state.completed[lesson.id]) return <LockedNotice lesson={lesson} track={track} />;
 
   return (
     <div className="runner">
@@ -119,11 +152,17 @@ function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
           {index + 1}/{steps.length}
         </span>
         <div className="runner-bar" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100}>
-          <span style={{ width: `${progress}%` }} />
+          <motion.span
+            initial={false}
+            animate={{ width: `${progress}%` }}
+            transition={{ type: 'spring', stiffness: 180, damping: 26 }}
+          />
         </div>
       </header>
 
       <main className="runner-main">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div key={index} className="runner-step-shell" {...stepMotion}>
         {step.kind === 'intro' && (
           <div className="runner-step">
             <div className="runner-chips">
@@ -136,6 +175,7 @@ function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
             </div>
             <h1 className="runner-h1">{lesson.title}</h1>
             <p className="runner-lede">{lesson.summary}</p>
+            <ProjectPreview lesson={lesson} />
             <section className="objectives">
               <p className="objectives-label">By the end of this lesson</p>
               <ul>
@@ -187,6 +227,15 @@ function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
           </div>
         )}
 
+        {step.kind === 'drill' && (
+          <DrillStep
+            drill={step.drill}
+            language={lesson.exercise.kind}
+            solved={Boolean(drillSolved[step.index])}
+            onSolved={() => setDrillSolved((current) => ({ ...current, [step.index]: true }))}
+          />
+        )}
+
         {step.kind === 'quiz' && (
           <QuizStep
             question={step.question}
@@ -207,7 +256,29 @@ function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
         {step.kind === 'done' && (
           <div className="runner-step runner-done">
             <span className="runner-done-mark">
-              <Icon name="check" size={22} />
+              <motion.span
+                className="runner-done-burst"
+                aria-hidden="true"
+                initial={reduceMotion ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                {Array.from({ length: 10 }).map((_, ringIndex) => (
+                  <motion.i
+                    key={ringIndex}
+                    style={{ rotate: `${ringIndex * 36}deg` }}
+                    initial={reduceMotion ? false : { scaleY: 0.2, opacity: 0 }}
+                    animate={{ scaleY: [0.2, 1, 0.85], opacity: [0, 0.9, 0] }}
+                    transition={{ duration: 1.1, delay: 0.1 + ringIndex * 0.03, ease: EASE_OUT }}
+                  />
+                ))}
+              </motion.span>
+              <motion.span
+                initial={reduceMotion ? false : { scale: 0.3, rotate: -20 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={POP}
+              >
+                <Icon name="check" size={22} />
+              </motion.span>
             </span>
             <h1 className="runner-h1">Lesson complete.</h1>
             <p className="runner-lede">
@@ -245,6 +316,8 @@ function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
             </div>
           </div>
         )}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {step.kind !== 'done' && (
@@ -252,6 +325,7 @@ function Runner({ lesson, track }: { lesson: Lesson; track: Track }) {
           <span className="runner-foot-note mono">
             {step.kind === 'practice' && !exerciseSolved && 'Run the checks to unlock Continue'}
             {step.kind === 'quiz' && !quizSolved[step.index] && 'Pick the answer you think is right'}
+            {step.kind === 'drill' && !drillSolved[step.index] && 'Answer to unlock Continue'}
             {(step.kind === 'intro' || step.kind === 'section') && `Step ${index + 1} of ${steps.length}`}
           </span>
           <button type="button" className="btn btn--primary runner-continue" onClick={advance} disabled={!canContinue}>
@@ -279,6 +353,7 @@ function QuizStep({
   solved: boolean;
   onChoose: (option: number) => void;
 }) {
+  const reduceMotion = useReducedMotion();
   const correct = choice === question.answer;
   return (
     <div className="runner-step">
@@ -288,7 +363,12 @@ function QuizStep({
       <h2 className="runner-h2">
         <Inline text={question.prompt} />
       </h2>
-      <ul className="runner-options">
+      <motion.ul
+        className="runner-options"
+        variants={stagger(0, 0.05)}
+        initial={reduceMotion ? false : 'hidden'}
+        animate="shown"
+      >
         {question.options.map((option, optionIndex) => {
           const state = solved || (choice !== null && correct)
             ? optionIndex === question.answer
@@ -298,26 +378,43 @@ function QuizStep({
               ? 'is-wrong'
               : '';
           return (
-            <li key={option}>
-              <button
+            <motion.li key={option} variants={fadeUp}>
+              <motion.button
                 type="button"
                 className={`runner-option ${state}`}
                 onClick={() => onChoose(optionIndex)}
                 disabled={solved}
+                animate={state === 'is-wrong' ? { x: [0, -6, 6, -3, 0] } : { x: 0 }}
+                whileTap={reduceMotion ? undefined : { scale: 0.99 }}
+                transition={{ duration: 0.32, ease: EASE_IN_OUT }}
               >
                 <span className="runner-option-key">{String.fromCharCode(65 + optionIndex)}</span>
                 <span className="runner-option-copy">
                   <Inline text={option} />
                 </span>
-                {state === 'is-correct' && <Icon name="check" size={15} />}
+                {state === 'is-correct' && (
+                  <motion.span
+                    initial={reduceMotion ? false : { scale: 0.4, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={POP}
+                    className="runner-option-mark"
+                  >
+                    <Icon name="check" size={15} />
+                  </motion.span>
+                )}
                 {state === 'is-wrong' && <Icon name="close" size={15} />}
-              </button>
-            </li>
+              </motion.button>
+            </motion.li>
           );
         })}
-      </ul>
+      </motion.ul>
       {choice !== null && (
-        <div className={`runner-feedback ${correct ? 'is-ok' : 'is-bad'}`}>
+        <motion.div
+          className={`runner-feedback ${correct ? 'is-ok' : 'is-bad'}`}
+          initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: EASE_OUT }}
+        >
           <p className="runner-feedback-title">{correct ? 'Correct.' : 'Not quite — try again.'}</p>
           {correct ? (
             <p>
@@ -326,8 +423,38 @@ function QuizStep({
           ) : (
             <p>Re-read the step above and pick the option that matches it. The explanation unlocks when you get there.</p>
           )}
-        </div>
+        </motion.div>
       )}
+    </div>
+  );
+}
+
+function LockedNotice({ lesson, track }: { lesson: Lesson; track: Track }) {
+  const index = track.lessons.findIndex((entry) => entry.id === lesson.id);
+  const previous = track.lessons[index - 1];
+  return (
+    <div className="runner-locked fade-in">
+      <div className="runner-locked-card">
+        <span className="runner-locked-icon">
+          <Icon name="lock" size={18} />
+        </span>
+        <h1 className="runner-h1">This lesson is locked</h1>
+        <p className="runner-lede">
+          {track.name} runs in order. Finish {previous ? `“${previous.title}”` : 'the previous lesson'} and this one
+          opens straight after it.
+        </p>
+        <div className="runner-locked-actions">
+          {previous && (
+            <Link to={`/learn/${track.id}/${previous.id}`} className="btn btn--primary">
+              Go to {previous.title}
+              <Icon name="arrowRight" size={15} />
+            </Link>
+          )}
+          <Link to={`/learn/${track.id}`} className="btn btn--ghost">
+            Back to {track.name}
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

@@ -9,7 +9,7 @@
       "level": "beginner",
       "title": "Selectors and the cascade",
       "summary": "How a browser decides which rule wins, and why yours sometimes loses.",
-      "minutes": 8,
+      "minutes": 13,
       "xp": 45,
       "objectives": [
         "Read a CSS rule: selector, property, value",
@@ -18,33 +18,144 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "CSS is a list of claims, and claims conflict"
+        },
+        {
           "type": "text",
-          "body": "CSS is a list of claims about elements. Each claim has a **selector** that picks elements and a block of **declarations** that describe how they should look."
+          "body": "A stylesheet is a set of statements: “every element with class `card` gets this background”, “every `h2` gets this colour”. Each statement has a **selector** that picks elements and a **declaration block** that describes them. Nothing executes in order like a program — the browser collects every matching claim and then decides which one wins."
+        },
+        {
+          "type": "text",
+          "body": "That decision is the cascade. It is the part of CSS that people find mysterious, and it is completely mechanical once you know the three tie-breakers: importance, specificity, then source order. When a rule “doesn't work”, it is almost never ignored — it is being outranked."
+        },
+        {
+          "type": "heading",
+          "body": "Anatomy of a rule"
         },
         {
           "type": "code",
           "language": "css",
-          "code": ".card {\n  background: #fffdf8;\n  border-radius: 12px;\n}\n\nh2 {\n  color: #1e4b3a;\n}",
+          "code": ".card {\n  background: #fffdf8;\n  border-radius: 12px;\n  padding: 24px;\n}\n\nh2 {\n  color: #1e4b3a;\n}",
           "caption": "Two rules: one class selector, one element selector"
         },
         {
           "type": "list",
           "items": [
             "`.card` selects every element with `class=\"card\"`. The dot is part of the selector, not the class name.",
-            "`h2` selects every `<h2>` on the page. Broad selectors are easy, but they leak.",
-            "The cascade resolves conflicts by specificity, then by source order. `.card` (0,1,0) beats `h2` (0,0,1).",
-            "`!important` is not a fix. It is a debt with 30% interest."
+            "`h2` selects every `<h2>` on the page. Convenient, but it means one edit can move a hundred elements.",
+            "Properties are `kebab-case`; values are typed — lengths, colours, keywords, functions like `rgb()` or `calc()`.",
+            "One typo in a property name silently disables that declaration. The browser does not warn you, it just moves on."
           ]
         },
         {
-          "type": "callout",
-          "tone": "tip",
-          "title": "Prefer classes",
-          "body": "Element selectors are fine for base typography, but anything you will style deliberately should have a class. It keeps specificity flat and predictable."
+          "type": "heading",
+          "body": "Who wins: specificity"
         },
         {
           "type": "text",
-          "body": "The inspector in your browser's dev tools shows which declaration won and which were struck through. That panel is the fastest way to learn the cascade."
+          "body": "Specificity is a score. An element selector (`h2`) counts 1. A class, attribute or pseudo-class (`.card`, `[data-theme]`, `:hover`) counts 10. An id (`#main`) counts 100. Inline `style=\"…\"` beats all of them, and `!important` beats even that."
+        },
+        {
+          "type": "text",
+          "body": "Compare scores left to right, like a three-digit number: a rule with one class and one element (11) beats a rule with two elements (2), and loses to a rule with two classes (20). When the scores are exactly equal, the rule that appears later in the stylesheet wins — which is why import order matters, and why a stylesheet loaded after yours can override you."
+        },
+        {
+          "type": "code",
+          "language": "css",
+          "code": "/* 0-0-1 */ h2 { color: black; }\n/* 0-1-0 */ .title { color: rebeccapurple; }\n/* 0-1-1 */ .post h2 { color: teal; }\n\n/* .title still wins for <h2 class=\"title\">: 10 > 2 */",
+          "caption": "Specificity, not position, decides first"
+        },
+        {
+          "type": "callout",
+          "tone": "warn",
+          "title": "!important is a debt with interest",
+          "body": "Every `!important` you add forces the next developer to add another one to beat it. If you need it, the specificity structure is wrong — usually a missing class on the element you are trying to style."
+        },
+        {
+          "type": "heading",
+          "body": "Prefer classes, and read the inspector"
+        },
+        {
+          "type": "text",
+          "body": "Element selectors are right for base typography — the default look of `body`, `h1`, `a`. Anything you style deliberately should hang off a class, because a class selector scores the same everywhere and does not depend on the surrounding markup."
+        },
+        {
+          "type": "text",
+          "body": "Your fastest debugging tool is the browser inspector: it lists every declaration that matched, strikes through the ones that lost, and shows the winning rule's file and line. Learn to read that panel and specificity stops being guesswork."
+        },
+        {
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Two rules both set `color` on the same element, one with `.card p` and one with `.card .body`. Which wins?",
+            "Why does a rule at the bottom of your file sometimes lose to a rule at the top?",
+            "What is the cost of fixing a conflict with `!important`?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Selector picks, declaration block describes.",
+            "Tie-breakers: importance, then specificity, then source order.",
+            "Element 1, class 10, id 100.",
+            "Style with classes; reserve ids for anchors and JavaScript hooks."
+          ]
+        }
+      ],
+      "drills": [
+        {
+          "kind": "choice",
+          "prompt": "Which selector wins when three rules target the same element?",
+          "options": [
+            "`p { color: red }`",
+            "`.intro { color: blue }`",
+            "`#hero { color: green }`",
+            "All tie"
+          ],
+          "answer": 2,
+          "explain": "Specificity ranks id beats class beats element: 1-0-0 against 0-1-0 against 0-0-1. The id rule wins even when written first.",
+          "hints": [
+            "Count ids, classes, elements.",
+            "The id column is the strongest."
+          ]
+        },
+        {
+          "kind": "fill",
+          "prompt": "Target every element with the class `card`.",
+          "code": "{{0}} {\n  padding: 24px;\n}",
+          "blanks": [
+            [
+              ".card"
+            ]
+          ],
+          "explain": "A leading dot targets a class. Without the dot you are targeting an element named `card`, which does not exist.",
+          "hints": [
+            "Classes start with a punctuation mark.",
+            "It is not a hash."
+          ]
+        },
+        {
+          "kind": "find",
+          "prompt": "Which rule will not apply?",
+          "lines": [
+            "p { color: #333; }",
+            ".intro { color: #111; }",
+            "#hero { color: b; }"
+          ],
+          "bad": 2,
+          "explain": "`b` is not a colour value. The declaration is dropped and the element falls back to an inherited colour.",
+          "hints": [
+            "Colours are hex or named.",
+            "One value is a single letter."
+          ]
         }
       ],
       "exercise": {
@@ -120,14 +231,18 @@
           "answer": 1,
           "explain": "With equal specificity, later source order wins — which is why import order matters."
         }
-      ]
+      ],
+      "build": {
+        "title": "A styled card",
+        "blurb": "A warm surface, a 12px radius, hairline border and a title colour — your first deliberate rule set."
+      }
     },
     {
       "id": "css-02",
       "level": "beginner",
       "title": "The box model",
       "summary": "Every element is a box. Learn what is inside it and what pushes it around.",
-      "minutes": 9,
+      "minutes": 14,
       "xp": 50,
       "objectives": [
         "Distinguish content, padding, border and margin",
@@ -136,32 +251,126 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "Everything is a rectangle"
+        },
+        {
           "type": "text",
-          "body": "Every element renders as a rectangle with four layers: the **content**, the **padding** around it, the **border**, and the **margin** that pushes neighbours away."
+          "body": "Every element renders as a box made of four layers, from the inside out: **content**, **padding**, **border** and **margin**. Content is the text or image. Padding is space inside the border that takes the element's background. Border is the visible edge. Margin is empty space outside, pushing other boxes away."
+        },
+        {
+          "type": "text",
+          "body": "Almost every “why is this 20px too wide” problem is one of these four layers doing something you did not expect. Once the box model is second nature, layout stops feeling like guesswork."
+        },
+        {
+          "type": "heading",
+          "body": "The one line that fixes width forever"
         },
         {
           "type": "code",
           "language": "css",
-          "code": "*, *::before, *::after {\n  box-sizing: border-box;\n}\n\n.note {\n  width: 320px;\n  padding: 24px;\n  border: 2px solid #dcd7c9;\n}"
+          "code": "*,\n*::before,\n*::after {\n  box-sizing: border-box;\n}\n\n.note {\n  width: 320px;\n  padding: 24px;\n  border: 2px solid #1e4b3a;\n}",
+          "caption": "320px means 320px"
         },
         {
           "type": "list",
           "items": [
-            "By default `width` measures the content only. Add padding and a border and the box grows past 320px.",
-            "`box-sizing: border-box` makes `width` include padding and border. This is what you almost always want.",
-            "Padding is inside the border and takes the element's background colour. Margin is outside and always transparent.",
-            "Vertical margins between siblings collapse into the larger one. Padding never collapses."
+            "By default `width` measures the content only. Add 24px padding and a 2px border on each side and the box renders 320 + 48 + 4 = 372px wide.",
+            "`box-sizing: border-box` makes `width` include padding and border, so the box stays exactly 320px and the content shrinks to fit. This is what you want in 99% of cases.",
+            "Padding is inside the border and inherits the background colour; margin is outside and always transparent.",
+            "Vertical margins between siblings **collapse**: a 24px bottom margin and a 32px top margin become 32px, not 56px. Padding does not collapse."
           ]
         },
         {
-          "type": "callout",
-          "tone": "note",
-          "title": "Why the universal reset",
-          "body": "`box-sizing: border-box` on `*, *::before, *::after` is the one reset worth memorising. It makes every width mean the same thing everywhere."
+          "type": "heading",
+          "body": "Margin collapse, the classic surprise"
         },
         {
           "type": "text",
-          "body": "When a layout overflows, check the box model before blaming flexbox. Nine times out of ten, a width plus padding is the culprit."
+          "body": "Collapsing is why the gap between two paragraphs is not the sum of their margins, and why a child's top margin can escape its parent and push the whole container down. Three things stop it: padding or a border on the parent, `overflow` other than `visible`, or a flex/grid parent. If a margin seems to be applied to the wrong element, suspect collapse first."
+        },
+        {
+          "type": "heading",
+          "body": "Width, max-width and overflow"
+        },
+        {
+          "type": "text",
+          "body": "`width` is a demand; `max-width` is a limit. A card with `width: 480px` will overflow a 360px phone and cause a sideways scrollbar. The same card with `max-width: 480px; width: 100%` fits everywhere and still stops growing on a desktop. Prefer `max-width` plus `min-width: 0` on flex children, which is the other common source of stubborn overflow."
+        },
+        {
+          "type": "callout",
+          "tone": "tip",
+          "title": "Why the universal reset",
+          "body": "`box-sizing: border-box` on `*, *::before, *::after` is the one reset worth memorising. It makes every width in your stylesheet mean the same thing, and it costs two lines."
+        },
+        {
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "A box has `width: 200px; padding: 20px; border: 5px`. How wide is it with and without `border-box`?",
+            "Two paragraphs have `margin-bottom: 40px` and `margin-top: 16px`. What is the gap?",
+            "Why does `max-width` survive a narrow screen when `width` does not?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Content, padding, border, margin — in that order.",
+            "`border-box` everywhere, set once on `*`.",
+            "Margins collapse vertically; padding never does.",
+            "Prefer `max-width` to `width` for anything responsive."
+          ]
+        }
+      ],
+      "drills": [
+        {
+          "kind": "short",
+          "prompt": "Which property adds space inside an element, between content and border?",
+          "answers": [
+            "padding"
+          ],
+          "explain": "`padding` is inside the border; `margin` is outside it. That distinction is what makes box maths predictable.",
+          "hints": [
+            "Margin is outside.",
+            "Seven letters."
+          ]
+        },
+        {
+          "kind": "choice",
+          "prompt": "With `box-sizing: border-box`, what does `width: 200px` include?",
+          "options": [
+            "Only the content",
+            "Content and padding",
+            "Content, padding and border",
+            "Everything including margin"
+          ],
+          "answer": 2,
+          "explain": "`border-box` folds padding and border into the declared width, so 200px is the size you actually see. Margin stays outside.",
+          "hints": [
+            "Margin is never inside the box.",
+            "The border is inside the declared width."
+          ]
+        },
+        {
+          "kind": "predict",
+          "prompt": "A box is 100px wide with 10px padding and `box-sizing: content-box`. How wide is it on screen?",
+          "code": ".box {\n  width: 100px;\n  padding: 10px;\n  box-sizing: content-box;\n}",
+          "answers": [
+            "120px",
+            "120"
+          ],
+          "explain": "With `content-box` the padding is added on top: 100 + 10 + 10 = 120px. That is exactly the surprise `border-box` removes.",
+          "hints": [
+            "Padding applies on both sides.",
+            "Add, do not subtract."
+          ]
         }
       ],
       "exercise": {
@@ -235,14 +444,18 @@
           "answer": 2,
           "explain": "Backgrounds paint under the content and the padding, but not the margin."
         }
-      ]
+      ],
+      "build": {
+        "title": "A box that measures what it says",
+        "blurb": "A 320px box with padding and a border that stays exactly 320px wide."
+      }
     },
     {
       "id": "css-03",
       "level": "beginner",
       "title": "Colour, type and rhythm",
       "summary": "The handful of properties that decide whether text feels designed.",
-      "minutes": 10,
+      "minutes": 14,
       "xp": 50,
       "objectives": [
         "Set a readable measure for body text",
@@ -251,32 +464,117 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "Most of your interface is text"
+        },
+        {
           "type": "text",
-          "body": "Most interfaces are text. Four decisions do most of the work: the typeface, the size scale, the line-height, and how wide a line of text is allowed to run."
+          "body": "Four decisions do most of the work of making a page feel designed: the typeface, the size scale, the line-height, and the measure — how wide a line of text gets. Get those right and the page reads as calm even before you add colour. Get them wrong and no amount of gradient will save it."
+        },
+        {
+          "type": "heading",
+          "body": "A body style worth reusing"
         },
         {
           "type": "code",
           "language": "css",
-          "code": "body {\n  font-family: Inter, system-ui, sans-serif;\n  font-size: 16px;\n  line-height: 1.6;\n  color: #14150f;\n}\n\n.lead {\n  font-size: 18px;\n  color: #4a4a44;\n  max-width: 62ch;\n}\n\n.eyebrow {\n  font-size: 12px;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n  color: #7c7a71;\n}"
+          "code": "body {\n  font-family: Inter, system-ui, sans-serif;\n  font-size: 16px;\n  line-height: 1.6;\n  color: #24251f;\n}\n\n.lead {\n  font-size: 18px;\n  color: #4a4a44;\n  max-width: 62ch;\n}\n\n.eyebrow {\n  font-size: 11px;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n  color: #6c6a60;\n}",
+          "caption": "Body, lead and label — three levels from one scale"
         },
         {
           "type": "list",
           "items": [
-            "A line of body text reads best between 45 and 75 characters. `max-width: 62ch` enforces it without media queries.",
-            "Line-height between 1.4 and 1.7 for paragraphs. Headings can be tighter: 1.1 to 1.2.",
-            "Use weight and colour for secondary hierarchy. Two typefaces is plenty; one is often better.",
-            "`ch` is the width of a zero. It scales with the font size, unlike `px`."
+            "A line of body text reads best between 45 and 75 characters. `max-width: 62ch` is a reliable target; `ch` is the width of a zero, so it scales with the font size instead of being frozen in pixels.",
+            "Line-height 1.4–1.7 for paragraphs; tighter (1.05–1.25) for large headings, where the extra space looks like a mistake.",
+            "Build hierarchy with size **and** weight **and** colour, not just size. A 15px semibold label and a 15px regular body can coexist if the weight and colour differ.",
+            "Two typefaces is plenty: one for display, one for text. A third is usually a decision you will regret at load time."
           ]
         },
         {
-          "type": "callout",
-          "tone": "tip",
-          "title": "Contrast is not optional",
-          "body": "Body text should hit at least 4.5:1 against its background. Muted grey on cream is a classic failure: `#7c7a71` on `#f5f2ea` is about 4.6:1, which passes — barely."
+          "type": "heading",
+          "body": "Why the small label needs letter-spacing"
         },
         {
           "type": "text",
-          "body": "Space is part of typography. Give a heading more room above than below, and it will group with the text it introduces."
+          "body": "Uppercase text loses the ascenders and descenders that help the eye separate letters, so it needs help. A tiny amount of tracking — `letter-spacing: 0.08em` — plus a smaller size and a muted colour turns “MY ACCOUNT” from shouty into a quiet label. Below about 12px, uppercase text becomes hard work for everyone."
+        },
+        {
+          "type": "callout",
+          "tone": "warn",
+          "title": "Contrast is not optional",
+          "body": "Body text should hit at least 4.5:1 against its background. Muted grey on cream is a classic failure: `#7c7a71` on `#f5f2ea` is about 3.4:1 — pretty, and unreadable for a lot of people in daylight."
+        },
+        {
+          "type": "heading",
+          "body": "Space is part of the type"
+        },
+        {
+          "type": "text",
+          "body": "Proximity tells the eye what belongs together. Give a heading more space above it than below, and it groups with the paragraph it introduces. Give two unrelated blocks the same gap and the page reads as a list of equal things, which is rarely what you mean."
+        },
+        {
+          "type": "text",
+          "body": "Pick a spacing scale — 4, 8, 12, 16, 24, 32, 48 — and use only those values. Random spacing is the difference between a layout that feels deliberate and one that feels almost right."
+        },
+        {
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Why is `max-width: 62ch` better than `max-width: 700px` for body text?",
+            "When should line-height go down rather than up?",
+            "Name two ways to make a label feel secondary without shrinking it."
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Typeface, scale, line-height, measure — fix those four first.",
+            "45–75 characters per line, `ch` units.",
+            "Hierarchy comes from weight and colour as much as size.",
+            "Use a spacing scale; avoid one-off values."
+          ]
+        }
+      ],
+      "drills": [
+        {
+          "kind": "fill",
+          "prompt": "Set body text to a comfortable line height.",
+          "code": "body {\n  font-size: 1rem;\n  line-height: {{0}};\n}",
+          "blanks": [
+            [
+              "1.6",
+              "1.5",
+              "1.7"
+            ]
+          ],
+          "explain": "A unitless line-height multiplies the font size, so it scales with every element. 1.5 to 1.7 is the readable range for body copy.",
+          "hints": [
+            "Unitless scales.",
+            "Somewhere between 1.5 and 1.7."
+          ]
+        },
+        {
+          "kind": "choice",
+          "prompt": "Why prefer `rem` over `px` for type sizes?",
+          "options": [
+            "It renders faster",
+            "It respects the user's root font-size setting",
+            "It is shorter to type",
+            "It works in more browsers"
+          ],
+          "answer": 1,
+          "explain": "`rem` is relative to the root font size, so a user who raised their default gets larger text everywhere. `px` ignores that preference.",
+          "hints": [
+            "Think about accessibility settings.",
+            "The r in rem means root."
+          ]
         }
       ],
       "exercise": {
@@ -352,14 +650,18 @@
           "answer": 2,
           "explain": "Around 1.5–1.7 gives comfortable line spacing for prose. Tight values are for headings."
         }
-      ]
+      ],
+      "build": {
+        "title": "An article with typographic rhythm",
+        "blurb": "A 62-character measure, a tracked uppercase label and a headline weight that carries hierarchy."
+      }
     },
     {
       "id": "css-04",
       "level": "intermediate",
       "title": "Flexbox, properly",
       "summary": "One axis, total control. The layout tool you will reach for every day.",
-      "minutes": 11,
+      "minutes": 15,
       "xp": 65,
       "objectives": [
         "Understand main axis vs cross axis",
@@ -368,32 +670,137 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "One axis, total control"
+        },
+        {
           "type": "text",
-          "body": "Flexbox lays out children along **one axis**. Set `display: flex` on the parent and the children become items that you can distribute, align and reorder."
+          "body": "Flexbox lays out children along a single axis. Set `display: flex` on the parent, and the children become items you can distribute, align and reorder. The mental model that unlocks it: there is a **main axis** (the direction items flow) and a **cross axis** (perpendicular to it). Every property acts on exactly one of them."
+        },
+        {
+          "type": "text",
+          "body": "By default the main axis is horizontal, so `justify-content` spaces items left-to-right and `align-items` moves them up and down. Add `flex-direction: column` and the two swap roles — the single most common source of confusion."
+        },
+        {
+          "type": "heading",
+          "body": "A toolbar, in five lines"
         },
         {
           "type": "code",
           "language": "css",
-          "code": ".bar {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 24px;\n}"
+          "code": ".bar {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 24px;\n}",
+          "caption": "Align on the cross axis, distribute on the main axis"
         },
         {
           "type": "list",
           "items": [
-            "`justify-content` distributes along the main axis: `flex-start`, `center`, `space-between`, `space-around`.",
-            "`align-items` positions on the cross axis: `stretch` by default, `center` for vertical centering.",
-            "`gap` is the modern spacing tool. It only applies between items and never adds outer margin.",
-            "`flex: 1` lets an item grow to fill leftover space. `flex: 0 0 auto` keeps its natural size."
+            "`justify-content` distributes along the main axis: `flex-start`, `center`, `flex-end`, `space-between`, `space-around`, `space-evenly`.",
+            "`align-items` positions on the cross axis. `stretch` is the default, which is why children mysteriously become full height.",
+            "`gap` only applies *between* items — no trailing margin on the last one, no negative-margin hacks.",
+            "`flex: 1` lets an item grow into leftover space; `flex: 0 0 auto` keeps it at its natural size. `flex: 1` on a child is how you make a search field fill the middle of a header."
           ]
+        },
+        {
+          "type": "heading",
+          "body": "Growing and shrinking"
+        },
+        {
+          "type": "text",
+          "body": "`flex` is shorthand for three values: grow, shrink, basis. `flex: 1` means “start from 0, take an equal share of the free space”. `flex: 1 1 auto` means “start at your natural size, then share the leftovers”. The difference shows up when items have different content lengths — and it is why one item sometimes eats the whole row."
+        },
+        {
+          "type": "text",
+          "body": "Items also refuse to shrink below their content by default. A long word or an unbreakable URL will push a flex row wider than its container. The fix is `min-width: 0` on the item that is overflowing, not a smaller font."
         },
         {
           "type": "callout",
           "tone": "note",
-          "title": "flex-wrap is a different layout",
-          "body": "Once items wrap, `justify-content` distributes each line and `align-content` distributes the lines. If you find yourself fighting it, grid is probably the better tool."
+          "title": "flex-wrap changes the rules",
+          "body": "Once items wrap, `justify-content` distributes each line and `align-content` distributes the lines themselves. If a wrapped row looks like two unrelated rows, that is the property you are missing."
+        },
+        {
+          "type": "heading",
+          "body": "When not to use flexbox"
         },
         {
           "type": "text",
-          "body": "Centering one thing? `display: grid; place-items: center` is even shorter than flexbox. For a row of controls, flexbox is still the clearest choice."
+          "body": "For centring a single thing, `display: grid; place-items: center` is shorter and more reliable. For a row of controls, a toolbar or a media object (avatar plus text), flexbox is still the right tool. And if you are fighting flexbox to control both rows and columns, the layout wants grid."
+        },
+        {
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "With `flex-direction: column`, which property moves items horizontally?",
+            "Why does a long unbroken URL break a flex row, and what fixes it?",
+            "What is the difference between `flex: 1` and `flex: 1 1 auto`?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Main axis from `flex-direction`, cross axis perpendicular.",
+            "`justify-content` main, `align-items` cross.",
+            "Space with `gap`, never margins.",
+            "`min-width: 0` rescues overflowing flex children."
+          ]
+        }
+      ],
+      "drills": [
+        {
+          "kind": "choice",
+          "prompt": "Which property aligns items along the main axis of a flex container?",
+          "options": [
+            "`align-items`",
+            "`justify-content`",
+            "`place-content`",
+            "`gap`"
+          ],
+          "answer": 1,
+          "explain": "`justify-content` works on the main axis; `align-items` works on the cross axis. In a row, main is horizontal.",
+          "hints": [
+            "Main axis, not cross axis.",
+            "It is the one with 'content'."
+          ]
+        },
+        {
+          "kind": "order",
+          "prompt": "Order a toolbar that pushes its last button to the right.",
+          "lines": [
+            ".toolbar {",
+            "  display: flex;",
+            "  align-items: center;",
+            "  gap: 12px;",
+            "}",
+            ".toolbar .spacer {",
+            "  margin-left: auto;",
+            "}"
+          ],
+          "explain": "`margin-left: auto` on a flex child eats the free space on that side, which pushes everything after it to the far end.",
+          "hints": [
+            "The container comes first.",
+            "Auto margins absorb free space."
+          ]
+        },
+        {
+          "kind": "short",
+          "prompt": "Which property sets spacing between flex items without margins?",
+          "answers": [
+            "gap",
+            "gap:",
+            "row-gap"
+          ],
+          "explain": "`gap` is applied by the container and never adds space on the outer edges, which is why it replaced margin hacks.",
+          "hints": [
+            "Three letters.",
+            "It replaced a long-standing hack."
+          ]
         }
       ],
       "exercise": {
@@ -469,14 +876,18 @@
           "answer": 1,
           "explain": "gap spaces the gaps, not the outer edges — no :last-child hacks required."
         }
-      ]
+      ],
+      "build": {
+        "title": "A toolbar that spaces itself",
+        "blurb": "A flex row with real gaps, centred items and the links pushed to the far edge."
+      }
     },
     {
       "id": "css-05",
       "level": "intermediate",
       "title": "Grid and responsive design",
       "summary": "Two-dimensional layout, then make it survive a 320px screen.",
-      "minutes": 13,
+      "minutes": 16,
       "xp": 70,
       "objectives": [
         "Create a responsive card grid with auto-fit",
@@ -485,33 +896,125 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "Two dimensions at once"
+        },
+        {
           "type": "text",
-          "body": "Grid works in two dimensions at once. The most useful pattern in day-to-day work is a card grid that reflows by itself, with no media queries at all."
+          "body": "Flexbox distributes along one axis. Grid defines rows **and** columns and places items into the resulting cells. That makes grid the right tool for page layouts and card collections, and flexbox the right tool for rows of controls."
+        },
+        {
+          "type": "text",
+          "body": "The most useful grid pattern in day-to-day work is a card grid that reflows by itself, with no media query at all: `repeat(auto-fit, minmax(240px, 1fr))`. Learn that line and you will use it for the rest of your career."
+        },
+        {
+          "type": "heading",
+          "body": "A grid that fits itself"
         },
         {
           "type": "code",
           "language": "css",
           "code": ".grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));\n  gap: 16px;\n}",
-          "caption": "A grid that decides its own column count"
+          "caption": "As many 240px columns as fit, sharing the leftover space"
         },
         {
           "type": "list",
           "items": [
-            "`repeat(auto-fit, …)` creates as many columns as fit and collapses empty ones. `auto-fill` keeps the empty ones.",
-            "`minmax(240px, 1fr)` means “never narrower than 240px, share the rest equally”.",
-            "`1fr` is a share of the free space, not a fixed size.",
-            "Media queries are for structural changes. If a grid can reflow by itself, let it."
+            "`repeat(auto-fit, …)` creates as many columns as fit and collapses the empty ones. `auto-fill` keeps the empty tracks instead, which leaves gaps at the end of a short row.",
+            "`minmax(240px, 1fr)` means “never narrower than 240px, but grow to share the free space”.",
+            "`1fr` is a share of the free space, not a fixed size — three `1fr` columns are equal only because they get the same share.",
+            "`gap` works for rows and columns, so you rarely need margins between grid items."
           ]
+        },
+        {
+          "type": "heading",
+          "body": "When a media query is actually needed"
+        },
+        {
+          "type": "text",
+          "body": "A grid that reflows covers most of it. Reach for a media query when the *structure* changes, not just the count: a sidebar that moves below the content, a table that becomes a list of cards, a nav that becomes a drawer. Write the small-screen layout as the base, then add complexity upward with `@media (min-width: 720px)`. That is mobile-first, and it produces less override code than the reverse."
+        },
+        {
+          "type": "code",
+          "language": "css",
+          "code": ".page {\n  display: grid;\n  gap: 24px;\n}\n\n@media (min-width: 960px) {\n  .page {\n    grid-template-columns: 220px minmax(0, 1fr);\n  }\n}",
+          "caption": "One column by default, sidebar above 960px"
+        },
+        {
+          "type": "heading",
+          "body": "The 320px test"
+        },
+        {
+          "type": "text",
+          "body": "Open the device toolbar, set the width to 320px and scroll. If the page moves sideways, something has a fixed width wider than the viewport — a `width`, a long word, a wide table, an image without `max-width: 100%`. Finding that element takes a minute; shipping without checking costs you every phone user."
         },
         {
           "type": "callout",
           "tone": "tip",
-          "title": "Mobile first",
-          "body": "Write the small-screen layout as the base, then add complexity with `@media (min-width: 720px)`. It produces less override code than the reverse."
+          "title": "minmax(0, 1fr) in sidebars",
+          "body": "`1fr` is shorthand for `minmax(auto, 1fr)`, and that `auto` minimum refuses to shrink below its content. Long code blocks or URLs then blow out the layout. Writing `minmax(0, 1fr)` is the fix you will need sooner or later."
         },
         {
-          "type": "text",
-          "body": "Test at 320px wide with the browser's device toolbar. If the page scrolls sideways, something has a fixed width wider than the viewport — often an image or a `min-width`."
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "`auto-fit` versus `auto-fill` — what differs visually?",
+            "Why can a `1fr` column still overflow?",
+            "What should be in the base styles versus inside a media query?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Grid for two dimensions, flexbox for one.",
+            "`repeat(auto-fit, minmax(240px, 1fr))` is the card-grid line.",
+            "Mobile-first: base styles for small, media queries add structure.",
+            "Test at 320px before you ship."
+          ]
+        }
+      ],
+      "drills": [
+        {
+          "kind": "fill",
+          "prompt": "Make three equal columns that collapse to one on narrow screens.",
+          "code": ".grid {\n  display: grid;\n  grid-template-columns: repeat({{0}}, minmax(0, 1fr));\n  gap: 24px;\n}\n\n@media (max-width: 700px) {\n  .grid { grid-template-columns: {{1}}; }\n}",
+          "blanks": [
+            [
+              "3",
+              "3,"
+            ],
+            [
+              "1fr"
+            ]
+          ],
+          "explain": "`repeat(3, minmax(0, 1fr))` gives three equal tracks that can shrink below their content. On small screens one track stacks them.",
+          "hints": [
+            "How many columns?",
+            "One column is 1fr."
+          ]
+        },
+        {
+          "kind": "choice",
+          "prompt": "What does `1fr` mean in a grid template?",
+          "options": [
+            "One fixed fraction of 100px",
+            "One share of the leftover space",
+            "One row",
+            "One flexible pixel"
+          ],
+          "answer": 1,
+          "explain": "`fr` is a fraction of the free space after fixed tracks and gaps are taken out. Two `1fr` tracks are equal whatever the viewport.",
+          "hints": [
+            "It is a share, not a size.",
+            "Free space gets divided."
+          ]
         }
       ],
       "exercise": {
@@ -581,14 +1084,18 @@
           "answer": 1,
           "explain": "auto-fit collapses empty tracks so the remaining items stretch; auto-fill keeps them reserved."
         }
-      ]
+      ],
+      "build": {
+        "title": "A responsive card grid",
+        "blurb": "Columns that reflow from three to one without a single breakpoint guess."
+      }
     },
     {
       "id": "css-06",
       "level": "advanced",
       "title": "Custom properties and theming",
       "summary": "Design tokens, one override, and a theme switch with no JavaScript.",
-      "minutes": 12,
+      "minutes": 15,
       "xp": 75,
       "objectives": [
         "Declare tokens on :root",
@@ -597,33 +1104,117 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "Variables that live in the cascade"
+        },
+        {
           "type": "text",
-          "body": "Custom properties are variables that live in the cascade. They inherit like any other property, which means a theme is just a different set of values on an ancestor."
+          "body": "A custom property is a value you name once and read everywhere. Unlike a preprocessor variable, it is resolved by the browser at runtime and it **inherits** like any other property. That inheritance is the whole trick: a theme is just a different set of values on a parent element."
+        },
+        {
+          "type": "heading",
+          "body": "Tokens on :root, themes on a scope"
         },
         {
           "type": "code",
           "language": "css",
-          "code": ":root {\n  --surface: #ffffff;\n  --ink: #14150f;\n}\n\n[data-theme=\"dark\"] {\n  --surface: #16181c;\n  --ink: #f2efe6;\n}\n\n.panel {\n  background: var(--surface);\n  color: var(--ink);\n}",
-          "caption": "One component, two themes, zero duplicated rules"
+          "code": ":root {\n  --surface: #ffffff;\n  --ink: #14150f;\n  --line: #e3e0d6;\n}\n\n[data-theme=\"dark\"] {\n  --surface: #16181c;\n  --ink: #f2efe6;\n  --line: #2a2d35;\n}\n\n.panel {\n  background: var(--surface);\n  color: var(--ink);\n  border: 1px solid var(--line);\n}",
+          "caption": "Components read tokens; themes only change values"
         },
         {
           "type": "list",
           "items": [
-            "Tokens belong on `:root` so every element can read them.",
-            "A `[data-theme=\"dark\"]` scope overrides only the values. `.panel` never changes.",
-            "Custom properties inherit, so a theme can be applied to a section, not just the page.",
-            "Provide a fallback: `var(--surface, #ffffff)` keeps the component usable if a token is missing."
+            "Declare tokens on `:root` so every element can inherit them.",
+            "A `[data-theme=\"dark\"]` scope overrides only the values. `.panel` never needs to know a theme exists.",
+            "Because custom properties inherit, a theme can be applied to one section of the page, not just the whole document.",
+            "`var(--surface, #ffffff)` supplies a fallback so a component still renders if the token is missing."
           ]
         },
         {
-          "type": "callout",
-          "tone": "note",
-          "title": "Name by role, not by value",
-          "body": "`--surface` and `--ink` survive a redesign. `--grey-100` does not: the day you make the theme warm, the name lies."
+          "type": "heading",
+          "body": "Name by role, not by value"
         },
         {
           "type": "text",
-          "body": "This is also how you support dark mode without duplicating every rule. Set `data-theme` on `<html>`, let the tokens do the work, and the whole interface follows."
+          "body": "`--surface` and `--ink` survive a redesign; `--grey-100` does not. The day you make the palette warm, the name lies and every future reader has to check the value. Name tokens after the job they do — surface, ink, muted, accent, line — and the stylesheet becomes readable."
+        },
+        {
+          "type": "heading",
+          "body": "Theming without duplicating rules"
+        },
+        {
+          "type": "text",
+          "body": "The payoff is that dark mode stops being a second stylesheet. Set `data-theme=\"dark\"` on `<html>` from a small script (or from a user preference), let the tokens change, and every component follows. Add `color-scheme: light dark` so form controls and scrollbars match."
+        },
+        {
+          "type": "code",
+          "language": "css",
+          "code": "html {\n  color-scheme: light dark;\n}\n\n@media (prefers-color-scheme: dark) {\n  :root:not([data-theme=\"light\"]) {\n    --surface: #16181c;\n    --ink: #f2efe6;\n  }\n}",
+          "caption": "Respect the system setting, allow an explicit override"
+        },
+        {
+          "type": "callout",
+          "tone": "warn",
+          "title": "Do not animate every token",
+          "body": "Transitioning custom properties that feed layout can trigger expensive repaints. Animate the concrete property (`background-color`, `color`) or a transform instead."
+        },
+        {
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Why does a theme on a `<section>` work without any extra CSS?",
+            "What breaks if you name a token `--grey-100`?",
+            "When is a fallback value worth writing?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Custom properties are runtime values that inherit.",
+            "Tokens on `:root`, theme overrides on a scope.",
+            "Name by role: surface, ink, muted, accent, line.",
+            "`color-scheme` keeps native controls consistent."
+          ]
+        }
+      ],
+      "drills": [
+        {
+          "kind": "fill",
+          "prompt": "Read a custom property with a fallback.",
+          "code": ":root {\n  --brand: #1c5c46;\n}\n\n.button {\n  background: var({{0}}, #234);\n}",
+          "blanks": [
+            [
+              "--brand"
+            ]
+          ],
+          "explain": "The name includes the two dashes. The second argument to `var()` is the fallback used when the property is undefined.",
+          "hints": [
+            "Custom property names start with two dashes.",
+            "It matches the name in `:root`."
+          ]
+        },
+        {
+          "kind": "choice",
+          "prompt": "Where must a custom property be declared so it can be overridden per section?",
+          "options": [
+            "Only in `:root`",
+            "On any selector — the cascade decides the winner",
+            "In a media query only",
+            "In JavaScript only"
+          ],
+          "answer": 1,
+          "explain": "Custom properties are inherited, so declaring them on a section overrides the `:root` value for everything inside it. That is the whole point of theming.",
+          "hints": [
+            "They cascade like any other property.",
+            "`:root` is just the most common place."
+          ]
         }
       ],
       "exercise": {
@@ -695,14 +1286,18 @@
           "answer": 1,
           "explain": "Names that describe the role keep meaning when the palette changes."
         }
-      ]
+      ],
+      "build": {
+        "title": "A themeable panel",
+        "blurb": "One panel that changes surface and ink when the theme attribute changes."
+      }
     },
     {
       "id": "css-07",
       "level": "advanced",
       "title": "Motion and polish",
       "summary": "Transitions that feel physical, and the accessibility guard everyone forgets.",
-      "minutes": 11,
+      "minutes": 15,
       "xp": 75,
       "objectives": [
         "Animate only transform and opacity for performance",
@@ -711,32 +1306,122 @@
       ],
       "sections": [
         {
+          "type": "heading",
+          "body": "Motion is feedback, not decoration"
+        },
+        {
           "type": "text",
-          "body": "Motion is feedback. A hover lift tells you the card is interactive; a 900ms fade tells you the designer had time on their hands. Keep it short and make it physical."
+          "body": "A hover lift tells you a card is interactive. A 900ms fade tells you the designer had time on their hands. Good motion answers a question the user already has — did that work, where did it come from, what changed — and then gets out of the way."
+        },
+        {
+          "type": "heading",
+          "body": "Two properties worth animating"
         },
         {
           "type": "code",
           "language": "css",
-          "code": ".card {\n  transition: transform 180ms ease, box-shadow 180ms ease;\n}\n\n.card:hover {\n  transform: translateY(-2px);\n  box-shadow: 0 8px 24px rgb(20 21 15 / 0.08);\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .card {\n    transition: none;\n  }\n}"
+          "code": ".card {\n  transition: transform 180ms ease, box-shadow 180ms ease;\n}\n\n.card:hover {\n  transform: translateY(-2px);\n  box-shadow: 0 8px 24px rgba(20, 21, 15, 0.12);\n}",
+          "caption": "180ms, transform only, no layout work"
         },
         {
           "type": "list",
           "items": [
-            "Animate `transform` and `opacity`. Animating `width`, `top` or `margin` forces layout on every frame.",
-            "150–250ms for hover and press feedback. 300ms+ only for entering a new screen.",
-            "`ease` or a gentle `cubic-bezier` feels natural. Linear feels mechanical.",
-            "Always wrap non-essential motion in `@media (prefers-reduced-motion: reduce)`."
+            "Animate `transform` and `opacity`. They are composited on the GPU and do not force the browser to recalculate layout. Animating `width`, `top` or `margin` reflows the page on every frame.",
+            "150–250ms for hover and press feedback. 300ms and up only for entering a new surface, like a dialog.",
+            "`ease` or a gentle `cubic-bezier` feels natural; `linear` feels mechanical for UI.",
+            "Animate the state change, not the arrival of the element, unless you are deliberately telling a story."
           ]
         },
         {
-          "type": "callout",
-          "tone": "warn",
-          "title": "Reduced motion is a health setting",
-          "body": "For some people, large movement triggers nausea or migraines. Honour the setting: keep the state change, drop the travel."
+          "type": "heading",
+          "body": "Keyframes are for loops and entrances"
         },
         {
           "type": "text",
-          "body": "Focus states deserve the same care as hover. Use `:focus-visible` so keyboard users see the ring, and never remove an outline without replacing it."
+          "body": "`transition` interpolates between two states that both exist. `@keyframes` describes a sequence, which is what you want for a loading pulse, a one-off entrance, or an attention nudge. Keep loops slow and low-contrast — a pulsing element in the corner of the eye is a distraction, not a delight."
+        },
+        {
+          "type": "code",
+          "language": "css",
+          "code": "@keyframes pulse {\n  0%, 100% { opacity: 1; }\n  50% { opacity: 0.55; }\n}\n\n.status-dot {\n  animation: pulse 2s ease-in-out infinite;\n}",
+          "caption": "A slow, quiet loop"
+        },
+        {
+          "type": "heading",
+          "body": "The guard everyone forgets"
+        },
+        {
+          "type": "text",
+          "body": "Some people set “reduce motion” in their operating system because movement makes them nauseous or triggers migraines. Honour it: keep the state change, drop the travel. One media query covers the whole site."
+        },
+        {
+          "type": "code",
+          "language": "css",
+          "code": "@media (prefers-reduced-motion: reduce) {\n  *,\n  *::before,\n  *::after {\n    animation-duration: 0.001ms !important;\n    animation-iteration-count: 1 !important;\n    transition-duration: 0.001ms !important;\n    scroll-behavior: auto !important;\n  }\n}",
+          "caption": "The reduced-motion guard, written once"
+        },
+        {
+          "type": "callout",
+          "tone": "note",
+          "title": "Focus deserves the same care as hover",
+          "body": "Use `:focus-visible` so keyboard users see a ring, and never remove an outline without replacing it. A page that only responds to a mouse is half a page."
+        },
+        {
+          "type": "heading",
+          "body": "Check yourself"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Why is `transform` cheaper than `top`?",
+            "What duration feels right for a hover state, and why?",
+            "What should happen to a 400ms slide when reduced motion is on?"
+          ]
+        },
+        {
+          "type": "heading",
+          "body": "What to remember"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Animate `transform` and `opacity` only.",
+            "150–250ms for feedback; longer only for entering surfaces.",
+            "Keyframes for sequences and loops, transitions for state.",
+            "Always ship the `prefers-reduced-motion` guard."
+          ]
+        }
+      ],
+      "drills": [
+        {
+          "kind": "choice",
+          "prompt": "Which query should wrap a large entrance animation?",
+          "options": [
+            "`@media (max-width: 700px)`",
+            "`@media (prefers-reduced-motion: reduce)`",
+            "`@supports (animation: fade)`",
+            "`@media (prefers-color-scheme: dark)`"
+          ],
+          "answer": 1,
+          "explain": "`prefers-reduced-motion` is the user telling you motion makes them ill. Respect it by replacing movement with an instant change.",
+          "hints": [
+            "Some users get motion sickness.",
+            "It is a preference, not a screen size."
+          ]
+        },
+        {
+          "kind": "short",
+          "prompt": "Which property should you animate instead of `width` to stay on the compositor?",
+          "answers": [
+            "transform",
+            "opacity",
+            "scale"
+          ],
+          "explain": "`transform` and `opacity` are cheap: the compositor handles them without recalculating layout. Animating `width` forces layout every frame.",
+          "hints": [
+            "It moves or scales the box.",
+            "It does not change layout."
+          ]
         }
       ],
       "exercise": {
@@ -802,7 +1487,11 @@
           "answer": 1,
           "explain": "Feedback still matters. Replace travel with a colour or opacity change."
         }
-      ]
+      ],
+      "build": {
+        "title": "A card that moves well",
+        "blurb": "A 180ms hover lift, a quiet pulse and a reduced-motion guard."
+      }
     }
   ]
 }

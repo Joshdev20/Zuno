@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Icon } from '../ui/Icon';
 import { Logo } from '../ui/Logo';
+import { scaleIn, viewportOnce } from '../../lib/motion';
+import { Accordion } from '../ui/Accordion';
 
 const faqs = [
   {
@@ -9,7 +12,7 @@ const faqs = [
   },
   {
     q: 'Is the curriculum really free?',
-    a: 'Yes. All 21 lessons, the playground and the checks are free with no account. Pro exists for people who want saved projects, challenge sets and feedback.',
+    a: 'Yes. All lessons, the playground and the checks are free with no account. Pro exists for people who want saved projects, challenge sets and feedback.',
   },
   {
     q: 'How long does it take?',
@@ -33,7 +36,13 @@ export function FaqSection() {
   return (
     <section className="section">
       <div className="container faq-grid">
-        <div className="faq-intro">
+        <motion.div
+          className="faq-intro"
+          initial={{ opacity: 0, x: -16 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        >
           <p className="eyebrow">Questions</p>
           <h2 className="section-title">
             The things people <em>ask</em> first.
@@ -46,18 +55,10 @@ export function FaqSection() {
             Try lesson one
             <Icon name="arrowRight" size={15} />
           </Link>
-        </div>
+        </motion.div>
         <div className="faq-list">
-          {faqs.map((faq) => (
-            <details key={faq.q} className="faq-item">
-              <summary>
-                <span>{faq.q}</span>
-                <span className="faq-toggle" aria-hidden="true">
-                  <Icon name="chevronDown" size={16} />
-                </span>
-              </summary>
-              <p>{faq.a}</p>
-            </details>
+          {faqs.map((faq, index) => (
+            <Accordion key={faq.q} q={faq.q} a={faq.a} index={index} />
           ))}
         </div>
       </div>
@@ -66,10 +67,18 @@ export function FaqSection() {
 }
 
 export function ClosingCta() {
+  const reduceMotion = useReducedMotion();
+
   return (
     <section className="section">
       <div className="container">
-        <div className="closing">
+        <motion.div
+          className="closing"
+          variants={scaleIn}
+          initial={reduceMotion ? false : 'hidden'}
+          whileInView="shown"
+          viewport={viewportOnce}
+        >
           <div className="closing-copy">
             <p className="eyebrow eyebrow--light">Ready when you are</p>
             <h2>
@@ -90,7 +99,7 @@ export function ClosingCta() {
               Or open the playground
             </Link>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

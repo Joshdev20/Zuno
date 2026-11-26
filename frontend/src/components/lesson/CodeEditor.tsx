@@ -3,15 +3,20 @@ import CodeMirror from '@uiw/react-codemirror';
 import { html as htmlLang } from '@codemirror/lang-html';
 import { css as cssLang } from '@codemirror/lang-css';
 import { javascript as jsLang } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
+import { python as pythonLang } from '@codemirror/lang-python';
+import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
+import { Prec } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
+import { tags } from '@lezer/highlight';
 import type { ExerciseKind } from '../../lib/types';
 
 const editorTheme = EditorView.theme(
   {
     '&': {
       backgroundColor: 'transparent',
-      fontSize: '13px',
+      color: '#dfe4f2',
+      fontSize: '14px',
+      fontWeight: '500',
       height: '100%',
     },
     '.cm-scroller': {
@@ -21,24 +26,45 @@ const editorTheme = EditorView.theme(
     },
     '.cm-content': {
       padding: '10px 0',
-      caretColor: '#d8b877',
+      caretColor: '#a78bff',
     },
     '.cm-gutters': {
       backgroundColor: 'transparent',
       border: 'none',
-      color: '#5b625d',
+      color: '#4a5474',
       paddingLeft: '6px',
     },
     '.cm-activeLine': { backgroundColor: 'rgba(255, 255, 255, 0.035)' },
-    '.cm-activeLineGutter': { backgroundColor: 'transparent', color: '#a5aea6' },
+    '.cm-activeLineGutter': { backgroundColor: 'transparent', color: '#8f99b8' },
     '&.cm-focused': { outline: 'none' },
     '.cm-selectionBackground, &.cm-focused .cm-selectionBackground, ::selection': {
-      backgroundColor: '#2b4a3c !important',
+      backgroundColor: 'rgba(123, 92, 255, 0.3) !important',
     },
-    '.cm-cursor, .cm-dropCursor': { borderLeftColor: '#d8b877' },
+    '.cm-cursor, .cm-dropCursor': { borderLeftColor: '#a78bff' },
   },
   { dark: true },
 );
+
+const highlight = HighlightStyle.define([
+  { tag: [tags.comment, tags.lineComment, tags.blockComment], color: '#8b96b8', fontStyle: 'italic' },
+  { tag: [tags.tagName, tags.typeName, tags.className, tags.namespace], color: '#8b7bff' },
+  { tag: tags.angleBracket, color: '#7b86a6' },
+  { tag: [tags.attributeName, tags.propertyName], color: '#5fd4c4' },
+  { tag: [tags.string, tags.special(tags.string), tags.attributeValue, tags.regexp], color: '#e6bd80' },
+  { tag: [tags.number, tags.integer, tags.float, tags.bool, tags.null, tags.atom], color: '#eb9dc4' },
+  {
+    tag: [tags.keyword, tags.controlKeyword, tags.moduleKeyword, tags.operatorKeyword, tags.definitionKeyword],
+    color: '#b092ff',
+  },
+  { tag: [tags.function(tags.variableName), tags.function(tags.propertyName)], color: '#7fb8ff' },
+  { tag: [tags.definition(tags.variableName), tags.variableName], color: '#dfe4f2' },
+  { tag: [tags.operator, tags.punctuation], color: '#94a0c0' },
+  { tag: [tags.brace, tags.squareBracket, tags.paren], color: '#7d88a8' },
+  { tag: [tags.meta, tags.documentMeta], color: '#7d88a8' },
+  { tag: [tags.heading, tags.strong], color: '#eef1fb', fontWeight: '600' },
+  { tag: tags.emphasis, fontStyle: 'italic' },
+  { tag: tags.invalid, color: '#ff8f8a' },
+]);
 
 export function CodeEditor({
   value,
@@ -55,8 +81,8 @@ export function CodeEditor({
 }) {
   const extensions = useMemo(() => {
     const language =
-      kind === 'html' ? htmlLang() : kind === 'css' ? cssLang() : jsLang();
-    return [language, editorTheme, EditorView.lineWrapping];
+      kind === 'html' ? htmlLang() : kind === 'css' ? cssLang() : kind === 'python' ? pythonLang() : jsLang();
+    return [language, editorTheme, Prec.highest(syntaxHighlighting(highlight)), EditorView.lineWrapping];
   }, [kind]);
 
   return (
@@ -66,7 +92,7 @@ export function CodeEditor({
       readOnly={readOnly}
       height="100%"
       minHeight={minHeight}
-      theme={oneDark}
+      theme="none"
       extensions={extensions}
       basicSetup={{
         lineNumbers: true,
@@ -78,6 +104,7 @@ export function CodeEditor({
         closeBrackets: true,
         highlightSelectionMatches: false,
         searchKeymap: true,
+        syntaxHighlighting: false,
       }}
     />
   );

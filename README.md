@@ -3,8 +3,12 @@
 Learn the web by building it. Zuno is an interactive coding platform: short lessons, real
 code, and checks that run in the browser in milliseconds.
 
-Three tracks today — HTML, CSS and JavaScript — 21 lessons, 21 coding exercises, 42
-knowledge checks and 12 badges, all playable without an account.
+Four tracks — HTML, CSS, JavaScript and Python — 27 lessons, 82 drills, 27 coding
+exercises, 54 knowledge checks and 13 badges, all playable without an account.
+
+Python is real: the exercises run in a CPython 3.12 interpreter (Pyodide, WebAssembly) on
+a worker thread, so `print()`, lists and functions behave exactly as they do on the
+command line. The other tracks run in a sandboxed iframe.
 
 A lesson plays as a sequence of small steps rather than a page you scroll: explain, see an
 example, write code and pass the checks, answer the knowledge checks, collect XP.
@@ -16,7 +20,7 @@ example, write code and pass the checks, answer the knowledge checks, collect XP
 | UI | React 19 + TypeScript + Vite |
 | Routing | React Router 7 (client-side, no page reloads) |
 | Editor | CodeMirror 6 (loaded lazily, only on lesson and playground routes) |
-| Code execution | Sandboxed `iframe` with `allow-scripts`, no same-origin access |
+| Code execution | Sandboxed `iframe` for HTML/CSS/JS; Pyodide in a Web Worker for Python |
 | API | FastAPI (optional, curriculum + anonymous progress mirror) |
 | Storage | `localStorage` (no database yet) |
 
@@ -65,11 +69,17 @@ derived from the lesson data, so new content needs no new UI:
 1. **Intro** — level chips, the promise of the lesson, the objectives.
 2. **Sections** — one idea per step. A paragraph stays with the code sample it introduces;
    a new paragraph starts a new step.
-3. **Practice** — the brief, the progressive hints and the live editor. Continue unlocks
+3. **Drills** — a short exercise after the explanation, one of six shapes: multiple
+   choice, fill the blank, predict the output, order the lines, find the wrong line, or
+   type a short answer. Wrong answers explain themselves.
+4. **Practice** — the brief, the progressive hints and the live editor. Continue unlocks
    only after every check passes.
-4. **Knowledge checks** — one question per step, immediate right/wrong feedback, the
+5. **Knowledge checks** — one question per step, immediate right/wrong feedback, the
    explanation on the correct answer, a retry on the wrong one.
-5. **Complete** — XP banked, checks passed, questions answered, next lesson.
+6. **Complete** — XP banked, checks passed, questions answered, next lesson.
+
+Lessons unlock in order inside a track: the next one opens when the previous one is
+completed, so advanced material never lands before the basics it assumes.
 
 The step index is saved in the progress record, so closing the tab mid-lesson and coming
 back resumes on the same step.
@@ -83,10 +93,18 @@ Each lesson's exercise declares its own checks:
 | `js` | Expression evaluates truthy inside the sandbox |
 | `source` | Submitted code contains required text |
 | `console` | The learner's code logged the expected value |
+| `python` | Expression evaluates truthy in the Python namespace after the code runs |
 
 Checks run inside the preview iframe (`src/lib/runner.ts`) and report back over
 `postMessage`, so the learner's code never touches the host page. Results arrive in
 milliseconds, which is what keeps the loop feeling instant.
+
+Python checks run through `src/lib/python.ts`, which talks to `public/pyodide-worker.js`.
+The learner's code executes in a fresh namespace per run, stdout and the source are
+exposed to checks as `__zuno_out` and `__zuno_src`, and the worker is terminated if a run
+exceeds eight seconds — an endless loop costs one click, not a frozen tab. The interpreter
+and its standard library are copied from `node_modules/pyodide` into `public/pyodide/` by
+`npm run build` (they are not committed), so nothing is fetched from a third-party CDN.
 
 ## Adding lessons
 

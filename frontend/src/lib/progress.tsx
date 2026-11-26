@@ -10,7 +10,7 @@ import {
 } from 'react';
 import { apiEnabled, saveProgress } from './api';
 import { tracks } from './curriculum';
-import type { Lesson } from './types';
+import type { Lesson, Track } from './types';
 
 const STORAGE_KEY = 'zuno.progress.v1';
 
@@ -141,6 +141,12 @@ export function trackStats(state: ProgressState) {
       complete: done === track.lessons.length,
     };
   });
+}
+
+export function isLessonUnlocked(state: ProgressState, track: Track, lesson: Lesson): boolean {
+  const index = track.lessons.findIndex((entry) => entry.id === lesson.id);
+  if (index <= 0) return true;
+  return Boolean(state.completed[track.lessons[index - 1].id]);
 }
 
 export function nextLessonFor(state: ProgressState): Lesson | undefined {

@@ -1,3 +1,7 @@
+import { motion, useReducedMotion } from 'framer-motion';
+import { AmbientScene } from './AmbientScene';
+import { EASE_OUT, POP, fadeUp, stagger, viewportOnce } from '../../lib/motion';
+
 const steps = [
   {
     index: '01',
@@ -20,34 +24,68 @@ const steps = [
 ];
 
 export function MethodSection() {
+  const reduceMotion = useReducedMotion();
+
   return (
-    <section className="section section--tint" id="method">
+    <section className="section section--tint method" id="method">
+      <div className="method-scene">
+        <AmbientScene variant="knot" />
+      </div>
       <div className="container">
-        <div className="section-head">
-          <div>
+        <motion.div
+          className="section-head"
+          variants={stagger(0, 0.08)}
+          initial={reduceMotion ? false : 'hidden'}
+          whileInView="shown"
+          viewport={viewportOnce}
+        >
+          <motion.div variants={fadeUp}>
             <p className="eyebrow">The method</p>
             <h2 className="section-title">
               Small loops, <em>tight</em> feedback.
             </h2>
-          </div>
-          <p className="section-note">
+          </motion.div>
+          <motion.p className="section-note" variants={fadeUp}>
             You learn a language by using it, not by watching someone else use it. Zuno is built around one loop,
             repeated until the syntax stops feeling foreign.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
-        <ol className="method-grid">
+        <div className="method-track">
+          <motion.span
+            className="method-rule"
+            aria-hidden="true"
+            initial={reduceMotion ? { scaleX: 1 } : { scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={viewportOnce}
+            transition={{ duration: 1.1, ease: EASE_OUT, delay: 0.15 }}
+          />
+
+        <motion.ol
+          className="method-grid"
+          variants={stagger(0.05, 0.12)}
+          initial={reduceMotion ? false : 'hidden'}
+          whileInView="shown"
+          viewport={viewportOnce}
+        >
           {steps.map((step) => (
-            <li key={step.index} className="method-step">
+            <motion.li
+              key={step.index}
+              className="method-step"
+              variants={fadeUp}
+              whileHover={reduceMotion ? undefined : { y: -4 }}
+              transition={POP}
+            >
               <div className="method-step-top">
                 <span className="method-index">{step.index}</span>
                 <span className="method-tag mono">{step.artefact}</span>
               </div>
               <h3>{step.title}</h3>
               <p>{step.body}</p>
-            </li>
+            </motion.li>
           ))}
-        </ol>
+        </motion.ol>
+        </div>
       </div>
     </section>
   );

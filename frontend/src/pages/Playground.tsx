@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { buildPlayground } from '../lib/runner';
 import { useSandbox } from '../lib/useSandbox';
 import { useProgress } from '../lib/progress';
 import { CodeEditor } from '../components/lesson/CodeEditor';
 import { Icon } from '../components/ui/Icon';
+import { EASE_OUT } from '../lib/motion';
 
 type Pane = 'html' | 'css' | 'js';
 
@@ -95,6 +97,8 @@ export function Playground() {
   const [js, setJs] = useState(templates.blank.js);
   const [showConsole, setShowConsole] = useState(false);
   const { srcDoc, result, timedOut, run } = useSandbox(4000);
+  const reduceMotion = useReducedMotion();
+  const [runCount, setRunCount] = useState(0);
   const { logPlaygroundRun } = useProgress();
   const lastRun = useRef(0);
 
@@ -105,6 +109,7 @@ export function Playground() {
   useEffect(() => {
     const timer = window.setTimeout(() => {
       run((runId) => buildPlayground({ markup: html, css, js, runId }));
+      setRunCount((current) => current + 1);
       const now = Date.now();
       if (now - lastRun.current > 30_000) {
         lastRun.current = now;
@@ -127,8 +132,18 @@ export function Playground() {
   const setValue = pane === 'html' ? setHtml : pane === 'css' ? setCss : setJs;
 
   return (
-    <div className="page page--wide fade-in">
-      <header className="page-head">
+    <motion.div
+      className="page page--wide"
+      initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: EASE_OUT }}
+    >
+      <motion.header
+        className="page-head"
+        initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: EASE_OUT }}
+      >
         <div>
           <p className="eyebrow">Playground</p>
           <h1 className="page-title">Three panes, no brief.</h1>
@@ -150,7 +165,7 @@ export function Playground() {
             ))}
           </div>
         </div>
-      </header>
+      </motion.header>
 
       <div className="playground">
         <div className="pg-editor">
@@ -215,10 +230,16 @@ export function Playground() {
                 <p className="console-empty">No output yet. Try console.log().</p>
               )}
               {result?.logs.map((line, index) => (
-                <p key={index} className="console-line">
+                <motion.p
+                  key={`${runCount}-${index}`}
+                  className="console-line"
+                  initial={reduceMotion ? false : { opacity: 0, x: -6 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.25, ease: EASE_OUT, delay: Math.min(index * 0.04, 0.4) }}
+                >
                   <span className="console-caret">›</span>
                   {line}
-                </p>
+                </motion.p>
               ))}
             </div>
           ) : (
@@ -231,6 +252,6 @@ export function Playground() {
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

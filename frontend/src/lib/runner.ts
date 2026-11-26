@@ -235,6 +235,38 @@ ${tail}
 </html>`;
 }
 
+/**
+ * A read-only rendering of the finished exercise, used for the "what you'll
+ * build" preview on the intro step. No check harness is injected.
+ */
+export function buildPreview(exercise: Exercise): string | null {
+  if (exercise.kind === 'python') return null;
+
+  if (exercise.kind === 'html') {
+    return injectHead(ensureDocument(exercise.solution), '', BASE_CSS);
+  }
+
+  const userCss = exercise.kind === 'css' ? exercise.solution : '';
+  const userJs = exercise.kind === 'js' ? `${exercise.prelude ? `${exercise.prelude}\n\n` : ''}${exercise.solution}` : '';
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Preview</title>
+<style>${BASE_CSS}</style>
+<style>${userCss}</style>
+</head>
+<body>
+${exercise.markup ?? ''}
+<script>
+${userJs}
+<\/script>
+</body>
+</html>`;
+}
+
 export function buildPlayground({
   markup,
   css,

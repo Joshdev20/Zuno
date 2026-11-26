@@ -1,7 +1,11 @@
 export type Level = 'beginner' | 'intermediate' | 'advanced';
-export type TrackId = 'html' | 'css' | 'js';
-export type ExerciseKind = 'html' | 'css' | 'js';
+export type TrackId = 'html' | 'css' | 'js' | 'python';
+export type ExerciseKind = 'html' | 'css' | 'js' | 'python';
 
+export interface SectionHeading {
+  type: 'heading';
+  body: string;
+}
 export interface SectionText {
   type: 'text';
   body: string;
@@ -23,10 +27,10 @@ export interface SectionCallout {
   body: string;
 }
 
-export type Section = SectionText | SectionCode | SectionList | SectionCallout;
+export type Section = SectionHeading | SectionText | SectionCode | SectionList | SectionCallout;
 
 export interface Check {
-  kind: 'dom' | 'js' | 'style' | 'source' | 'console';
+  kind: 'dom' | 'js' | 'style' | 'source' | 'console' | 'python';
   label: string;
   selector?: string;
   property?: string;
@@ -55,6 +59,65 @@ export interface QuizQuestion {
   explain: string;
 }
 
+export type Drill =
+  | {
+      kind: 'choice';
+      prompt: string;
+      options: string[];
+      answer: number;
+      explain: string;
+      hints?: string[];
+      after?: number;
+    }
+  | {
+      kind: 'fill';
+      prompt: string;
+      code: string;
+      blanks: string[][];
+      explain: string;
+      hints?: string[];
+      after?: number;
+    }
+  | {
+      kind: 'order';
+      prompt: string;
+      lines: string[];
+      explain: string;
+      hints?: string[];
+      after?: number;
+    }
+  | {
+      kind: 'find';
+      prompt: string;
+      lines: string[];
+      bad: number;
+      explain: string;
+      hints?: string[];
+      after?: number;
+    }
+  | {
+      kind: 'predict';
+      prompt: string;
+      code: string;
+      answers: string[];
+      explain: string;
+      hints?: string[];
+      after?: number;
+    }
+  | {
+      kind: 'short';
+      prompt: string;
+      answers: string[];
+      explain: string;
+      hints?: string[];
+      after?: number;
+    };
+
+export interface LessonBuild {
+  title: string;
+  blurb: string;
+}
+
 export interface Lesson {
   id: string;
   level: Level;
@@ -64,8 +127,12 @@ export interface Lesson {
   xp: number;
   objectives: string[];
   sections: Section[];
+  drills?: Drill[];
   exercise: Exercise;
   quiz: QuizQuestion[];
+  challenge?: boolean;
+  project?: boolean;
+  build?: LessonBuild;
 }
 
 export interface Track {

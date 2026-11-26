@@ -1,13 +1,29 @@
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
 import { Icon } from '../ui/Icon';
+import { SplitText } from '../ui/SplitText';
+import { trackSpotlight } from '../../lib/useSpotlight';
+import { AmbientScene } from './AmbientScene';
 import { totalLessons, totalMinutes } from '../../lib/curriculum';
 
+
 const hours = Math.round((totalMinutes / 60) * 10) / 10;
+
+const copy = {
+  hidden: {},
+  shown: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
+};
+
+const line = {
+  hidden: { opacity: 0, y: 14 },
+  shown: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const } },
+};
 
 function HeroMock() {
   return (
     <div className="hero-visual" aria-hidden="true">
-      <div className="mock">
+      <div className="mock spotlight" onPointerMove={trackSpotlight}>
         <div className="mock-chrome">
           <span className="mock-dots">
             <i />
@@ -137,21 +153,56 @@ function HeroMock() {
 }
 
 export function Hero() {
+  const reduceMotion = useReducedMotion();
+  const stage = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
+  const visualY = useTransform(scrollYProgress, [0, 1], [0, 90]);
+  const visualFade = useTransform(scrollYProgress, [0, 0.9], [1, 0.35]);
+
+  const tiltX = useMotionValue(0);
+  const tiltY = useMotionValue(0);
+  const springX = useSpring(tiltX, { stiffness: 120, damping: 18 });
+  const springY = useSpring(tiltY, { stiffness: 120, damping: 18 });
+  const rotateY = useTransform(springX, [-0.5, 0.5], [7, -7]);
+  const rotateX = useTransform(springY, [-0.5, 0.5], [-6, 6]);
+
+  const onMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (reduceMotion) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    tiltX.set((event.clientX - rect.left) / rect.width - 0.5);
+    tiltY.set((event.clientY - rect.top) / rect.height - 0.5);
+  };
+
+  const onLeave = () => {
+    tiltX.set(0);
+    tiltY.set(0);
+  };
+
   return (
-    <section className="hero">
+    <section className="hero" ref={heroRef}>
+      <AmbientScene />
+
       <div className="container hero-grid">
-        <div className="hero-copy">
-          <p className="eyebrow">Interactive curriculum · HTML · CSS · JavaScript</p>
+        <motion.div
+          className="hero-copy"
+          variants={copy}
+          initial={reduceMotion ? false : 'hidden'}
+          animate="shown"
+        >
+          <motion.p className="eyebrow" variants={line}>
+            Interactive curriculum · HTML · CSS · JavaScript · Python
+          </motion.p>
           <h1 className="hero-title">
-            Learn the web
+            <SplitText text="Learn the web" delay={0.12} />
             <br />
-            by <em>building</em> it.
+            <SplitText text="by building it." emWords={['building']} delay={0.26} />
           </h1>
-          <p className="hero-lede">
+          <motion.p className="hero-lede" variants={line}>
             {totalLessons} short lessons, written to be read once and used immediately. Write real code in the
             browser, get checked in milliseconds, and keep a streak that makes the habit stick.
-          </p>
-          <div className="hero-actions">
+          </motion.p>
+          <motion.div className="hero-actions" variants={line}>
             <Link to="/learn/html/html-01" className="btn btn--primary btn--lg">
               Start lesson one
               <Icon name="arrowRight" size={16} />
@@ -160,14 +211,27 @@ export function Hero() {
               <Icon name="terminal" size={16} />
               Try the playground
             </Link>
-          </div>
-          <ul className="hero-meta">
+          </motion.div>
+          <motion.ul className="hero-meta" variants={line}>
             <li>No account needed</li>
             <li>{totalLessons} lessons · {hours} hours</li>
             <li>Progress saved locally</li>
-          </ul>
-        </div>
-        <HeroMock />
+          </motion.ul>
+        </motion.div>
+        <motion.div
+          className="hero-stage"
+          ref={stage}
+          onPointerMove={onMove}
+          onPointerLeave={onLeave}
+          style={reduceMotion ? { perspective: 1200 } : { perspective: 1200, y: visualY, opacity: visualFade }}
+          initial={reduceMotion ? false : { opacity: 0, y: 26 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.18 }}
+        >
+          <motion.div style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}>
+            <HeroMock />
+          </motion.div>
+        </motion.div>
       </div>
 
       <div className="strip">
@@ -179,6 +243,7 @@ export function Hero() {
           <span>Flexbox</span>
           <span>Grid</span>
           <span>Async</span>
+          <span>Python</span>
           <span>Accessibility</span>
         </div>
       </div>

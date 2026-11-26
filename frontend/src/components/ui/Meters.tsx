@@ -5,7 +5,7 @@ export function ProgressBar({
   label,
 }: {
   value: number;
-  tone?: 'pine' | 'clay' | 'brass' | 'ink';
+  tone?: 'pine' | 'clay' | 'brass' | 'slate' | 'ink';
   height?: number;
   label?: string;
 }) {

@@ -5,7 +5,7 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
-  icon: 'spark' | 'layers' | 'brush' | 'bolt' | 'flame' | 'trophy' | 'target' | 'grid' | 'clock';
+  icon: 'spark' | 'layers' | 'brush' | 'bolt' | 'flame' | 'trophy' | 'target' | 'grid' | 'clock' | 'terminal';
   test: (state: ProgressState) => boolean;
 }
 
@@ -79,12 +79,22 @@ export const badges: Badge[] = [
     test: (state) => trackDone(state, 'js'),
   },
   {
+    id: 'python-complete',
+    name: 'Interpreter',
+    description: 'Finish every Python lesson.',
+    icon: 'terminal',
+    test: (state) => trackDone(state, 'python'),
+  },
+  {
     id: 'polyglot',
     name: 'Polyglot',
-    description: 'Complete a lesson in all three tracks.',
+    description: 'Complete a lesson in every track.',
     icon: 'grid',
     test: (state) =>
-      trackStarted(state, 'html') > 0 && trackStarted(state, 'css') > 0 && trackStarted(state, 'js') > 0,
+      trackStarted(state, 'html') > 0 &&
+      trackStarted(state, 'css') > 0 &&
+      trackStarted(state, 'js') > 0 &&
+      trackStarted(state, 'python') > 0,
   },
   {
     id: 'quiz-ace',
